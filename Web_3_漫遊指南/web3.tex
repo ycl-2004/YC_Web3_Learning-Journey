@@ -1,0 +1,112 @@
+\documentclass[11pt,a4paper]{article}
+
+\input{style.tex}
+
+% ---------------- Document ----------------
+\begin{document}
+
+% ========== 建议：把这一段放在 main.tex 对应章节位置 ==========
+\section{Web 3.0 与元宇宙：概念区分、机制与基础设施}
+
+\begin{KeyBox}
+\textbf{本节阅读导图：}
+\begin{itemize}
+  \item 先分清三个概念：\textbf{区块链（底层技术）}、\textbf{Web 3.0（关系与确权）}、\textbf{元宇宙（宏大数字世界系统）}
+  \item 再看演进逻辑：Web 2.0 的矛盾 $\rightarrow$ 区块链带来的确权与协作 $\rightarrow$ Web 3.0 的组织与激励（DAO/通证）
+  \item 最后解释互补：\textbf{元宇宙偏前端体验}，\textbf{Web 3.0 偏后端制度与基础设施}
+\end{itemize}
+\end{KeyBox}
+
+\subsection{一、三个概念：是什么？怎么区分？}
+
+\subsubsection{1) 定义（What it is）}
+\begin{DefBox}
+\textbf{区块链（Blockchain）是什么：}
+一种为了解决\textbf{中心化服务器}带来的信任与控制问题而出现的底层技术（文中提到 2008 年正式诞生）。通过\textbf{分布式账本/数据库}与\textbf{加密协议}实现点对点记录与验证。
+
+\medskip
+\textbf{Web 3.0 是什么：}
+以\textbf{“用户能拥有互联网”}为核心的互联网演进方向：用户不只是使用者，还能通过\textbf{通证（token）/智能合约}对数字资产与价值分配拥有更强控制；组织形态上以\textbf{DAO}作为“企业替代物/社区所有”的载体。
+
+\medskip
+\textbf{元宇宙（Metaverse）是什么：}
+一个更宏大的\textbf{社会经济系统级}数字世界设想。大众常把它理解为体验升级（VR/AR、数字人等），但文中强调它不只是“大型游戏”，还需要能支撑“宇宙”的\textbf{真实性}与基础设施。
+\end{DefBox}
+
+\subsubsection{2) 用途与主线矛盾（Why it matters）}
+\begin{KeyBox}
+\textbf{用途/解决什么问题（文中主线）：}
+\begin{itemize}
+  \item \textbf{Web 2.0 的矛盾：}平台巨头掌握大量用户数据与规则解释权；用户资产不受控，可能遭遇“杀熟”、封号等（用户被当作“流量”，平台沿用 AARRR 与 S-R 模式）。
+  \item \textbf{区块链为 Web 2.0 提供“升级方向”：}用去中心化与确权机制，让用户能在平台中\textbf{拥有资产/分享价值}，从而把 Web 2.0 推向 Web 3.0。
+  \item \textbf{Web 3.0 对组织与激励的改变：}从“管理层做、用户用”，走向\textbf{社区所有、成员共同受益}的 DAO。
+  \item \textbf{元宇宙与 Web 3.0 的互补：}元宇宙更偏\textbf{前端体验}，Web 3.0 更偏\textbf{后端制度与基础设施}；开放、互操作的元宇宙需要 Web 3.0 的底座。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{二、Web 2.0 $\rightarrow$ Web 3.0：机制与激励怎么变？}
+
+\subsubsection{1) 机制对比（How it works）}
+\begin{HowBox}
+\textbf{Web 2.0（文中描述的典型机制）：}
+\begin{itemize}
+  \item 平台围绕 AARRR：获客 $\rightarrow$ 激活 $\rightarrow$ 留存 $\rightarrow$ 推荐 $\rightarrow$ 变现；
+  \item 用户被当作“资产/流量”，数据与规则由平台集中控制与变现；
+  \item 终局叙事偏 IPO/并购退出：收益与用户关联弱，用户难以分享增长红利。
+\end{itemize}
+
+\medskip
+\textbf{Web 3.0（文中描述的典型机制）：}
+\begin{itemize}
+  \item \textbf{通证 + 智能合约：}持有通证使用服务；通证也是\textbf{收益分配凭证}，使“使用者”进入“所有者社群”。
+  \item \textbf{DAO（社区所有）：}所有者是社区成员；成员共享利益，用户与产品利益绑定更强。
+  \item \textbf{IEO vs. IPO：}IEO 门槛更低、无需中心化审核；通证在上所前也可能已公开、去中心化并可链上交易，从而获得更大流动性。
+  \item \textbf{用户为何能成为所有者：}使用产品完成\textbf{测试}与\textbf{推广}两项工作；推广成本本是 Web 2.0 的大头之一，因此收益分配给使用者具备经济直觉。
+\end{itemize}
+\end{HowBox}
+
+\subsubsection{2) 风险与现实约束（Risks \& Limits）}
+\begin{WarnBox}
+\textbf{风险/注意（文中明确或隐含的点）：}
+\begin{itemize}
+  \item \textbf{风险与收益并存：}若产品失败，通证/社群财富可能随之清零。
+  \item \textbf{竞争更激烈：}利益绑定带来黏性与稳固，也可能导致更急迫的“跑马圈地”。
+  \item \textbf{元宇宙落地难：}要成为“宇宙”，需要极复杂的基础设施与生态系统，短时间难以实现；目前更接近的是 Web 3.0。
+  \item \textbf{推进不确定：}在巨头生态中重分配利益，Web 3.0 推动是否顺利仍待观察。
+\end{itemize}
+\end{WarnBox}
+
+\subsection{三、元宇宙 $\leftrightarrow$ Web 3.0：为何说相辅相成？}
+
+\subsubsection{1) 前端 vs. 后端：角色分工（Front-end vs. Back-end）}
+\begin{HowBox}
+\textbf{文中的分工框架：}
+\begin{itemize}
+  \item \textbf{元宇宙：}偏前端/表现层/应用层（交互体验、VR/AR、AI、IoT 等）。
+  \item \textbf{Web 3.0：}偏中后端/技术层与制度层（去中心化数据库、加密技术、协议、确权与协作机制）。
+\end{itemize}
+\end{HowBox}
+
+\subsubsection{2) 开放互操作所需模块（Infrastructure modules）}
+\begin{HowBox}
+\textbf{为了“开放且互操作”的元宇宙，文中点名的 Web 3.0 模块：}
+\begin{itemize}
+  \item \textbf{去中心化身份：}跨世界保持“核心身份”一致；资产与身份绑定并强调唯一性。
+  \item \textbf{去中心化存储：}支撑开放性与抗停机；例：\textbf{Filecoin / IPFS}。
+  \item \textbf{NFT：}现实物品与元宇宙物品的一一对应。
+  \item \textbf{DAO：}作为社区“操作系统”，提供全球性、去中心化协作层，减少第三方依赖。
+\end{itemize}
+\end{HowBox}
+
+\subsubsection{3) 元宇宙真实性：物理 vs. 社会（Authenticity）}
+\begin{KeyBox}
+\textbf{元宇宙的“真实性”问题（文中强调的深层点）：}
+\begin{itemize}
+  \item \textbf{物理真实性：}更多由 VR/AR 等技术去逼近与模拟。
+  \item \textbf{社会关系真实性：}Web 3.0 通过确权与规则透明（智能合约/通证）提升秩序稳定性，减少“中心化服务器当上帝”的不确定性。
+  \item \textbf{稀缺性机制：}Web 2.0 游戏由服务器决定产出与分配；Web 3.0 通过智能合约限制通证生成条件与上限，形成更稳定的稀缺性与规则边界。
+\end{itemize}
+\end{KeyBox}
+% ========== 到这里结束 ==========
+
+\end{document}

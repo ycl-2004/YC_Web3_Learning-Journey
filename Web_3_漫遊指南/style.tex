@@ -1,0 +1,141 @@
+% =========================
+% style.tex  (ALL STYLES)
+% =========================
+
+% ---------- Page & Fonts ----------
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+
+% CJK font fallbacks (Overleaf 常見可用 Noto)
+\IfFontExistsTF{Noto Serif CJK TC}{
+  \setCJKmainfont{Noto Serif CJK TC}
+}{
+  \IfFontExistsTF{Noto Sans CJK TC}{
+    \setCJKmainfont{Noto Sans CJK TC}
+  }{
+    \setCJKmainfont{SimSun}
+  }
+}
+\setmainfont{TeX Gyre Termes}
+
+% ---------- Packages ----------
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+% ---------- Color Palette ----------
+\definecolor{ink}{HTML}{1F2937}
+\definecolor{muted}{HTML}{6B7280}
+\definecolor{brand}{HTML}{2563EB}
+\definecolor{brand2}{HTML}{0EA5E9}
+\definecolor{soft}{HTML}{EFF6FF}
+\definecolor{warn}{HTML}{F59E0B}
+\definecolor{good}{HTML}{10B981}
+\definecolor{rose}{HTML}{F43F5E}
+\definecolor{paper}{HTML}{FFFFFF}
+
+% ---------- Hyperref ----------
+\hypersetup{
+  colorlinks=true,
+  linkcolor=brand,
+  urlcolor=brand2,
+  citecolor=brand
+}
+
+% ---------- Global typography ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% Clean lists inside boxes
+\setlist[itemize]{itemsep=4pt, topsep=4pt, leftmargin=1.4em}
+\setlist[enumerate]{itemsep=4pt, topsep=4pt, leftmargin=1.6em}
+
+% ---------- Header ----------
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{muted}{Web3 / DApps 筆記}}
+\rhead{\textcolor{muted}{\thepage}}
+\renewcommand{\headrulewidth}{0pt}
+
+% ---------- Section style ----------
+\titleformat{\section}{\Large\bfseries\color{ink}}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\large\bfseries\color{ink}}{\thesubsection}{0.8em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{ink}}{\thesubsubsection}{0.8em}{}
+\titlespacing*{\section}{0pt}{1.0em}{0.4em}
+\titlespacing*{\subsection}{0pt}{0.8em}{0.3em}
+\titlespacing*{\subsubsection}{0pt}{0.5em}{0.2em}
+
+% ---------- tcolorbox base ----------
+\tcbset{
+  enhanced,
+  breakable,
+  colback=paper,
+  colframe=brand!18,
+  boxrule=0.5pt,
+  arc=10pt,
+  left=10pt,right=10pt,top=10pt,bottom=10pt,
+  before skip=10pt, after skip=10pt
+}
+
+% ---------- Box components ----------
+\newtcolorbox{KeyBox}[1]{
+  colback=paper,
+  colframe=brand!18,
+  borderline west={4pt}{0pt}{brand},
+  title=\textbf{#1},
+  coltitle=ink,
+  fonttitle=\bfseries,
+  colbacktitle=paper,
+  boxed title style={boxrule=0pt, colframe=paper}
+}
+
+\newtcolorbox{DefBox}[1]{
+  colback=paper,
+  colframe=brand2!18,
+  borderline west={4pt}{0pt}{brand2},
+  title=\textbf{#1},
+  coltitle=ink,
+  fonttitle=\bfseries,
+  colbacktitle=paper,
+  boxed title style={boxrule=0pt, colframe=paper}
+}
+
+\newtcolorbox{HowBox}[1]{
+  colback=paper,
+  colframe=good!18,
+  borderline west={4pt}{0pt}{good},
+  title=\textbf{#1},
+  coltitle=ink,
+  fonttitle=\bfseries,
+  colbacktitle=paper,
+  boxed title style={boxrule=0pt, colframe=paper}
+}
+
+\newtcolorbox{WarnBox}[1]{
+  colback=paper,
+  colframe=warn!22,
+  borderline west={4pt}{0pt}{warn},
+  title=\textbf{#1},
+  coltitle=ink,
+  fonttitle=\bfseries,
+  colbacktitle=paper,
+  boxed title style={boxrule=0pt, colframe=paper}
+}
+
+% ---------- Tag pill ----------
+\newcommand{\tagpill}[1]{%
+  \tikz[baseline=(X.base)]\node[
+    fill=soft, draw=brand!25, rounded corners=6pt,
+    inner xsep=7pt, inner ysep=2.5pt
+  ](X){\small\textcolor{brand}{\textbf{#1}}};%
+}

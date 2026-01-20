@@ -1,0 +1,643 @@
+% !TEX program = xelatex
+\documentclass[11pt,a4paper]{article}
+
+\input{style.tex}
+\renewcommand{\arraystretch}{1.18}
+
+% =========================
+% DAO Notes (NEW FILE)
+% =========================
+\begin{document}
+
+% ---------- Title ----------
+\begin{center}
+  {\LARGE \textbf{DAO（去中心化自治組織）重點筆記}}\\[6pt]
+  {\large \textcolor{muted}{只保留：是什麼｜用途｜用在哪｜怎麼 work｜例子}}\\[10pt]
+  \tagpill{DAO}\quad \tagpill{Governance}\quad \tagpill{Smart Contract}\quad \tagpill{Voting}\quad \tagpill{Token}\quad
+  \tagpill{Org Design}
+\end{center}
+
+\begin{KeyBox}{快速總結（考前 30 秒）}
+\begin{itemize}
+  \item \textbf{一句話}：DAO 是 Web3 的「社會關係／組織作業系統」；用\textbf{智能合約 + 社群協作}共同管理資產、達成共同目標。
+  \item \textbf{本質}：把公司裡的「規則、資金、決策」盡可能\textbf{寫進合約}，再用\textbf{投票/委託/聲譽}等機制協調人。
+  \item \textbf{為何需要}：跨國跨時區、匿名也能協作；規則更透明、資金流向可追溯；參與者也可能是所有者。
+  \item \textbf{現實版本}：很多事情仍無法 100\% 合約自動化，會演化成 \textbf{DO（去中心化組織）}：關鍵決策仍需人工協作 + 投票。
+\end{itemize}
+\end{KeyBox}
+
+\tableofcontents
+
+% =========================================================
+\section{DAO 是什麼？（定位與比喻）}
+
+\begin{DefBox}{一句話定義}
+\textbf{DAO（Decentralized Autonomous Organization）}是一種由\textbf{成員集體所有與共同治理}的組織方式：成員共同管理加密資產，為了\textbf{共同目標}運作；其規則與資金管理多由\textbf{智能合約}界定與執行。
+\end{DefBox}
+
+\begin{KeyBox}{用在哪（你要能回答「在哪裡出現」）}
+\begin{itemize}
+  \item \textbf{Web3 社群/專案治理}：資金庫（Treasury）怎麼花、資助哪些專案、誰可以做決策。
+  \item \textbf{公共資助/公益捐助}：用投票決定資金分配（例：捐助型 DAO）。
+  \item \textbf{產品/協議發展}：協議升級、參數調整、開發者補助、社群提案流程。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{直覺比喻：DApps vs DAO}
+如果說 \textbf{DApps} 是 Web3 世界「看得見的應用/磚瓦」，那 \textbf{DAO} 更像是 Web3 的「\textbf{社會作業系統}」：定義人怎麼協作、怎麼決策、錢怎麼分配。
+\end{HowBox}
+
+\begin{DefBox}{DAO vs DO（考點：為什麼會變成 DO）}
+\begin{itemize}
+  \item \textbf{DAO（理想型）}：規則與執行盡量由合約自動完成。
+  \item \textbf{DO（現實型）}：有些目標/工作無法完全自動化，需要\textbf{人工協作與介入}（但仍保持去中心化決策）。
+\end{itemize}
+\end{DefBox}
+
+% =========================================================
+\section{DAO 的「至少要有」的組成（框架）}
+
+\begin{KeyBox}{DAO 最少包含哪些部分（記成 5 個模組）}
+\begin{enumerate}
+  \item \textbf{目標與章程（Mission/Charter）}：讓所有成員對「要達成什麼」有共同理解。
+  \item \textbf{參與方式與激勵（Participation \& Incentives）}：用勞動/資金/資源換取報酬與權益（最難設計）。
+  \item \textbf{爭議處理（Dispute/Consensus）}：靠溝通 + 投票機制把分歧收斂成共識。
+  \item \textbf{協作流程（Workflow/Tools）}：日常討論、文件、任務協作工具（常見：Discord）。
+  \item \textbf{發展路徑（Growth Path）}：組織如何從小到大、從創始團隊引導到社群自治。
+\end{enumerate}
+\end{KeyBox}
+
+\begin{HowBox}{兩種發展路徑（很常考：Exit to DAO vs DAO First）}
+\begin{itemize}
+  \item \textbf{Exit to DAO（歸於 DAO）}：早期先用較中心化方式啟動，之後逐步把權力下放到社群（現實中更常見）。
+  \item \textbf{DAO First（始於 DAO）}：從一開始就確定通證分配、資本構成與治理規則，以去中心化方式直接運作。
+\end{itemize}
+\end{HowBox}
+
+% =========================================================
+\section{公司 vs DAO：差在哪？（超高頻對照）}
+
+\subsection{一句話抓差異}
+\begin{DefBox}{三個根本差異（Rule / Value / Identity）}
+\begin{itemize}
+  \item \textbf{規則（Rule）}：公司靠法律合同與內部制度；DAO 主要靠\textbf{鏈上合約/程式規則}約束。
+  \item \textbf{利益分配（Value）}：公司分配權偏中心化；DAO 參與者往往同時是\textbf{通證持有人}，理論上更利害一致。
+  \item \textbf{身份邊界（Identity）}：公司多為固定雇傭與層級；DAO 允許更自由的\textbf{進出與跨 DAO 協作}。
+\end{itemize}
+\end{DefBox}
+
+\subsection{DAO vs 傳統企業（表格整理）}
+
+\begin{KeyBox}{對照表（背這張就夠）}
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}lX X@{}}
+\toprule
+ & \textbf{DAO} & \textbf{傳統企業} \\
+\midrule
+權力結構 &
+通常更偏「\textbf{平等/分散}」，依治理設計可委託代表 &
+通常\textbf{等級分明}（股東/董事會/管理層/員工） \\
+\addlinespace[3pt]
+規則更改 &
+多數需要\textbf{提案 + 成員投票}通過 &
+可由\textbf{少數人決策}或依公司章程流程（看組織結構） \\
+\addlinespace[3pt]
+投票與執行 &
+可用合約\textbf{自動計票 + 上鏈執行}，不必信任中介 &
+就算投票也多為\textbf{內部計票 + 人工執行} \\
+\addlinespace[3pt]
+服務/資金分配 &
+可用去中心化方式\textbf{自動提供服務/分配資金}（例：資助/基金） &
+常需\textbf{人工處理或集中控制}，更容易被操縱 \\
+\addlinespace[3pt]
+透明度 &
+活動與資金流向通常\textbf{更公開可驗證} &
+活動多為\textbf{內部私密}，不一定對外公開 \\
+\bottomrule
+\end{tabularx}
+\end{KeyBox}
+
+\begin{WarnBox}{提醒：DAO 不是「一定更好」}
+\begin{itemize}
+  \item 分散治理會引入\textbf{協調成本}（大家都投票＝很慢）。
+  \item 透明可驗證也代表\textbf{可追蹤性}更強；隱私通常需要額外機制。
+\end{itemize}
+\end{WarnBox}
+
+% =========================================================
+\section{DAO 怎麼 work？（組織架構 + 專案制）}
+
+\subsection{組織架構（核心團隊 + 公會 + 專案組）}
+
+\begin{HowBox}{典型架構（你要能講出「為什麼不是天天投票」）}
+\begin{itemize}
+  \item 多數 DAO 會有\textbf{核心創始團隊/決策委員會}處理日常事務，避免無休止投票。
+  \item 重大方向/資金分配仍傾向由\textbf{成員投票}決定（核心團隊不是完全壟斷）。
+  \item 依需求設立\textbf{公會（Guild）}：像人才池，聚集特定技能的人（開發/內容/社群/財務等）。
+  \item DAO 可同時跑多個\textbf{專案（Project）}：專案成員可從不同公會橫向組隊，形成\textbf{縱橫結構}。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{Holacracy（對應概念）}
+DAO 常被描述為 Web3 原生的 \textbf{Holacracy（整體式組織）}：每個人既是獨立個體，也是一個更大整體的一部分；不是嚴格上下級層級。
+\end{KeyBox}
+
+\subsection{專案制運作（從提案到分配）}
+
+\begin{HowBox}{專案流程（Proposal \texorpdfstring{$\rightarrow$}{->} Vote \texorpdfstring{$\rightarrow$}{->} Funding \texorpdfstring{$\rightarrow$}{->} Tasks \texorpdfstring{$\rightarrow$}{->} Rewards）}
+\begin{enumerate}
+  \item \textbf{發起專案}：任何成員提出能促進目標的計畫，在社群宣導爭取支持。
+  \item \textbf{投票決策}：社群投票決定是否提供資金（Treasury）。
+  \item \textbf{招募組隊}：若通過，從各公會招募成員組成專案組。
+  \item \textbf{任務拆解}：專案拆成任務（短期賞金／長期協作任務）。
+  \item \textbf{回報分配}：依貢獻度/積分/規則分配賞金、分紅或通證激勵。
+\end{enumerate}
+\end{HowBox}
+
+\begin{DefBox}{貢獻值 / 聲譽 / 勳章（Web3 履歷感）}
+\begin{itemize}
+  \item 完成任務可獲\textbf{貢獻值}（不同 DAO 叫聲譽/經驗值等）：多為\textbf{不可流通}，但會影響未來收益與權限（白名單、PASS、POAP 等）。
+  \item 勳章/徽章：通常\textbf{無財務價值、不可轉讓}，但有社交與能力證明價值，可成為你的 Web3 履歷。
+\end{itemize}
+\end{DefBox}
+
+\begin{KeyBox}{兩類任務（要會分）}
+\begin{itemize}
+  \item \textbf{賞金任務（Bounty）}：週期短、交付明確；完成拿賞金 + 一些貢獻值。
+  \item \textbf{專案任務（Project Work）}：協作度高、門檻較高；回報周期長，常以\textbf{分紅/長期收益}呈現。
+\end{itemize}
+\end{KeyBox}
+
+% =========================================================
+\section{治理機制：DAO 常見的 7 種投票（只背核心直覺）}
+
+\subsection{1) 流動民主（Liquid Democracy / Vote Delegation）}
+\begin{DefBox}{是什麼}
+成員可以把投票權\textbf{委託給專家}，也能\textbf{隨時撤回}自己投；委託可多級轉委託。
+\end{DefBox}
+
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item 解決「所有人都投每一案」的注意力問題：讓專家代投，但保留退出權。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{2) 二次方投票（Quadratic Voting）}
+\begin{DefBox}{是什麼}
+允許同一選項投多票，但\textbf{邊際成本遞增}：投 $k$ 票成本 $\propto k^2$（直覺：越偏好越貴）。
+\end{DefBox}
+
+\begin{HowBox}{例子（背直覺）}
+想強烈支持某提案可以多投，但會變得非常貴；常用於\textbf{公共資源分配}（典型：捐助/資助型 DAO）。
+\end{HowBox}
+
+\begin{WarnBox}{限制}
+需要嚴格的\textbf{身份防女巫（Sybil）}機制，否則可用多身份繞過成本。
+\end{WarnBox}
+
+\subsection{3) 全息共識（Holographic Consensus）}
+\begin{DefBox}{是什麼（解決注意力稀缺）}
+用「押注/預測」幫忙篩選提案：押注者用注意力通證對提案成功概率下注，讓小群體能\textbf{代表性地聚焦重要提案}。
+\end{DefBox}
+
+\begin{HowBox}{流程（4 步）}
+\begin{enumerate}
+  \item \textbf{發起提案}
+  \item \textbf{提案增強}：持有人對看好提案押注，沒押注到門檻的提案被忽略
+  \item \textbf{投票決策}：有投票權者表決；押對得獎勵，押錯受損失
+  \item \textbf{上鏈執行}：通過提案生效並執行
+\end{enumerate}
+\end{HowBox}
+
+\begin{WarnBox}{常見質疑（背兩句就好）}
+\begin{itemize}
+  \item 會不會只篩出「有話題/傳播」的提案，而非最重要的提案？
+  \item 押注者關心「會不會過」而不是「該不該過」，是否可能扭曲結果？
+\end{itemize}
+\end{WarnBox}
+
+\subsection{4) 信念投票（Conviction Voting）}
+\begin{DefBox}{是什麼}
+投票效用不只看票數，還看\textbf{時間累積}：支持越久影響越大；撤回支持影響會逐步衰減。
+\end{DefBox}
+
+\begin{KeyBox}{用在哪}
+\begin{itemize}
+  \item 特別適合\textbf{預算決策}：不要求大家在同一時點做最終決定，降低投票門檻。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{5) 怒退機制（Rage Quitting）}
+\begin{DefBox}{是什麼（保護少數者）}
+如果對治理結果不滿，成員可\textbf{退出並取回對應份額資金}；常在投票通過後設\textbf{緩衝期（Grace Period）}供退出。
+\end{DefBox}
+
+\begin{HowBox}{為什麼重要}
+防止大戶用投票侵吞小戶利益：你不滿意，就能帶走你那份。
+\end{HowBox}
+
+\subsection{6) 知識提取投票（KEV: Knowledge-extractable Voting）}
+\begin{DefBox}{是什麼}
+引入不可交易的\textbf{知識通證}，讓懂該議題的專家在該類提案中\textbf{權重更高}；投對（與最終結果一致）獎勵知識通證，投錯扣減。
+\end{DefBox}
+
+\begin{WarnBox}{常見問題}
+\begin{itemize}
+  \item 「專家是否正確」仍依賴最終投票結果來回饋，可能出現與全息共識類似的質疑。
+\end{itemize}
+\end{WarnBox}
+
+\subsection{7) 聲譽投票（Reputation-based Voting）}
+\begin{DefBox}{是什麼（治理權與財務價值解耦）}
+把治理權從可交易通證分離出來，改用不可轉讓的\textbf{聲譽/積分}投票；聲譽可因貢獻獲得，也可被扣減或隨時間衰減。
+\end{DefBox}
+
+\begin{KeyBox}{解決什麼問題}
+\begin{itemize}
+  \item 降低「借幣/租票」發動治理攻擊的可行性（通證金融化帶來的治理風險）。
+  \item 讓 DAO 能依自身理解定義「民主」與權重（自訂聲譽規則）。
+\end{itemize}
+\end{KeyBox}
+
+% =========================
+% Paste below your previous content
+% Topic: DID -> SBT + DAO cases
+% =========================
+
+\section{从 DID 到 SBT：Web 3.0 的身份证（Identity）}
+
+\begin{DefBox}{一句话定义：DID 是什么？}
+\textbf{去中心化识别码（Decentralized Identifier, DID）}可以理解为 Web3 的「身份证」：它是\textbf{全局唯一、持久、且不依赖中心化登记机构}的标识符，通常通过加密算法生成或登记。
+\end{DefBox}
+
+\begin{KeyBox}{为什么 Web3 需要「身份证」？（核心直觉）}
+\begin{itemize}
+  \item 现实世界里，你的一张身份证背后连接着\textbf{大量社会关系与记录}（教育、工作、医保、出行等），它让你能被识别、被准入、被服务。
+  \item Web3 里也是一样：\textbf{你的身份本质是你在链上留下的行为与社会关系的总和}，DID 就是把这些痕迹组织成「可验证身份」的入口。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{DID 怎么 work（链上可验证）}
+\begin{itemize}
+  \item DID \textbf{基于区块链}：链上数据\textbf{公开透明、可查验、难以篡改}。
+  \item 当你在 Web3 亮出 DID：别人\textbf{不必依赖权威机构}，就能验证它的真伪与准入资格（靠链上可验证性）。
+\end{itemize}
+\end{HowBox}
+
+\subsection{POAP：用 NFT 做「出席证明」}
+
+\begin{DefBox}{是什麼}
+\textbf{出席证明协议（Proof of Attendance Protocol, POAP）}是在以太坊上专门用于发放「出席徽章」NFT 的协议。组织者可向 DAO 成员或活动参与者发放徽章。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{用途}：证明「你参加过某活动/属于某社群/完成某经历」。
+  \item \textbf{用在哪}：DAO 活动、线下会议、黑客松、社群任务完成证明；也可能成为其他场合的\textbf{通行证}或「炫耀资本」。
+  \item 这些徽章 NFT 存在你的\textbf{钱包}中，\textbf{公开可查}，像钱包里的其他链上资产与痕迹一样可被检索。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{痛点：NFT 可转手 \texorpdfstring{$\Rightarrow$}{=>} 身份会被买卖}
+\begin{itemize}
+  \item 目前很多 Web3 身份用「钱包里的 NFT」来证明经历，但 NFT 可以\textbf{转卖}。
+  \item 结果：可能出现\textbf{多重身份}与「黄牛黑市」——不利于形成健康可持续的 Web3 身份体系。
+\end{itemize}
+\end{WarnBox}
+
+\subsection{SBT：不可转让的身份凭证}
+
+\begin{DefBox}{一句话定义}
+\textbf{灵魂绑定通证（Soul Bound Token, SBT）}可以理解为「\textbf{不可转让的 NFT}」：一经授予，\textbf{无法转手}，用来更可靠地绑定钱包与真实经历。
+\end{DefBox}
+
+\begin{KeyBox}{解决什么问题？}
+\begin{itemize}
+  \item 把「经历/资格」从可交易资产中剥离出来：\textbf{经历只能由真正完成的人拥有}。
+  \item 让我们能更稳定地识别：\textbf{某个钱包到底做过什么、参与过什么、贡献过什么}。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{例子：RabbitHole（任务化学习 + SBT 成就徽章）}
+\begin{itemize}
+  \item RabbitHole 把 DApps 拆成\textbf{游戏化任务}，用户通过使用 DApps 获得 \textbf{XP/经验}、升级并拿奖励。
+  \item 它发行「冒险勋章」用来展示用户的成就与知识，并将其设计为\textbf{不可转让的 SBT}。
+  \item 结果：任何带有该徽章的钱包，\textbf{更可信地代表}钱包所有者确实完成了对应的任务与成就。
+\end{itemize}
+\end{HowBox}
+
+\begin{WarnBox}{一句话展望}
+目前 SBT 案例还不算多，但一旦大规模普及，将显著改变 Web3 的\textbf{身份、准入、声誉与协作模式}。
+\end{WarnBox}
+
+% =========================================================
+\section{DAO 在各领域的典型案例（投资 / 慈善 / 艺术 / 协议治理）}
+
+\begin{KeyBox}{本节你要记住的框架}
+DAO 不只是一种「组织概念」，它会以不同目标呈现为不同类型：\textbf{投资型、慈善资助型、收藏/艺术型、协议治理型}等。
+\end{KeyBox}
+
+% ---------------- Investment DAO ----------------
+\subsection{投资：Cult.DAO（去中心化风投）}
+
+\begin{DefBox}{是什麼}
+\textbf{Cult.DAO} 是一个\textbf{去中心化风投（Venture DAO）}：由成员共同决定投资哪些 Web3 项目，资金由协议机制持续注入其金库。
+\end{DefBox}
+
+\begin{HowBox}{怎麼 work（角色 + 权力结构）}
+\begin{itemize}
+  \item 两个群体：\textbf{守卫（Guardians）}与\textbf{选民（Voters）}。
+  \item 成员\textbf{质押}原生通证 \textbf{CULT} 可获得治理通证 \textbf{dCULT}（对应治理权）。
+  \item \textbf{dCULT 持有量前 50 名}成为守卫：拥有\textbf{发起提案}的权利；其他人为普通选民参与投票。
+  \item 守卫提案内容需与\textbf{投资其他 Web3 项目}有关；最终仍由\textbf{成员投票}决定是否通过。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{资金来源（为什么能运作）}
+\begin{itemize}
+  \item 投资资金来自 Cult.DAO 的\textbf{小金库（Treasury）}：从每笔 \textbf{CULT 交易}中抽取 \textbf{0.4\%} 佣金作为持续资金来源。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{用传统企业类比（秒懂版）}
+\begin{itemize}
+  \item Cult.DAO $\approx$ Web3 的\textbf{去中心化风投基金}
+  \item \textbf{CULT 质押者} $\approx$ 基金投资人（LP）
+  \item \textbf{守卫} $\approx$ 项目经理/投委会（筛项目、提案）
+  \item \textbf{所有成员投票} $\approx$ 基金治理与决策机制（更公开/更程序化）
+\end{itemize}
+\end{HowBox}
+
+% ---------------- Charity DAO ----------------
+\subsection{慈善：Gitcoin（捐助型资助平台 / DAO）}
+
+\begin{DefBox}{是什麼}
+\textbf{Gitcoin} 是构建在以太坊上的去中心化协作与资助平台：既支持开发者通过赏金协作，也通过多轮资助把资金部署到 Web3 基础设施项目中。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{用在哪}：开源工具、协议、技术网络等 Web3 新基础设施项目。
+  \item \textbf{用途}：让社区以更开放的方式表达「应该资助什么」，并帮助项目获得\textbf{曝光与注意力}。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{关键价值（文本主旨）}
+\begin{itemize}
+  \item Gitcoin 已进行十多轮资助，覆盖数千项目。
+  \item 对项目而言，Gitcoin 带来的\textbf{关注度}往往比资助金额本身更有价值：它像行业风向标，指引从业者关注方向。
+\end{itemize}
+\end{HowBox}
+
+% ---------------- Art / Collector DAO ----------------
+\subsection{数字艺术：PleasrDAO（收藏 + 社群共治）}
+
+\begin{DefBox}{是什麼}
+\textbf{PleasrDAO} 是由收藏家与数字艺术家组成的 DAO：共同收购并资助具有文化意义的作品（多为 NFT），并与社区共享与再创造。
+\end{DefBox}
+
+\begin{HowBox}{起源故事（你要会讲的一段）}
+\begin{itemize}
+  \item 2021/3/26：加密艺术家 pplpleasr 表示将把 Uniswap V3 官宣视频片段做成 NFT 出售，收益用于公益。
+  \item 社区成员号召成立轻量 DAO 竞拍，\textbf{一天筹集超过 60 万美元}。
+  \item 最终以 \textbf{310 ETH} 竞得；竞拍后决定持续运作，并以 \textbf{PleasrDAO} 命名纪念首次慈善竞拍。
+  \item 随后发行治理通证 \textbf{PEEPS}，按贡献比例分配；持有人共同享有 DAO 旗下 NFT 所有权。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{作品例子（记 2--3 个即可）}
+\begin{itemize}
+  \item \textbf{Stay Free}：Edward Snowden 的 NFT，支持其非营利基金会 Freedom of the Press。
+  \item \textbf{Dreaming at Dusk}：围绕 Tor Project 早期洋葱服务的历史与艺术呈现，支持在线隐私与匿名相关非营利努力。
+  \item \textbf{Doge}：以狗狗币 meme 为原型的标志性 NFT，记录互联网历史片段。
+\end{itemize}
+\end{KeyBox}
+
+% ---------------- Protocol governance DAO ----------------
+% =========================
+% Paste below your previous content
+% Updates: Uniswap (more detailed) + add FWB DAO + CityDAO + How to build DAO (Aragon)
+% =========================
+
+% ---------------- Protocol governance DAO (UPDATED) ----------------
+\subsection{协议治理：Uniswap（DEX 协议 + DAO 治理）}
+
+\begin{DefBox}{是什麼}
+\textbf{Uniswap} 是一个以\textbf{协议}形式存在的去中心化交易所（DEX），其治理以 \textbf{DAO} 形式运作：社区通过治理通证与投票流程，决定协议升级与新功能引入。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{用在哪}：协议参数调整、功能升级、资源分配、生态发展等治理事项。
+  \item \textbf{用途}：把「原本由开发团队全权决定」的开发决策，转移到\textbf{社区治理}（投票/委托投票）上。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{治理转移：UNI 的意义（时间点 + 核心变化）}
+\begin{itemize}
+  \item 2020 年 9 月：推出治理通证 \textbf{UNI}，开启新的治理结构。
+  \item \textbf{UNI 引入前}：开发团队全权负责确定 Uniswap 的开发决策。
+  \item \textbf{UNI 引入后}：治理权正式转移到社区；任何 UNI 持有者可\textbf{投票}或\textbf{委托他人投票}影响协议发展。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{UNI 总量与分配（背比例就够）}
+团队分发了 \textbf{10 亿枚 UNI} 给开发团队、社区、投资者与顾问（部分有归属期）：
+\begin{itemize}
+  \item \textbf{60.00\%}：Uniswap 社区成员
+  \item \textbf{21.266\%}：团队成员与未来员工（\textbf{4 年归属}）
+  \item \textbf{18.044\%}：投资者（\textbf{4 年归属}）
+  \item \textbf{0.69\%}：顾问（\textbf{4 年归属}）
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{提案怎么通过？（三阶段投票流程）}
+任何 UNI 持有者都可以提出「更改或引入新功能」的提案，但在实施前要过三关：
+\begin{enumerate}
+  \item \textbf{热度投票（Temperature Check）}\\
+  提议者先在社区宣讲想法；提案需获得 \textbf{25,000 UNI} 赞成票，才进入下一阶段。
+  \item \textbf{共识投票（Consensus Check）}\\
+  提议者进行更正式的陈述/答辩，突出提案优势；需获得不少于 \textbf{50,000 UNI} 赞成票。
+  \item \textbf{治理提案（Governance Proposal）}\\
+  提交\textbf{经审计的代码}进行最终审议；提案需获得高达 \textbf{40,000,000 UNI} 赞成票才可实施。
+\end{enumerate}
+\end{HowBox}
+
+\begin{WarnBox}{门槛机制（谁有资格提交提案）}
+\begin{itemize}
+  \item 只有当提议者\textbf{持有或被委托}合计超过 \textbf{2,500,000 UNI} 时，才能提交提案供社区考虑。
+  \item 该门槛最初是 \textbf{10,000,000 UNI}，后来通过治理修改为 \textbf{2,500,000 UNI}，以\textbf{降低提案门槛}。
+\end{itemize}
+\end{WarnBox}
+
+\begin{KeyBox}{一句话总结（考点）}
+\textbf{协议是产品本体，DAO 是治理系统。}Uniswap 用 UNI + 分阶段投票，把协议升级权从团队转移给社区，并用门槛设计平衡「开放参与」与「治理效率」。
+\end{KeyBox}
+
+% =========================================================
+\subsection{社交：FWB DAO（门槛式社区俱乐部）}
+
+\begin{DefBox}{是什麼}
+\textbf{FWB（Friends with Benefits）DAO} 在这里不是常见语境的含义，而是一个\textbf{包罗万象的讨论社区}：更像「有门槛的俱乐部论坛」。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{目标}：让 Web3 成为一种\textbf{文化现象}。
+  \item \textbf{载体}：主要在 \textbf{Discord} 社区内开展讨论与活动；成员通过参与活动获得参与证明（类似 POAP/徽章逻辑）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{加入门槛（如何成为成员）}
+\begin{itemize}
+  \item 需要持有 \textbf{75 枚 FWB 通证}
+  \item 填写申请表，并由社区\textbf{审议通过}
+  \item 规模与价格（文本信息）：约 \textbf{3000+} 成员；FWB 曾最高约 \textbf{190 美元/枚}
+\end{itemize}
+\end{HowBox}
+
+% =========================================================
+\subsection{与现实结合：CityDAO（用 DAO 运作一座城市的实验）}
+
+\begin{DefBox}{是什麼}
+\textbf{CityDAO} 的目标是建立一个「以 DAO 方式运作的城市」：把治理、参与与资源配置用 DAO 机制组织起来。
+\end{DefBox}
+
+\begin{KeyBox}{关键事实（文本信息）}
+\begin{itemize}
+  \item CityDAO 已在美国\textbf{怀俄明州}购买 \textbf{40 英亩}（约 16 万平方米）土地。
+  \item 并将 DAO 社区已确定的旗帜插在该土地上，作为现实世界的象征性落地。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{提醒}
+这类项目通常会遇到「链上治理」与「现实法律/产权/行政」之间的对接问题；现实落地比链上实验更复杂。
+\end{WarnBox}
+
+% =========================================================
+\section{教你建立一个 DAO：Aragon（手把手流程）}
+
+\begin{DefBox}{为什么建议从「建 DAO」开始体验 Web3？}
+参与或自己建立一个 DAO 是亲身体验 Web3 的\textbf{低门槛方式}：建立一个 DAO 在工具支持下可以非常快（文本类比：像建一个群一样简单）。
+\end{DefBox}
+
+\begin{HowBox}{Aragon 建 DAO 流程（7 步）}
+\begin{enumerate}
+  \item 打开 \href{https://aragon.org/}{https://aragon.org/}
+  \item 点击 \textbf{Create your DAO}
+  \item 点击 \textbf{Create an organization}，进入模板选择（见下一框）
+  \item 给你的 DAO 起名字
+  \item 设置投票规则（Support\%、Minimum Approval\%、Vote Duration）
+  \item 设置通证信息：通证名称、总量、初始分发钱包
+  \item 检查参数后点击 \textbf{Launch your organization} 完成创建
+\end{enumerate}
+\end{HowBox}
+
+\begin{KeyBox}{Aragon 三种成熟模板（考点：差在「可否转让」与「投票方式」）}
+\begin{itemize}
+  \item \textbf{Company}：通证\textbf{可转让}，代表对组织的所有权（更像股权）。
+  \item \textbf{Membership}：通证\textbf{不可转让}，投票采用\textbf{一人一票}。
+  \item \textbf{Reputation}：通证\textbf{不可转让}，投票采用\textbf{声誉加权}（Reputation-based Voting）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{投票参数怎么理解（把三格翻译成人话）}
+\begin{itemize}
+  \item \textbf{SUPPORT\%}：在「参与投票的人」里，需要多少比例赞成票才算通过。
+  \item \textbf{MINIMUM APPROVAL\%}：在「所有通证持有人」里，需要多少比例赞成票才算通过（防止少数人低参与度强推）。
+  \item \textbf{VOTE DURATION}：投票持续时间。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{建完只是开始：DAO 运营要补什么？}
+\begin{itemize}
+  \item Aragon 还提供插件辅助运营：\textbf{争议处理、代理投票、金库管理}等。
+  \item 真正难的是「\textbf{填充成员与业务}」：通证的发放与分配像股权一样决定激励与积极性。
+  \item DAO 的「办公场所」往往是线上协作空间：成员跨地域、无需面试、自愿加入、完全远程协作。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{最重要的坑（先记一句）}
+\textbf{通证分配与经济模型}会直接决定 DAO 的长期激励与治理稳定性；理解它往往需要一定经济学基础。
+\end{WarnBox}
+
+
+% =========================================================
+% =========================
+% Updated Review Section
+% Covers: DAO + Governance + DID/SBT + Cases + Uniswap + Aragon
+% =========================
+
+\section{快速複習題（自測用）}
+
+\begin{KeyBox}{Q1：為什麼說 DAO 是 Web3 的「社會作業系統」？}
+A：因為 DAO 解決的不是單一功能，而是「\textbf{人如何協作、如何決策、資金如何分配}」的社會關係問題；就像作業系統協調硬體與軟體，DAO 協調人與資源。
+\end{KeyBox}
+
+\begin{KeyBox}{Q2：DAO 與傳統公司的三個根本差異是什麼？}
+A：\textbf{（1）規則}：公司靠法律與合同，DAO 靠鏈上合約与代码；  
+\textbf{（2）利益分配}：公司偏中心化，DAO 参与者常同时是通证持有人；  
+\textbf{（3）身份边界}：公司层级固定，DAO 允许自由进出与跨组织协作。
+\end{KeyBox}
+
+\begin{KeyBox}{Q3：為什麼現實中的 DAO 常會演化成 DO？}
+A：因為許多目標與工作\textbf{無法完全用智能合約自動化}，仍需要人工協作與判断；但決策權仍盡量保持去中心化。
+\end{KeyBox}
+
+\begin{KeyBox}{Q4：DAO 的典型組織結構為什麼不是「所有事情都投票」？}
+A：為避免協調成本過高，多數 DAO 會授權\textbf{核心團隊/委員會}處理日常事務；重大方向與資金仍由\textbf{社群投票}決定。
+\end{KeyBox}
+
+\begin{KeyBox}{Q5：什麼是 DID？為什麼可以把它理解為 Web3 的身份證？}
+A：DID 是\textbf{全局唯一、去中心化、可鏈上驗證}的識別碼；它背後連結的是你在 Web3 的\textbf{行為與社會關係總和}，而不是一張單純的卡片。
+\end{KeyBox}
+
+\begin{KeyBox}{Q6：POAP 在 Web3 身份系統中扮演什麼角色？}
+A：POAP 是用 NFT 形式發放的\textbf{出席/参与证明}；它記錄你參與過的活動與社群，可作為未來准入或声誉展示的依据。
+\end{KeyBox}
+
+\begin{KeyBox}{Q7：為什麼需要 SBT？它解決了什麼問題？}
+A：因為 NFT \textbf{可以轉手}，會導致身份被買賣；SBT 是\textbf{不可轉讓的 NFT}，能更可靠地綁定「錢包 ↔ 真實經歷」。
+\end{KeyBox}
+
+\begin{KeyBox}{Q8：RabbitHole 的 SBT 設計想解決什麼？}
+A：確保擁有某成就徽章的錢包\textbf{真的完成過對應任務}，避免身份與成就被轉賣或偽造。
+\end{KeyBox}
+
+\begin{KeyBox}{Q9：Uniswap 為什麼是「協議 + DAO」的經典案例？}
+A：因為 Uniswap 的\textbf{交易功能由協議提供}，而\textbf{協議升級與治理由 DAO 決定}；UNI 的引入把決策權從團隊轉移給社群。
+\end{KeyBox}
+
+\begin{KeyBox}{Q10：Uniswap 提案為什麼要分三個投票階段？}
+A：為了在\textbf{開放參與}與\textbf{治理效率}之間取得平衡：  
+先用低門檻篩想法（熱度投票），再建立共識，最後才進入高門檻的正式治理投票。
+\end{KeyBox}
+
+\begin{KeyBox}{Q11：FWB DAO 與一般 DAO 最大的不同是什麼？}
+A：FWB 更像一個\textbf{有門檻的文化社群/俱樂部}，重點在身份、文化與社交，而非資產治理或協議升級。
+\end{KeyBox}
+
+\begin{KeyBox}{Q12：CityDAO 的實驗性在哪裡？}
+A：它嘗試把 DAO 的治理模式\textbf{落地到現實世界的土地與城市概念}中，面臨鏈上治理與現實法律/行政的銜接挑戰。
+\end{KeyBox}
+
+\begin{KeyBox}{Q13：投資型 DAO（如 Cult.DAO）與慈善 DAO（如 Gitcoin）的核心差別？}
+A：\textbf{是否期待財務回報}。  
+投資型 DAO 追求投資收益；慈善 DAO 聚焦公共資助與產業引導，不以回報為目的。
+\end{KeyBox}
+
+\begin{KeyBox}{Q14：為什麼說「建立 DAO 很簡單，但經營很難」？}
+A：工具（如 Aragon）讓建 DAO 變得容易；但\textbf{通证分配、激励机制、治理设计}決定了 DAO 能否长期运作。
+\end{KeyBox}
+
+\begin{KeyBox}{Q15：Aragon 的三種 DAO 模板差異重點是什麼？}
+A：\textbf{通证是否可轉讓}與\textbf{投票權如何計算}：  
+Company（可轉讓、像股權）／Membership（不可轉讓、一人一票）／Reputation（不可轉讓、聲譽加權）。
+\end{KeyBox}
+
+\begin{WarnBox}{最後一句總結（考前記這句）}
+Web3 的核心不是「把公司搬到鏈上」，而是\textbf{用協議與身份系統，重組人、資源與激勵的關係}；  
+DAO 解決組織，DID/SBT 解決身份，兩者共同塑造 Web3 的社會結構。
+\end{WarnBox}
+
+
+\end{document}

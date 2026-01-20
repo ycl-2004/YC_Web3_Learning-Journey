@@ -1,0 +1,495 @@
+% !TEX program = xelatex
+\documentclass[11pt,a4paper]{article}
+
+\input{style.tex}
+
+% ---------------- Document ----------------
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{Web3 / DApps 重點筆記}}\\[6pt]
+  {\large \textcolor{muted}{只保留：是什麼｜用途｜用在哪｜怎麼 work｜例子}}\\[10pt]
+  \tagpill{DApps}\quad \tagpill{Infra}\quad \tagpill{IPFS}\quad \tagpill{Storj}\quad \tagpill{DeFi}\quad
+  \tagpill{SocialFi}\quad \tagpill{GameFi}
+\end{center}
+
+\begin{KeyBox}{快速總結（考前 30 秒）}
+\begin{itemize}
+  \item \textbf{DApps}：建在區塊鏈上、屬於\textbf{應用層}的去中心化應用；像 Web3 世界「看得見的磚瓦」。
+  \item \textbf{去中心化對使用者的價值}：核心是\textbf{資料所有權}（Web2 多由平台控制）。
+  \item \textbf{五層架構}：硬體層／資料層／網路層／共識層／應用層（有時拆出協議層）。
+  \item \textbf{Web3：胖協議、瘦應用}：能力（如安全）被埋在協議裡；\textbf{智能合約}是典型例子。
+  \item \textbf{基礎設施類 DApps}：常以「協議」存在，連接 DApps 與底層各層（例：\textbf{IPFS / Storj}）。
+\end{itemize}
+\end{KeyBox}
+
+\tableofcontents
+
+% ---------------- 1) DApps ----------------
+\section{DApps 是什麼？（定位與比喻）}
+
+\begin{DefBox}{一句話定義}
+\textbf{DApps（Decentralized Applications）}是建立在\textbf{區塊鏈}上的\textbf{去中心化應用}，多位於最上層的\textbf{應用層（Application Layer）}。
+\end{DefBox}
+
+% ---------------- DApp 判定標準（加在「DApps 是什麼」章節中） ----------------
+\subsection{DApps 判定標準（需要滿足什麼）}
+
+\begin{DefBox}{一句話}
+要成為去中心化應用（DApp），不只是在區塊鏈上運行；它還需要在\textbf{程式控制、通證分配、治理決策}三方面符合去中心化標準。
+\end{DefBox}
+
+\begin{KeyBox}{三大標準（整理版）}
+\begin{enumerate}
+  \item \textbf{開源 + 自動運行 + 無單一實體控制大多數通證}\\
+  應用必須完全開源並能自動運行；不應由單一實體掌控其大部分通證。資料與記錄需加密後存放於\textbf{公鏈}。
+  
+  \item \textbf{通證需由標準化規則產生，並用於運行與激勵}\\
+  通證必須依照標準算法／規則發行，且應在開始運營時就將部分或全部通證發放給使用者。應用運行需\textbf{依賴該通證}，使用者的貢獻應以通證作為獎勵。
+  
+  \item \textbf{規則可更改，但需多數用戶認可（治理去中心化）}\\
+  系統規則可因時制宜調整，但變更需被\textbf{大多數用戶認可}，而非最終解釋權掌握在某個實體手中。
+\end{enumerate}
+\end{KeyBox}
+
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{用途}：在 Web3 的數位世界中，提供使用者能直接互動的功能（交易、社交、遊戲、金融等）。
+  \item \textbf{用在哪}：Web3.0 由區塊鏈構成的世界；DApps 是其中「看得見摸得著」的部分。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{直覺比喻}
+區塊鏈的底層（硬體/資料/網路/共識）像冰山在水面下的基礎設施；\textbf{DApps}像是水面上的「建築材料」，把底層能力變成可用的產品。
+\end{HowBox}
+
+% ---------------- 2) Decentralization value ----------------
+% ---------- Replace / extend your Section 2 with the following ----------
+
+\section{去中心化對使用者的重要性}
+
+\begin{KeyBox}{核心問題：資料所有權（Data Ownership）}
+\begin{itemize}
+  \item Web2 常見狀況：使用者以為資料「屬於自己」，但平台在註冊條款中已掌握大量控制權。
+  \item 去中心化要解決：\textbf{資料究竟歸平台，還是歸個人？}
+\end{itemize}
+\end{KeyBox}
+
+\subsection{平台信任問題：規則黑箱 vs 鏈上可驗證}
+
+\begin{DefBox}{問題本質}
+在 Web2 平台上，\textbf{帳號與規則的最終解釋權}往往掌握在平台手中；使用者面對封禁/限制時，容易陷入「規則看得見，但判定過程看不見」的黑箱。
+\end{DefBox}
+
+\begin{HowBox}{例子（短影音創作者帳號無故封禁）}
+\begin{itemize}
+  \item 你花大量時間經營一個\textbf{百萬粉絲}帳號（這其實是你的數位資產）。
+  \item 你想把帳號轉交他人繼續經營，僅把手機號換成接收方的手機號。
+  \item 你再次登入時，平台卻把帳號\textbf{永久封禁}，理由是「違反社區規則」。
+  \item 你讀完規則也找不到對應條款；找客服只得到幾句制式回覆，無法知道真正原因。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{DApps 的差異（透明度如何提升信任）}
+\begin{itemize}
+  \item \textbf{行為記錄公開透明}：帳號在 App 內的行為記錄、與 App/其他帳號互動，多數可在鏈上查驗。
+  \item \textbf{規則可上鏈、可追溯}：社群規則/核心機制可在上線時就記錄在鏈上，避免平台事後「黑箱解釋」。
+  \item \textbf{可驗證}：使用者能以鏈上資料驗證「發生了什麼」，減少單方裁量造成的不確定性。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{收益分配問題：平台/公司壟斷分配權 vs 協議化分配}
+
+\begin{DefBox}{問題本質}
+在 Web2 公司或平台體系中，\textbf{價值分配規則}通常由中心化機構決定，貢獻者（創作者/員工/開發者）未必能按貢獻即時、可預期地獲得回報。
+\end{DefBox}
+
+\begin{HowBox}{例子（大廠員工期權難以變現）}
+\begin{itemize}
+  \item 你與團隊做出一個\textbf{月活百萬}的 App，拿到老闆給的期權。
+  \item 你想離職回老家，老闆說期權必須等「上市解禁」才能變現，但上市時間不確定。
+  \item 若你現在走，公司只願意以\textbf{1 元/股}回購期權，你被迫繼續留下。
+  \item 後來公司為上市選擇\textbf{合股}（例如 10 股合 1），你手上的期權價值被稀釋成原本的\textbf{1/10}。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{DApps 的方向（協議化分配 + 貢獻者激勵）}
+\begin{itemize}
+  \item \textbf{貢獻可被記錄}：貢獻（內容/開發/治理/流動性等）可透過鏈上互動或規則化指標被追蹤。
+  \item \textbf{分配規則可寫入協議/智能合約}：收益分配可由智能合約自動執行，降低「事後變更/單方稀釋」的不確定性。
+  \item \textbf{通證激勵}：協議可用通證把收益/治理權分配給貢獻者，讓「使用者/貢獻者」更可能成為價值共同體的一部分。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{提醒：去中心化不等於零風險}
+\begin{itemize}
+  \item 規則上鏈提高透明度，但仍需要良好的治理與機制設計，否則也可能出現激勵失衡或濫用。
+  \item 「公開透明」通常意味著可追蹤性更強；隱私保護需要額外機制（例如加密/權限/零知識證明等）。
+\end{itemize}
+\end{WarnBox}
+
+
+% ---------------- 3) Layers ----------------
+\section{區塊鏈五層架構（每層做什麼）}
+
+\subsection{五層功能對照表}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{層級} & \textbf{主要功能（你要記得的動詞）} \\
+\midrule
+硬體層 (Hardware) & 節點計算機組成的 P2P 網路，\textbf{共同運算／驗證／記錄交易} \\
+資料層 (Data) & 像資料庫：\textbf{存資料} + \textbf{保障帳戶/交易安全} \\
+網路層 (Network) & \textbf{組網}、\textbf{傳播資料}、\textbf{驗證資料} \\
+共識層 (Consensus) & 用共識算法/機制讓節點對\textbf{區塊有效性達成一致} \\
+應用層 (Application) & DApps 多在此；有時拆出協議層（Protocol Layer） \\
+\bottomrule
+\end{tabularx}
+
+\subsection{視覺化：五層冰山（由下到上）}
+\begin{center}
+\begin{tikzpicture}[font=\small]
+  \node[draw=brand!18, fill=soft, rounded corners=12pt, inner sep=12pt] (box) {
+    \begin{minipage}{0.92\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance=6mm]
+      \tikzstyle{layer}=[rounded corners=10pt, minimum width=0.86\textwidth, minimum height=10mm, align=center]
+      \node[layer, fill=brand!10,  draw=brand!30]  (app)  {\textbf{應用層}：DApps（使用者看得到）};
+      \node[layer, fill=good!10,   draw=good!30,   below=of app]  (con)  {\textbf{共識層}：共識算法 / 一致性};
+      \node[layer, fill=brand2!10, draw=brand2!30, below=of con]  (net)  {\textbf{網路層}：組網 / 傳播 / 驗證};
+      \node[layer, fill=warn!10,   draw=warn!30,   below=of net]  (data) {\textbf{資料層}：存儲 / 安全};
+      \node[layer, fill=rose!10,   draw=rose!30,   below=of data] (hard) {\textbf{硬體層}：節點計算機（P2P）};
+    \end{tikzpicture}
+
+    \vspace{6pt}
+    \textcolor{muted}{\small 記法：越底層越「看不見」，但越是上層能否運作的基礎。}
+    \end{minipage}
+  };
+\end{tikzpicture}
+\end{center}
+
+% ---------------- 4) Fat protocol vs fat app ----------------
+\section{Web2 vs Web3：瘦協議/胖應用 vs 胖協議/瘦應用}
+
+\begin{DefBox}{概念對照}
+\begin{itemize}
+  \item \textbf{Web2：瘦協議、胖應用} —— 許多能力（如安全）靠外部應用（防火牆/殺毒/安全公司）完成。
+  \item \textbf{Web3：胖協議、瘦應用} —— 能力被內建進傳輸/互動協議；\textbf{智能合約}是典型「協議」形態。
+\end{itemize}
+\end{DefBox}
+
+\begin{HowBox}{一句話抓重點}
+Web3 把「規則與保障」寫進協議（Protocol）與智能合約，所以很多 Web2 需要外掛 App 才做得到的事，在 Web3 可能直接由協議提供。
+\end{HowBox}
+
+\section{例子精讀（只保留用途/用在哪/怎麼 work）}
+
+\subsection{Web3Graph：資料圖譜協議}
+
+\begin{DefBox}{是什麼}
+Web3Graph 是 Web3 時代的\textbf{資料圖譜協議}：為 Web3 原住民/應用提供圖譜資訊，讓資訊交流與呈現更快速、準確。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{用在哪}：從\textbf{資料層到應用層}；支援 GameFi / DeFi / SocialFi / DAO / NFT 等提供資料基礎。
+  \item \textbf{用途}：建立統一、開放、安全的資料規範與圖譜事件/關係資料，幫助應用快速啟動。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{怎麼 work（核心機制）}
+\begin{itemize}
+  \item 借鑑 Open Graph：引入 meta 等概念。
+  \item 底層採用\textbf{二分圖（Bipartite Graph）}資料結構，可表達 Open Graph 的行為/關係（被描述為其「超集」）。
+  \item 產品工具：API / SDK / Studio / Extension，讓開發者可直接整合協議並復用既有事件/關係圖譜資料做冷啟動。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{經濟模型（為什麼能長期運作）}
+\begin{itemize}
+  \item 貢獻者與使用者不割裂：開發者可使用協議開發並獲得激勵，也能用資料做分析。
+  \item 開放式生態：允許第三方基於基礎資料提供二次服務（例：信用評分），形成多層次資料使用市場。
+  \item 協議價值：在\textbf{資料使用與流通}中被實現。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{ENS：以太坊域名系統}
+
+\begin{DefBox}{是什麼}
+ENS（Ethereum Name Service）是基於以太坊的\textbf{分散式命名系統}，把可讀域名（如 \texttt{vitalik.eth}）解析為地址/內容哈希/元資料等標識符，或反向解析。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{用途}：用「好記的域名」替代長地址，降低轉帳與識別門檻。
+  \item \textbf{用在哪}：轉帳、查地址動向、身份識別（域名可能成為象徵）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{怎麼 work（分層與規則）}
+\begin{itemize}
+  \item 類似 DNS：\textbf{分層域名}，用點號分隔；域名擁有者可控制子域名。
+  \item 頂級域名（如 \texttt{.eth}）由\textbf{Registrar 智能合約}管理，合約規定子域名分配規則。
+  \item 取得方式：遵循合約規則、\textbf{先到先得}。
+\end{itemize}
+\end{HowBox}
+
+\subsection{Etherscan：以太坊區塊鏈瀏覽器}
+
+\begin{DefBox}{是什麼}
+Etherscan 是常用的以太坊區塊鏈瀏覽器，用於\textbf{查交易}與\textbf{查智能合約}，可直接分析鏈上底層資料。
+\end{DefBox}
+
+\begin{HowBox}{怎麼用（操作流程）}
+\begin{enumerate}
+  \item 在首頁搜尋框輸入地址或 ENS（例如 \texttt{vitalik.eth}）。
+  \item 查看地址概覽：餘額、市值，以及交易列表欄位（交易編號/類型/區塊/時間/發起方/接收方/金額/交易費）。
+  \item 點進任一筆交易 → 看交易詳細狀態與執行結果。
+\end{enumerate}
+\end{HowBox}
+
+\begin{WarnBox}{常見失敗交易：你要會看}
+\begin{itemize}
+  \item \textbf{Reverted}：交易被退回（通常已支付交易費，但因技術/執行問題失敗）。
+  \item \textbf{Out of Gas}：Gas 上限不足；交易費不是固定，發起方設定上限與速度，網路依擁堵扣費；上限太低會導致執行中止。
+\end{itemize}
+\end{WarnBox}
+
+
+% ---------------- 5) Infra DApps ----------------
+\section{基礎設施類 DApps：存儲與傳輸（IPFS / Storj）}
+
+\subsection{IPFS（InterPlanetary File System）}
+\begin{DefBox}{是什麼}
+\textbf{IPFS} 是一種\textbf{內容尋址}、\textbf{版本化}、\textbf{點對點（P2P）}的超媒體傳輸協議，整合 P2P、BitTorrent、Git 版本控制等概念，被視為對標 HTTP 的新一代通信協議。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪}
+\begin{itemize}
+  \item \textbf{用途}：以「內容」而不是「伺服器位置」來定位檔案，適合去中心化存取。
+  \item \textbf{常見用法}：存放 \textbf{NFT 源文件}（例：無聊猿系列 NFT 的檔案常用 IPFS 存儲）。
+  \item \textbf{入口}：\href{https://ipfs.io/}{https://ipfs.io/}
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{怎麼 work（HTTP vs IPFS）}
+\begin{itemize}
+  \item \textbf{HTTP}：先找到「伺服器位置」→ 再用「路徑」找檔案。
+  \item \textbf{IPFS}：直接用\textbf{內容哈希（hash）}找檔案；檔案會被分配唯一哈希（由檔案內容計算）。
+  \item 當你查詢某個哈希時：IPFS 用\textbf{分散式哈希表（DHT）}快速定位擁有該資料的節點 → 取回資料。
+  \item \textbf{大檔案}：會自動切成多個小塊，可從多個節點\textbf{並行同步下載}，只要節點在線且網路正常，速度可很快。
+\end{itemize}
+\end{HowBox}
+
+\subsection{Storj（分布式雲存儲）}
+\begin{DefBox}{是什麼}
+\textbf{Storj} 是 Web3 常用的分布式雲存儲工具：用戶可購買存儲服務，也可提供閒置硬碟空間當節點賺取回報。
+\end{DefBox}
+
+\begin{KeyBox}{用途／用在哪（通證模型）}
+\begin{itemize}
+  \item \textbf{購買者}：用平台通證 \textbf{STORJ} 購買存儲服務。
+  \item \textbf{供給者（節點）}：提供閒置存儲空間，獲得 \textbf{STORJ} 回報。
+  \item \textbf{入口}：\href{https://www.storj.io/}{https://www.storj.io/}
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{怎麼 work（加密分片 \texorpdfstring{$\rightarrow$}{->} 分發 \texorpdfstring{$\rightarrow$}{->} 重組）}
+\begin{itemize}
+  \item 上傳時：客戶端先\textbf{加密}資料，並\textbf{分解成多個碎片}。
+  \item 分發：碎片透過網路分發給多個節點；同時客戶端生成「如何找到碎片位置」的資訊。
+  \item 下載時：客戶端讀取定位資訊 → 找回碎片 → 在本機\textbf{重新組裝}成原始資料。
+  \item 安全性：資料全程加密，\textbf{只有所有者有密鑰}，其他節點無法解密。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{Storj 三類角色}
+\begin{itemize}
+  \item \textbf{用戶端（Client）}：上傳/下載、加密/解密、重組資料。
+  \item \textbf{節點（Node）}：提供存儲與帶寬，存放碎片。
+  \item \textbf{衛星（Satellite）}：伺服器集群，連接用戶端與節點；協助找最快節點、並記錄支出/收益。
+\end{itemize}
+\end{KeyBox}
+
+% ---------------- 6) DeFi ----------------
+\section{金融借贷（DeFi）與典型案例：Aave}
+
+\begin{DefBox}{為什麼 DeFi 借贷熱門？}
+Web3 早期大量參與者帶有投機動機；\textbf{金融借贷類 DApps} 因「高收益」成為熱門領域。2020 年的 \textbf{DeFi Summer} 指的就是借贷類 DeFi 在 2020 夏季大量湧現。
+\end{DefBox}
+
+\begin{WarnBox}{風險觀點（文本要點）}
+\begin{itemize}
+  \item 高收益常來自\textbf{高槓桿}與「樂觀的一致性預期」。
+  \item 熊市預期轉向可能引發\textbf{踩踏}，加速泡沫破裂。
+  \item 極端市場下，去中心化\textbf{無法自動解決流動性問題}（文本觀點）。
+\end{itemize}
+\end{WarnBox}
+
+\subsection{Aave（去中心化借贷協議）}
+\begin{DefBox}{是什麼}
+\textbf{Aave} 是去中心化借贷系統：用戶可把加密貨幣存入資產池賺利息（存款人），也可抵押後借出其他資產（借款人）。存/借由協議自動完成，不需傳統中介。
+\end{DefBox}
+
+\begin{HowBox}{怎麼 work（存款 \texorpdfstring{$\rightarrow$}{->} aToken \texorpdfstring{$\rightarrow$}{->} 贖回）}
+\begin{itemize}
+  \item 存款：把資產存入 Aave 流動池，協議按存款額發放 \textbf{aToken} 作為存款憑證。
+  \item 贖回：取回資產時，協議\textbf{收回並銷毀}對應 aToken。
+  \item 例：存入 ETH \texorpdfstring{$\rightarrow$}{->} 得到 aETH；交還 aETH \texorpdfstring{$\rightarrow$}{->} 取回 ETH。
+  \item aToken：與存入資產的市價\textbf{1:1 掛鈎}，且可轉讓/交易，使存款人仍保有一定流動性（文本要點）。
+\end{itemize}
+\end{HowBox}
+
+\begin{HowBox}{借款端（利率、抵押、LTV、清算）}
+\begin{itemize}
+  \item 借款需要先存入\textbf{抵押品}，再從資產池借出其他資產。
+  \item 利率類型：\textbf{浮動利率（Variable APY）}隨市場波動（適合短期）；
+        \textbf{固定利率（Stable APY）}借贷期間不變（文本描述）。
+  \item \textbf{Max LTV}：不同抵押品有不同最高借贷比率。
+        例：抵押價值 100 美元，若 Max LTV = 82.50\%，最多可借 82.5 美元等值資產。
+  \item \textbf{Liquidity Threshold（清算臨界點）}：若貸款率超過臨界點，協議會\textbf{自動清算抵押品}並收取清算罰款。
+  \item 例：用 ETH 抵押借款，若 ETH 價格下跌導致貸款率上升，可能觸發清算。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{補充（文本提及）}
+Aave 文本中提到其目前獲得英國的電子貨幣機構牌照；但許多其他 DeFi 仍以較原始方式運營。
+\end{KeyBox}
+
+% ---------------- 7) SocialFi ----------------
+\section{社交類 DApps（SocialFi）與案例：Mirror}
+
+\begin{DefBox}{SocialFi 是什麼？}
+\textbf{SocialFi} 讓用戶把社交影響力「金融化」：創作內容、參與社群、NFT 鑄造、互動、觀看影片等都可能帶來收入。
+\end{DefBox}
+
+\begin{KeyBox}{相對 Web2 社交的優勢（文本要點）}
+\begin{itemize}
+  \item 更公平分配廣告/收益，提供更好的用戶體驗（文本主張）。
+  \item 透過 \textbf{DAO} 維護：把平台管理權/話語權交還給用戶，終結「算法霸權」，形成創作者經濟與更公平的收益模型（文本表述）。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{Mirror（去中心化內容發布平台）}
+\begin{DefBox}{是什麼}
+\textbf{Mirror} 是建立在 \textbf{Arweave（去中心化存儲協議）}上的內容發布平台。文章可被存儲到 Arweave，並可鑄造成 NFT 轉贈/出售，甚至發起 NFT 眾籌。
+\end{DefBox}
+
+\begin{KeyBox}{Mirror 的 6 個基礎功能（文本列舉）}
+\begin{itemize}
+  \item 發布作品（Entries）
+  \item 發起眾籌（Crowdfunds）
+  \item 發布 NFT（Editions）
+  \item 發起競拍（Auctions）
+  \item 分享收益（Splits）
+  \item 發起投票（Token Race）
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{發布文章 / 同時鑄成 NFT（流程 + 例子）}
+\begin{itemize}
+  \item 發文時可選擇「同步鑄成 NFT」：需上傳一張\textbf{2:1} 寬高比圖片並支付交易費。
+  \item 若不勾選 NFT：無需交易費，但也沒有直接變現通道（文本描述）。
+  \item 文章 NFT 常見三檔定價（文本例）：\textbf{1 ETH / 0.1 ETH / 0.01 ETH}，類似打賞的預設選項。
+  \item Editions：也可手動建立圖片/影片 NFT，並嵌入文章中售賣，形成內容+藏品閉環。
+\end{itemize}
+\end{HowBox}
+
+\begin{HowBox}{眾籌 / 競拍 / 分潤 / 投票（文本流程要點）}
+\begin{itemize}
+  \item \textbf{眾籌（Crowdfunds）}：支持者存入 ETH 資助項目，換取項目通證；眾籌可嵌入任意條目。
+  \item \textbf{競拍（Auctions）}：需先在 \textbf{Zora / Foundation / Rarible / SuperRare} 或自定合約鑄 NFT；
+        設最低價，首次出價高於最低價後競拍才開始；每 15 分鐘更新一次，無更高出價則結束（文本描述）。
+  \item \textbf{分享收益（Splits）}：可把 NFT 銷售或眾籌收益分配給不同貢獻者。
+  \item \textbf{投票（Token Race）}：有門檻；需成為正式會員並持有官方通證 \textbf{WRITE}（發放稀少，文本提及）。
+\end{itemize}
+\end{HowBox}
+
+% ---------------- 8) GameFi ----------------
+\section{遊戲類 DApps（GameFi）與案例：Alien Worlds}
+
+\begin{DefBox}{GameFi 是什麼？}
+\textbf{GameFi} 把「遊戲 + NFT + DeFi」結合：鏈上開發遊戲，角色/道具做成 NFT，遊戲內資產可交易，玩家可 \textbf{Play-to-Earn}（邊玩邊賺）。
+\end{DefBox}
+
+\begin{WarnBox}{現況限制（文本要點）}
+\begin{itemize}
+  \item 底層設施仍在發展：運算速度/可擴展性有限，\textbf{娛樂性與體驗多不如 Web2 遊戲}。
+  \item 許多玩家主要為 \textbf{to-Earn} 而來，部分項目偏重賣道具而忽視可玩性（文本觀點）。
+  \item 若要長期運營：需要提供情緒價值，讓用戶願意為娛樂付費，而不只為炒作道具。
+\end{itemize}
+\end{WarnBox}
+
+\subsection{Alien Worlds（異形世界）}
+\begin{DefBox}{是什麼}
+\textbf{Alien Worlds} 是基於 \textbf{WAX 公鏈}的太空探索遊戲：共有 \textbf{6 個星球}，每個星球都是一個 DAO。玩家可透過挖礦、任務與戰鬥等方式參與生態。
+\end{DefBox}
+
+\begin{KeyBox}{核心機制（文本例子）}
+\begin{itemize}
+  \item 玩家透過\textbf{挖礦}賺取通證 \textbf{Trilium（TLM）}；每次挖礦有機會挖到 NFT。
+  \item 進入遊戲先獲得免費挖礦工具；也可參選星球理事候選人，當選後參與治理（文本描述）。
+  \item NFT 卡牌可推出更多玩法（如「閃耀」升級、格鬥作戰等）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{兩種資產形態：NFT + 同質化通證 TLM}
+\begin{itemize}
+  \item \textbf{NFT}：遊戲道具/資產（非同質化）。
+  \item \textbf{TLM（ERC-20 同質化通證）}：扮演遊戲「金幣」角色。
+  \item TLM 用途：挖礦獲得；可\textbf{質押到星球 DAO} 參與管理決策；也用於購買/升級道具、參與任務與活動（文本描述）。
+\end{itemize}
+\end{HowBox}
+
+% ---------------- 9) Other sectors ----------------
+\section{其他領域：能源/碳中和、交易所}
+
+\subsection{能源 / 碳中和：Dovu}
+\begin{DefBox}{是什麼}
+\textbf{Dovu} 將\textbf{碳信用}通證化，並提供基於\textbf{哈希圖（Hashgraph）}的碳交易市場，使人們能更即時地抵消自身碳排放（文本描述）。
+\end{DefBox}
+
+\begin{KeyBox}{怎麼用（需求側/供給側）}
+\begin{itemize}
+  \item \textbf{需求側}：提供交易通證 \textbf{DOV} 與碳計算器。
+  \item \textbf{供給側}：與各地農場合作，透過植樹造林等方式降低碳排放（文本描述）。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{交易所：中心化 vs 去中心化}
+\begin{DefBox}{基本分類}
+加密資產交易所包含\textbf{中心化交易所（CEX）}與\textbf{去中心化交易所（DEX）}。文本指出中心化交易所仍佔主導，原因之一是發展較早、對 Web2 使用者更友善。
+\end{DefBox}
+
+\begin{KeyBox}{交易標的（文本提及）}
+\begin{itemize}
+  \item 主要交易：\textbf{加密貨幣}與 \textbf{NFT}。
+\end{itemize}
+\end{KeyBox}
+
+% ---------------- Review ----------------
+\section{快速複習題（自測用）}
+
+\begin{KeyBox}{Q1：IPFS 與 HTTP 在「找檔案」方式上的差別？}
+A：HTTP 先找伺服器位置再用路徑找檔案；IPFS 用\textbf{內容哈希}直接在分布式網路中定位資料（常用 DHT）。
+\end{KeyBox}
+
+\begin{KeyBox}{Q2：Storj 上傳/下載的關鍵流程是什麼？}
+A：上傳時\textbf{加密 + 分片 + 分發到節點}；下載時依定位資訊取回碎片並在本機\textbf{重組}。
+\end{KeyBox}
+
+\begin{KeyBox}{Q3：Aave 的 aToken 用來做什麼？}
+A：作為存款憑證；存入資產得到對應 aToken（如 aETH），贖回時交還 aToken 取回資產。
+\end{KeyBox}
+
+\begin{KeyBox}{Q4：Mirror 內容變現的兩條常見路徑？}
+A：文章可直接鑄成 NFT 售賣；或用 Crowdfunds 眾籌（支持者存 ETH 換項目通證），也可 Auctions 競拍與 Splits 分潤。
+\end{KeyBox}
+
+\vspace{8pt}
+\begin{center}
+\textcolor{muted}{\small 提醒：若 PDF 出現像 ``borderline west'' 這種字，代表它被你打進正文；LaTeX 註解要用 \%（不是 //）。}
+\end{center}
+
+\end{document}

@@ -1,0 +1,336 @@
+% !TEX program = xelatex
+\documentclass[11pt,a4paper]{article}
+
+\input{style.tex}
+\renewcommand{\arraystretch}{1.18}
+
+\begin{document}
+
+% ---------- Title ----------
+\begin{center}
+  {\LARGE \textbf{NFT（非同質化通證）重點筆記}}\\[6pt]
+  {\large \textcolor{muted}{只保留：是什麼｜用途｜用在哪｜怎麼 work｜例子}}\\[10pt]
+  \tagpill{NFT}\quad \tagpill{Token}\quad \tagpill{Smart Contract}\quad \tagpill{ERC-721}\quad
+  \tagpill{ERC-1155}\quad \tagpill{Digital Twin}
+\end{center}
+
+\begin{KeyBox}{快速總結（考前 30 秒）}
+\begin{itemize}
+  \item \textbf{一句話}：NFT 是一種\textbf{不可互換、通常不可分割}的通證，用\textbf{智能合約寫入唯一識別}，把「真實世界的唯一性」帶進數位世界。
+  \item \textbf{本質}：NFT 更像\textbf{區塊鏈上的證書/憑證}（provenance + ownership record），可用來對應\textbf{數位內容}或\textbf{現實資產/權益}（數位孿生）。
+  \item \textbf{用在哪}：數位藝術/收藏、遊戲道具、門票/會員（訪問權）、實物綁定（可赎回）、域名/身份（ENS）等。
+  \item \textbf{關鍵提醒}：買 NFT \textbf{不一定}等於買到「底層素材著作權」；以及 NFT 的\textbf{存儲方式}（鏈上/IPFS/中心化）會影響不可篡改性與安全性。
+\end{itemize}
+\end{KeyBox}
+
+\tableofcontents
+
+% =========================================================
+\section{NFT 是什麼？（定位與定義）}
+
+\begin{DefBox}{一句話定義}
+\textbf{NFT（Non-Fungible Token）}是一種在區塊鏈上發行的\textbf{非同質化通證}：每個通證在智能合約中帶有\textbf{唯一識別資訊}（如 hash / tokenId / metadata 指針），因此\textbf{彼此不可互換}，且多數情況\textbf{不可分割}。
+\end{DefBox}
+
+\begin{KeyBox}{FT vs NFT（抓住「可互換」這個核心差別）}
+\begin{itemize}
+  \item \textbf{同質化通證（FT）}：可互換、可拆分。例：\textbf{BTC/ETH}，1 BTC 等於另一個 1 BTC（像兩張面額相同的鈔票）。
+  \item \textbf{非同質化通證（NFT）}：不可互換、通常不可拆分。每個 NFT 都有\textbf{獨一無二}的識別資訊，因此「沒有兩個 NFT 完全相同」。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{為什麼 NFT 被說成「數位孿生」的基礎？}
+數位世界可以無限複製同一份檔案（像素/屬性完全一致），但現實世界的物品具有\textbf{唯一性}。\\
+NFT 透過區塊鏈把「唯一識別 + 可驗證記錄」帶入數位世界，使某個數位物件/權益可以被當作\textbf{獨特的、可追溯的資產/憑證}來持有與交易。
+\end{HowBox}
+
+% =========================================================
+\section{用途（能解決什麼問題？）}
+
+\begin{KeyBox}{用途（回答：NFT 可以做什麼）}
+\begin{itemize}
+  \item \textbf{出处证明（Provenance）}：用唯一識別與鏈上記錄證明「這個東西從哪來、誰持有過」。
+  \item \textbf{所有權/權益記錄}：像現實世界的證書一樣，NFT 可作為「所有權記錄」或「權益憑證」。
+  \item \textbf{把資產與權利拆分為可交易的數位單位}：例如\textbf{門票/會員資格}、\textbf{遊戲道具}、\textbf{實物兑付權}等。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{NFT 是资产吗？（考點式回答）}
+\begin{itemize}
+  \item \textbf{可以是「资产」}：當 NFT 代表\textbf{可交易的權益/所有權/使用權}（例如門票、會員、兑付權、遊戲道具）時，市場會把它當作資產定價。
+  \item \textbf{但本質更像「鏈上憑證」}：NFT 自身常代表的是\textbf{某種權利或對應關係}，而非一定等於「你已擁有底層內容/實物的全部法律權利」。
+\end{itemize}
+\end{WarnBox}
+
+% =========================================================
+\section{用在哪（典型場景 / 類型）}
+
+\begin{KeyBox}{NFT 常見 5 類應用（背分類 + 例子就夠）}
+\begin{itemize}
+  \item \textbf{數位藝術/收藏 NFT}：圖片、文字、攝影、音樂、影片等（常被稱為「數位藏品」）。
+  \item \textbf{遊戲道具 NFT}：道具/角色/土地等；強調「玩家可真正持有」與跨場景的可組合性想像。
+  \item \textbf{訪問權 NFT}：門票、會員資格、粉絲社群准入（可降低黃牛/可查出票與交易記錄）。
+  \item \textbf{數位孿生 NFT}：與實物 1:1 綁定（可赎回）；赎回後 NFT 可能被\textbf{銷毀}以維持對應關係。
+  \item \textbf{身份/域名 NFT}：如 \textbf{ENS} 域名，把難讀的地址映射為可讀名字（例：vitalik.eth）。
+\end{itemize}
+\end{KeyBox}
+
+% =========================================================
+\section{怎麼 work（機制 / 合約標準 / 存儲）}
+
+\subsection{唯一性從哪裡來？}
+
+\begin{HowBox}{NFT 的「唯一性」怎麼被保證？}
+\begin{itemize}
+  \item NFT 在\textbf{智能合約}中帶有\textbf{識別資訊}（tokenId / metadata / hash 等）。
+  \item 這些資訊讓每個 NFT 可被鏈上驗證，且\textbf{不能被另一枚通證直接替代}。
+  \item 交易與持有變更會留下\textbf{可追溯的鏈上記錄}，因此能做出处证明。
+\end{itemize}
+\end{HowBox}
+
+\subsection{合約標準（ERC-721 / ERC-1155 / ERC-3664）}
+
+\begin{DefBox}{NFT 是什麼層級的東西？}
+NFT 可理解為\textbf{一套智能合約規格/標準}下鑄造出的通證。常見標準包括 \textbf{ERC-721} 與 \textbf{ERC-1155}，並有更偏遊戲/元宇宙特性的延伸（如文中提到的 \textbf{ERC-3664}）。
+\end{DefBox}
+
+\begin{KeyBox}{ERC-721 vs ERC-1155（只記「定位差異」）}
+\begin{itemize}
+  \item \textbf{ERC-721}：更偏「\textbf{收藏/投資}」場景的經典標準；用於數位藏品、證明型資產等。
+  \item \textbf{ERC-1155}：更偏「\textbf{功能型/大量資產}」場景；一個合約可管理\textbf{多種類/多份}通證，常見於 Web3 遊戲資產。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{ERC-3664（文中定位：更像「下一代遊戲 NFT」）}
+文中強調其更貼合元宇宙/遊戲：\textbf{屬性可升級、可修改、可添加/移除、可組合、可拆分}，讓遊戲道具能像「可成長的物件」那樣被合約定義。
+\end{HowBox}
+
+\subsection{NFT 存在哪裡？（鏈上 / IPFS / 中心化）}
+
+\begin{KeyBox}{NFT 資料存儲的 3 種方式（安全性由高到低）}
+\begin{itemize}
+  \item \textbf{鏈上存儲}：安全級別最高、最符合不可篡改（例：文中提到 CryptoPunks、Uniswap V3 的 LP NFT）。
+  \item \textbf{IPFS 分佈式存儲}：安全性相對高、去中心化程度較好（例：文中提到 Doodles、无聊猿等使用 IPFS）。
+  \item \textbf{中心化伺服器存儲}：安全級別最低、受單點影響最大（不符合 Web3 去中心化精神）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{買到 NFT = 買到著作權嗎？（超高頻陷阱）}
+\begin{itemize}
+  \item \textbf{不一定。}NFT 交易的是「通證所有權/權益」，但底層素材的\textbf{著作權}要看項目的授權條款。
+  \item 文中給出三種常見授權：\textbf{完全開放}／\textbf{完全保留}／\textbf{有限開放}（商用有上限或需談版稅）。
+\end{itemize}
+\end{WarnBox}
+
+% =========================================================
+\section{例子（用案例把分類與機制對上）}
+
+\subsection{例子 1：UniSocks（數位孿生 / 可赎回）}
+
+\begin{DefBox}{UniSocks（數位孿生 NFT）}
+UniSocks 是一種與實物商品\textbf{1:1 綁定}的 NFT：持有人可選擇\textbf{赎回}對應實物；赎回後其 NFT 可能被\textbf{銷毀}以維持唯一對應。
+\end{DefBox}
+
+\begin{HowBox}{它怎麼 work（對回「數位孿生」的邏輯）}
+\begin{itemize}
+  \item NFT 作為「\textbf{兑付權/所有權記錄}」存在於鏈上。
+  \item 持有人可在「持有（當資產）」與「赎回（換成實物）」之間選擇。
+  \item 若赎回，需有機制避免一物多賣（文中描述：赎回後 NFT 被銷毀）。
+\end{itemize}
+\end{HowBox}
+
+\subsection{例子 2：ENS（身份/域名 NFT）}
+
+\begin{DefBox}{ENS（Ethereum Name Service）}
+ENS 是以太坊的域名系統：把難讀的錢包地址映射成可讀域名（例如 \texttt{vitalik.eth}），域名以 NFT 形式儲存在錢包中，可被交易轉讓。
+\end{DefBox}
+
+\begin{KeyBox}{用在哪（身份/可讀性）}
+\begin{itemize}
+  \item \textbf{身份呈現}：用域名替代地址，提高可識別性。
+  \item \textbf{資產/權利化}：域名可作為可交易的權益（像網域一樣）。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{例子 3：BAYC（数位艺术 + 社群/商用權）}
+
+\begin{DefBox}{BAYC（数字艺术 NFT + 社群身份）}
+BAYC 是頭像類（PFP）數位藝術 NFT 系列；除了收藏與交易，還被強調為一種\textbf{身份認同與社群歸屬}的載體。
+\end{DefBox}
+
+\begin{HowBox}{它怎麼 work（為什麼不只是圖片）}
+\begin{itemize}
+  \item NFT 作為「\textbf{身份標誌}」：持有者常把它作為社交頭像，形成社群可見的身份信號。
+  \item \textbf{商用授權}（文中取向）：交易後著作權/商用權授權給持有者，使其可做衍生與二創（提升使用價值）。
+  \item \textbf{社群運營}：持有者社群與活動（聚會、私域）把 NFT 從「收藏」推向「使用」。
+\end{itemize}
+\end{HowBox}
+
+% =========================================================
+\section{NFT 交易平台（用在哪：買賣 / 發行 / 流動性）}
+
+\begin{KeyBox}{你要記住的框架（平台差在哪）}
+NFT 交易平台的差異通常看 4 件事：
+\begin{itemize}
+  \item \textbf{審核門檻}：誰都能上架 vs 平台嚴格審核（影響詐騙風險/品質）
+  \item \textbf{付款方式}：純加密錢包 vs 可刷卡/美元（影響新手門檻）
+  \item \textbf{鏈生態}：Ethereum / Solana / Polygon 等（影響社群與資產集中度）
+  \item \textbf{平台治理}：公司化平台 vs DAO/社群化平台（是否更符合 Web3 精神）
+\end{itemize}
+\end{KeyBox}
+
+\subsection{OpenSea（最大型綜合 NFT 市集）}
+\begin{DefBox}{是什麼}
+\textbf{OpenSea} 是全球規模最大的 NFT 交易平台之一，支援多條主流公鏈的 NFT 進行一級/二級市場交易。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用途}：買賣各類 NFT、瀏覽系列、掛單/出價、做市場流動性。
+  \item \textbf{用在哪}：多鏈資產交易的「大市場」，常作為價格與地板價（Floor Price）的參考入口。
+\end{itemize}
+\end{KeyBox}
+\begin{WarnBox}{注意（風險點）}
+文中強調 OpenSea 對發行方審核不嚴、誰都能上架；即使有藍勾驗證，也不等於作品權威或價值保證，因此買家需自行判斷真偽與價值。
+\end{WarnBox}
+
+\subsection{Nifty Gateway（審核制 + 可用美元）}
+\begin{DefBox}{是什麼}
+\textbf{Nifty Gateway} 是 Gemini 交易所旗下的 NFT 平台，具備較嚴格的上架審核機制，並支援以美元方式購買。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用途}：更偏「精品/策展」型 NFT 發售與交易；降低新手換幣門檻。
+  \item \textbf{用在哪}：希望用 \textbf{美元/銀行卡} 直接購買 NFT 的情境。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{Axie Marketplace（遊戲專用市場）}
+\begin{DefBox}{是什麼}
+\textbf{Axie Marketplace} 是專門交易 \textbf{Axie Infinity} 遊戲資產（角色/道具/土地等 NFT）的官方/核心市場。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用途}：遊戲內資產交易與定價，服務單一遊戲生態。
+  \item \textbf{用在哪}：Web3 遊戲中「資產即 NFT」的典型案例（用市場承接玩家流動性）。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{Magic Eden（Solana 生態主力市場）}
+\begin{DefBox}{是什麼}
+\textbf{Magic Eden} 是 Solana 生態的重要 NFT 交易平台，常被稱為「Solana 上的 OpenSea」。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用途}：Solana 鏈上 NFT 的主要交易入口與流動性匯聚地。
+  \item \textbf{用在哪}：Solana NFT 生態中高頻交易與熱門系列聚集處。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{X2Y2（更偏 Web3 精神的交易平台：社群/DAO 取向）}
+\begin{DefBox}{是什麼}
+\textbf{X2Y2} 被文中描述為更偏去中心化的 NFT 交易平台：所有權屬於 Web3 社群，以 DAO 自治取向運作。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用途}：提供 NFT 市集交易功能，同時以「社群所有/治理」吸引偏好 Web3 理念的使用者。
+  \item \textbf{用在哪}：對比公司化平台（如 OpenSea）時常被拿來談「平台是否去中心化」。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{Gem（聚合器：一次看多個市場）}
+\begin{DefBox}{是什麼}
+\textbf{Gem} 不是單一交易平台，而是 NFT 市集\textbf{聚合器}：把多個平台的掛單匯總，支援批量購買/批量掛單以節省成本。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用途}：一站式比價與掃貨；批量操作降低手續費與時間成本。
+  \item \textbf{用在哪}：需要在多個 NFT 市場間快速搜尋、集中下單的情境。
+\end{itemize}
+\end{KeyBox}
+
+
+% =========================================================
+\section{知名 NFT Project（例子：三個代表性系列）}
+
+\begin{KeyBox}{本節只背三件事}
+\begin{itemize}
+  \item 這些 Project 為什麼紅：\textbf{共識度 + 稀缺性 + 社群運營 + 使用/身份屬性}
+  \item 它們不只是圖片：常結合\textbf{社群准入、商用授權、活動/空投、擴展故事}
+  \item 評估時要看：\textbf{存儲方式}與\textbf{著作權授權條款}（能不能二創/商用）
+\end{itemize}
+\end{KeyBox}
+
+\subsection{Azuki（PFP 系列 + 強社群 + 合約創新）}
+\begin{DefBox}{是什麼}
+\textbf{Azuki} 是頭像類（PFP）NFT 系列，以角色風格、配飾稀缺度與社群運營建立共識，並探索 IP 延展與現實活動結合。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用在哪}：社交頭像身份、社群歸屬、IP 擴展與二創空間（利於傳播）。
+  \item \textbf{用途}：把 NFT 從「收藏」推向「品牌/IP」：讓持有者更願意公開展示、參與社群。
+\end{itemize}
+\end{KeyBox}
+\begin{HowBox}{怎麼 work（你要能講出它做了什麼）}
+\begin{itemize}
+  \item \textbf{共識與社群建設}：透過白名單/社群機制篩選高共識成員，形成長期品牌效應。
+  \item \textbf{合約創新（文中重點）}：提到 ERC-721A 降低鑄造成本（一次 Gas 可鑄造多枚）。
+  \item \textbf{回饋機制}：空投（如 BEANZ）擴大系列與市場關注，提升持有者體感。
+\end{itemize}
+\end{HowBox}
+\begin{WarnBox}{注意}
+文中提到 Azuki 曾出現信任危機事件；此類 Project 的後續走勢高度依賴\textbf{團隊運營}與\textbf{社群信任}是否能維持。
+\end{WarnBox}
+
+\subsection{BAYC（无聊猿：身份社群 + 商用權）}
+\begin{DefBox}{是什麼}
+\textbf{Bored Ape Yacht Club（BAYC）} 是由 Yuga Labs 打造的現象級 PFP NFT 系列，總量 10,000，採 ERC-721 標準，並強調「收藏 + 身份 + 社群」三位一體。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用在哪}：作為社交身份象徵、社群准入與活動參與的門票（身份/圈層屬性很強）。
+  \item \textbf{用途}：將 NFT 從「圖片」升級為「可商用的 IP 資產 + 社群會員資格」。
+\end{itemize}
+\end{KeyBox}
+\begin{HowBox}{怎麼 work（成功機制：抓 3 點）}
+\begin{itemize}
+  \item \textbf{稀缺性 + 屬性稀有度}：系列內個體價格差異常來自特徵稀缺度與市場共識。
+  \item \textbf{社群運營與玩法}：不斷釋放新玩法/活動，維持注意力與共識。
+  \item \textbf{商用授權}：文中強調交易後著作權/商用權授權給持有者，提升衍生與二創價值。
+\end{itemize}
+\end{HowBox}
+
+\subsection{Cheers UP（CUP：官方授權 + 平台身份標識）}
+\begin{DefBox}{是什麼}
+\textbf{Cheers UP（CUP）} 是文中提到的海外 NFT 系列，具備官方授權背景與固定總量機制（盲盒態/開圖態兩種形態，總量封頂）。
+\end{DefBox}
+\begin{KeyBox}{用途 / 用在哪}
+\begin{itemize}
+  \item \textbf{用在哪}：作為社群文化符號與身份展示（文中提到可設為平台海外站頭像並獲得特殊標識）。
+  \item \textbf{用途}：用「授權 + 社群文化」提高共識起點，並透過活動/空投/積分等方式維持互動。
+\end{itemize}
+\end{KeyBox}
+\begin{WarnBox}{注意}
+這類依賴授權與平台生態的系列，後續表現很吃\textbf{社群熱度}與\textbf{項目方運營節奏}；高起點不等於能長期維持。
+\end{WarnBox}
+
+
+% =========================================================
+\section{快速複習題（自測用）}
+
+\begin{KeyBox}{Q1：NFT 是资产吗？}
+A：NFT 可以被市場當作資產交易，但本質更像鏈上\textbf{憑證/權益記錄}：它可代表所有權、访问权、兑付权或某種对照关系；是否「真擁有」底層內容/實物的完整權利，要看授權與法律安排。
+\end{KeyBox}
+
+\begin{KeyBox}{Q2：FT 和 NFT 的核心差別是什麼？}
+A：\textbf{可互換性}。FT（如 BTC/ETH）同質可互換且可拆分；NFT 具有唯一識別，\textbf{不可互換}且多數\textbf{不可分割}。
+\end{KeyBox}
+
+\begin{KeyBox}{Q3：買 NFT 為什麼不一定買到著作權？}
+A：因為 NFT 交易的是\textbf{通證所有權/權益}，但底層素材著作權取決於項目的授權條款（完全開放／完全保留／有限開放）。
+\end{KeyBox}
+
+\begin{WarnBox}{最後一句總結（考前記這句）}
+NFT 用智能合約把「\textbf{唯一性 + 可追溯}」帶進數位世界，讓數位內容與現實權益能以\textbf{憑證/權益}形式交易；但要特別注意\textbf{存儲方式}與\textbf{著作權授權}兩個坑。
+\end{WarnBox}
+
+\end{document}
