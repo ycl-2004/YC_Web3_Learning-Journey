@@ -1,0 +1,604 @@
+% !TEX program = xelatex
+\documentclass[11pt,a4paper]{article}
+
+\input{style.tex}
+\renewcommand{\arraystretch}{1.18}
+
+\begin{document}
+
+% ---------- Title ----------
+\begin{center}
+  {\LARGE \textbf{通证经济（Token Economics / Tokenomics）重點筆記}}\\[6pt]
+  {\large \textcolor{muted}{只保留：是什麼｜用途｜用在哪｜怎麼 work｜文中例子}}\\[10pt]
+  \tagpill{Web3}\quad \tagpill{Tokenomics}\quad \tagpill{Supply}\quad \tagpill{Demand}\quad
+  \tagpill{Distribution}\quad \tagpill{DAO}\quad \tagpill{GameFi}\quad \tagpill{X-to-Earn}
+\end{center}
+
+\begin{KeyBox}{快速總結（考前 30 秒）}
+\begin{itemize}
+  \item \textbf{一句話}：通证经济（Tokenomics）就是 Web3 项目里「通证如何\textbf{供给}、如何被\textbf{需求}、如何\textbf{分配激励}」的整套规则；设计好坏直接决定项目能否形成\textbf{正循环}。
+  \item \textbf{三根支柱}：\textbf{供给}（上限/已生成/净增速/销毁）＋\textbf{需求}（实用/收益/投机/收藏等）＋\textbf{分配}（激励从哪来、何时发、激励什么行为）。
+  \item \textbf{核心规律}：供不应求价格涨、供过于求价格跌；但 Web3 特别强调\textbf{分配机制}，因为它决定早期冷启动与长期留存。
+  \item \textbf{高频风险}：欺诈跑路与失败项目很多；供给失控导致贬值、巨鲸撤资导致死亡螺旋；锚定币/中心化承诺存在信任与监管风险；安全事件会触发崩盘式外流。
+\end{itemize}
+\end{KeyBox}
+
+\tableofcontents
+
+% =========================================================
+\section{通证经济是什麼？（定位与定义）}
+
+\begin{DefBox}{一句话定义}
+\textbf{通证经济（Token Economics / Tokenomics）}是 Web3 项目的「经济体系设计」：围绕通证的\textbf{发放、分配、流通与使用}机制，系统性安排\textbf{供给、需求、分配}三大要素，使项目能够\textbf{吸引参与者}并形成可持续的\textbf{正反馈}。
+\end{DefBox}
+
+\begin{KeyBox}{为什么说通证是 Web3 的核心？（文中要点）}
+\begin{itemize}
+  \item 通证是 Web3 的\textbf{激励工具}：奖励用户参与，是驱动系统运行的「燃油」。
+  \item 通证是 Web3 的\textbf{连接器}：连接生态中不同项目/场景（身份、NFT、交易媒介都可以是通证）。
+  \item 成败关键在\textbf{机制}：通证的\textbf{发放、分配、流通使用}机制，决定项目能否跑起来、跑得久。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{行业现实（文中提醒）}
+截至 2022 年初市场上同质化通证已超过 6000 种，NFT 数量更庞大；仅 2021 年 Web3 参与者在欺诈跑路项目中损失高达 120 亿美元（不含大量非恶意失败项目）。学习通证经济学的价值在于：\textbf{更好判断项目价值与风险}，参与时「擦亮眼睛」。
+\end{WarnBox}
+
+% =========================================================
+\section{用途（通证经济能解决什么问题？）}
+
+\begin{KeyBox}{用途（回答：Tokenomics 用来做什么）}
+\begin{itemize}
+  \item \textbf{冷启动拉新}：在产品体验尚不完善、网络效应未形成时，用财务激励吸引用户使用与贡献。
+  \item \textbf{协调多方参与者}：在投资人、团队、社区成员、生态供应商之间做激励与约束，避免失衡。
+  \item \textbf{维持系统运转}：通过供给/消耗/收入/金库机制，让经济体系长期可持续。
+  \item \textbf{价格与门槛管理}：通过市场供需与金库操作，影响通证价格，从而影响进入门槛与参与结构（文中在 DAO 里强调）。
+\end{itemize}
+\end{KeyBox}
+
+% =========================================================
+\section{通证经济三大支柱：供给｜需求｜分配}
+
+% -------------------------
+\subsection{供给（Supply）：上限｜已生成｜净增速｜销毁}
+
+\begin{DefBox}{供给的 3 个维度（文中框架）}
+任意时刻，一个通证经济体系的供给关键维度有 3 个：\textbf{通证数量上限}、\textbf{已生成通证数量}、\textbf{通证净增长速度}。\\
+若设计\textbf{销毁机制}，则：\textbf{净增长 = 生成通证 - 销毁通证}。
+\end{DefBox}
+
+\begin{KeyBox}{供给模型 4 类（背分类 + 例子就够）}
+\begin{itemize}
+  \item \textbf{紧缩型模型}：总量有上限或净增长为负（常依赖「需求上升」的隐含假设）。
+  \item \textbf{膨胀型模型}：总量无上限且净增长为正（适合流通型/实用型，但会稀释贬值）。
+  \item \textbf{双通证模型}：同一生态中两种通证，一紧缩（价值储藏/治理），一膨胀（流通/消耗），并由转换机制关联。
+  \item \textbf{锚定模型}：供给锚定现实资产/商品价值，用于特定场景的稳定计价与交易便利。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{供给模型怎么 work（抓住「优点/代价」）}
+\begin{itemize}
+  \item \textbf{紧缩型}：通过稀缺性维护价值，但可能让人更愿意\textbf{囤积}而非流通，降低生态活跃度。
+  \item \textbf{膨胀型}：更利于流通与使用，但增发会导致\textbf{持续贬值压力}。
+  \item \textbf{双通证}：让「价值储藏」与「流通使用」分工，分别匹配不同供给逻辑，降低单一通证承载过多矛盾。
+  \item \textbf{锚定型}：通过 1:1 锚定实现稳定价格，但引入\textbf{中心化信任}与审计/监管风险。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{文中例子：供给模型与参数}
+\begin{itemize}
+  \item \textbf{BTC（紧缩型）}：上限 2100 万枚；无销毁；产出速度周期性减半；已生成约 1900 万枚，剩余约 200 万枚将在 2140 年前后完成生成。文中观点：BTC 更像 Web3 的「黄金」，偏价值储藏，不强调生态内循环使用。
+  \item \textbf{DOGE（膨胀型）}：总量无上限；已生成约 1300 亿枚；每年增发 50 亿枚；无销毁。
+  \item \textbf{双通证（Axie Infinity：AXS + SLP）}：
+    \begin{itemize}
+      \item \textbf{AXS（治理/价值储藏倾向）}：总量上限 2.7 亿枚；用于参与治理投票、购买关键道具（Axies）。
+      \item \textbf{SLP（流通/消耗倾向）}：总量无上限；通过对战/任务产出；繁殖等消耗带来销毁，但净增速总体为正。
+    \end{itemize}
+  \item \textbf{USDT（锚定型）}：发行方声称以美元现金等价物为基石，发行等价值 USDT，使 1 USDT 约等于 1 美元；供给随储备变化（文中提到约 800 亿美元量级）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{供给侧高频风险点（文中）}
+\begin{itemize}
+  \item \textbf{紧缩型的副作用}：预期升值会强化囤积，抑制流通与生态活跃。
+  \item \textbf{膨胀型的代价}：增发导致贬值，若缺乏真实需求承接，会伤害长期发展。
+  \item \textbf{锚定型的信任风险}：缺乏监管时，发行方声明与审计报告未必真实准确，价格可能因质疑而波动。
+\end{itemize}
+\end{WarnBox}
+
+% -------------------------
+\subsection{需求（Demand）：通证被「想要」的原因}
+
+\begin{DefBox}{通证像商品也像资产（文中表述）}
+通证是加密数字物品：有时更像\textbf{商品}（为了使用），有时更像\textbf{资产}（为了投资）。一种通证可同时兼具多种功能，从而扩大需求面。
+\end{DefBox}
+
+\begin{KeyBox}{需求类型 5 类（背定义 + 例子）}
+\begin{itemize}
+  \item \textbf{持有型实用}：持有即可获得持续权利/非物化效用（会员、投票治理等）。
+  \item \textbf{消耗型实用}：使用功能必须\textbf{消耗}通证（常伴随销毁/费用机制）。
+  \item \textbf{收益型增值}：持有/质押带来定期收益或分成（像理财/现金流）。
+  \item \textbf{投机型增值}：通证本身用途弱，需求来自「未来有人更高价接盘」的信念与情绪。
+  \item \textbf{收藏}：不升值也不可交易/转赠仍有人买，原因是艺术性与偏好。
+\end{itemize}
+\end{KeyBox}
+
+\begin{KeyBox}{文中例子：需求类型对应项目}
+\begin{itemize}
+  \item \textbf{持有型实用：BAYC} —— 持有可成为私密俱乐部会员，并可能获得团队发放的 NFT 空投。
+  \item \textbf{消耗型实用：ChainLink（LINK）} —— LINK 的用途是支付使用去中心化预言机服务的费用。
+  \item \textbf{收益型增值：Curve Finance（CRV）} —— 质押 CRV 得 veCRV，可分享交易所交易佣金收入。
+  \item \textbf{多重角色：ETH} —— 作为最大生态的通用通证，在不同项目中扮演不同功能角色。
+  \item \textbf{收藏（不可二级交易仍有需求）} —— 文中提到部分国内数字藏品平台：购买后不可二次交易/转赠，但因艺术性强仍可能被秒空。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{投机型需求的关键点（文中提醒）}
+投机型需求的驱动力是对未来的信念与圈层情绪：强但难量化。判断强弱往往需要进入圈子感受持有者热情；同时也意味着\textbf{波动与崩塌风险更高}。
+\end{WarnBox}
+
+% -------------------------
+\subsection{分配（Distribution）：激励从哪来｜何时发｜激励什么}
+
+\begin{DefBox}{分配的核心目的（文中）}
+通证分配的核心目的是\textbf{合理激励用户与早期团队}，推动项目形成正循环。在早期产品未成熟时，通证的财务激励是吸引用户的重要因素。
+\end{DefBox}
+
+\begin{KeyBox}{一个 Web3 项目常见参与者（文中）}
+\textbf{投资人}、\textbf{发起团队}、\textbf{社区成员}、\textbf{生态供应商}。\\
+分配给谁、按什么节奏分配，会直接影响项目成败。
+\end{KeyBox}
+
+\begin{HowBox}{理解分配逻辑：先回答 3 个问题（文中）}
+\begin{itemize}
+  \item \textbf{激励通证从何而来？}
+  \item \textbf{分配时间表（Vesting/Cliff）怎样？}
+  \item \textbf{激励哪些行为？}
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{从何而来（文中两条路）}
+\begin{itemize}
+  \item \textbf{通证增发}：活动奖励、贡献者奖励、流动性质押奖励、空投等（总量增加）。
+  \item \textbf{项目金库（Treasury）再分配}：通过智能合约对日常交易收小额费用进入金库，再从金库发放激励（不增加总量，只是再分配）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{金库机制怎么 work（文中关键判断）}
+好的通证收集与发放机制应使：\textbf{发放激励通证}、\textbf{交易活跃度}、\textbf{收集到的通证}三者呈正比例波动。\\
+交易活跃时应发更多激励；若需要发放的通证少于「可/应发放」量，可能导致社区信心崩塌、用户退出。\\
+增发发放不易“发不出”，但\textbf{无节制增发}会透支增长空间、造成贬值；金库发放需要\textbf{量入为出}。
+\end{HowBox}
+
+\begin{KeyBox}{分配时间表：对用户更友好的 3 个特征（文中）}
+\begin{itemize}
+  \item \textbf{团队 Vesting 比用户更长}：团队更久才能拿完通证，利益与项目深度绑定。
+  \item \textbf{团队 Cliff 晚于用户}：先让用户拿到应得部分，再让团队开始拿，降低“造势后消失”风险。
+  \item \textbf{至少 50\% 通证分给社区}：激励社区在项目成熟后最终接手运营。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{被激励的行为会把项目推向何方（文中提醒）}
+激励规则决定参与者行动方向。常见激励是\textbf{活跃度}（如半年内使用/交易次数、首尾间隔等）。\\
+但当行业周期与情绪变化时，原本善意的激励设计也可能产生负面作用；文中以 \textbf{UST-LUNA 机制}作为“设计会失败”的典型提醒（细节在其他章节展开）。
+\end{WarnBox}
+
+% =========================================================
+\section{DAO 的经济模型（文中框架）}
+
+\begin{DefBox}{DAO 经济模型：一句话}
+DAO 的通证经济模型围绕「\textbf{创世通证}＋\textbf{金库}＋\textbf{成员治理投票}＋\textbf{产品/服务收入}」运转：成员用原生通证治理与贡献，DAO 通过产品/服务获得收入进入金库，再用于开支、激励或调控通证供需。
+\end{DefBox}
+
+\begin{HowBox}{DAO 基本流程怎么 work（按文中叙述）}
+\begin{itemize}
+  \item \textbf{建立时}创造\textbf{创世通证}：部分分发给创始成员，部分留在金库。
+  \item \textbf{金库资产}可能同时包含：DAO 原生通证与 ETH 等通用通证（有时创始成员需用 ETH 购买创世通证）。
+  \item \textbf{治理}：成员持原生通证投票，影响 DAO 决策与金库运营。
+  \item \textbf{价值创造}：成员贡献力量做出产品；用户可来自 DAO 内或外。
+  \item \textbf{收入}：外部用户付费（可用原生通证、ETH，甚至法币约定）；收入进金库，用于 DAO 开支或在市场调控原生通证供需。
+  \item \textbf{进入门槛}：通过管理原生通证价格影响加入门槛与成员结构。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{DAO 正反馈的关键（文中结论）}
+让模型形成正反馈的关键在于\textbf{为成员带来价值}，包括：
+\begin{itemize}
+  \item \textbf{外部价值}：原生通证在交易市场的增值（可出售变现）。
+  \item \textbf{内部价值}：成为 DAO 一员获得的归属感、知识等内在收益。
+\end{itemize}
+两者相互补充、也相互影响。
+\end{KeyBox}
+
+\begin{WarnBox}{DAO 的死亡螺旋（文中机制）}
+若原生通证\textbf{流动性差}，个别成员退出可能引发价格大幅波动，动摇信心；当价格剧烈波动且内部价值又低时，成员可能跟随抛售，贡献者减少、产品质量下降，最终进入\textbf{死亡螺旋}。\\
+文中对 DAO 运营的提醒：不要只依赖新成员资金流入，要组织资本/资产/通证\textbf{持续流入生态}，控制外流并创新激励机制以降低流失率。
+\end{WarnBox}
+
+% =========================================================
+\section{GameFi：Game or Fi？（文中要点）}
+
+\begin{DefBox}{GameFi 是什么？（文中定义）}
+\textbf{GameFi} 是把 Web2 游戏本体与 Web3 经济模型结合的游戏：用户资产 DeFi 化，\textbf{游戏道具 NFT 化}；用户参与游戏可获得奖励；代码可更公开透明，降低项目方作弊空间。
+\end{DefBox}
+
+\begin{KeyBox}{用在哪（GameFi 常见结构）}
+\begin{itemize}
+  \item \textbf{单通证模型}：产出场景获得通证、消耗场景失去通证（例：CryptoKitties；Axie 初期也曾是单通证后迭代）。
+  \item \textbf{双通证模型}：母通证（治理）+ 子通证（经济/流通），母通证通常更难获得、价值更高。
+  \item \textbf{NFT 定位两类}：
+    \begin{itemize}
+      \item 入场门票：必须先买 NFT 才能参与（现多见）。
+      \item 工具/能力：NFT 越多/越稀有，胜率/技能越强（文中提到 Era7）。
+    \end{itemize}
+  \item \textbf{质押}：质押通证或 NFT 换取奖励以稳定经济系统（例：Fancy Birds）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{GameFi 的金融本质（文中一句话）}
+GameFi 的经济模型，本质是\textbf{调控游戏内部通证的价格与数量变化}：重点在于平衡\textbf{产出场景}与\textbf{消耗场景}，否则通胀/出逃会破坏系统。
+\end{HowBox}
+
+\subsection{文中案例：Axie Infinity（成长与衰落）}
+
+\begin{KeyBox}{成长时间线（文中）}
+\begin{itemize}
+  \item 2017/12 开发开始；2018/02 预售筹集 900 ETH；2020/05 土地售罄筹集超 4600 ETH。
+  \item 2021/02 Ronin 主网上线；2021/07 日活超 35 万、日交易量超 2500 万美元；2021/08 收入 3.6 亿美元达巅峰。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{爆发原因（文中归纳）}
+\begin{itemize}
+  \item \textbf{技术}：迁移至 Ronin 侧链（为高性能与用户爆发铺路）。
+  \item \textbf{市场}：头像热潮带来 NFT 新用户。
+  \item \textbf{资本}：暴跌后资本寻找新增长点；GameFi 回本周期清晰、易被接受。
+\end{itemize}
+\end{HowBox}
+
+\begin{HowBox}{经济模型（文中）}
+\begin{itemize}
+  \item \textbf{双通证}：SLP（子通证，用于繁殖等费用）＋ AXS（母通证/治理 ERC-20，可玩游戏、质押、参与投票）。
+  \item \textbf{准入}：需购买 Axie NFT 才能参与。
+  \item \textbf{产出}：战斗胜利等获得通证奖励。
+  \item \textbf{消耗}：哺育/繁衍、获取治理资格等；也可在二级市场出售 NFT 获取通证；质押也可得奖励。
+\end{itemize}
+\end{HowBox}
+
+\begin{WarnBox}{死亡螺旋触发点（文中）}
+当负面情绪出现、通证价值下降，玩家抛售出逃会破坏系统平衡。文中指出 2022/03 Ronin Network 遭大规模黑客攻击后，各项指标暴跌，Axie 难回巅峰规模。
+\end{WarnBox}
+
+\begin{KeyBox}{GameFi 改变了什么（文中）}
+P2E 的关键差异不只是复杂度，而是\textbf{资产处置权}：运营商破产/关服时，玩家不必失去已获得资产。更投入的玩家也可能更忠诚、并参与治理。
+\end{KeyBox}
+
+% =========================================================
+\section{X-to-Earn（做 X 就赚钱）：增长模型与生命周期}
+
+\begin{DefBox}{X-to-Earn 是什么？（文中定义）}
+\textbf{X-to-Earn} 本质是：通过执行「X」这一动作获得通证，从而为用户带来收益。X 可以是任何动词（Move/Learn/Sing/Sleep 等）。它常用通证做冷启动，用市值膨胀吸引参与者投入劳动或资本。
+\end{DefBox}
+
+\begin{HowBox}{增长模型怎么 work（文中）}
+\begin{itemize}
+  \item \textbf{早期}：用通证激励吸引参与者（劳动/资本）。
+  \item \textbf{规模形成后}：通过游戏化、收费服务或外部性经济活动实现盈利与留存。
+  \item \textbf{对参与者}：形成新的要素市场，让资本/劳动力更高效地变现并获得回报。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{项目生命周期 5 阶段（文中）}
+\begin{itemize}
+  \item \textbf{1 市值膨胀期}：吸引参与者；月活决定上限（文中提到：月活 100 万可称现象级）。
+  \item \textbf{2 市值收缩期}：早期获利者离场；看是否有长期参与者留下、贡献值多大。
+  \item \textbf{3 不确定期}：寻找真实需求；看生态产品如何留人。
+  \item \textbf{4 第二增长曲线}：出现外部付费或外部性规模化带来爆发。
+  \item \textbf{5 死亡螺旋}：另一种结局：未找到商业模式与正外部性，参与者持续流失。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{X-to-Earn 的结构性风险（文中）}
+核心风险是：若用户获得的通证大量立刻离开体系进入市场，容易造成\textbf{通胀与价值走低}；若无法找到真实商业模式承接需求，就可能在收缩期走向\textbf{死亡螺旋}。
+\end{WarnBox}
+% =========================================================
+\section{X-to-Earn 的 6 种经济模型（按：频次 × 本金 × 劳动）}
+
+\begin{DefBox}{核心分类方法（文中）}
+理性的 X-to-Earn 参与者会考虑三件事：\textbf{本金投入}、\textbf{劳动投入}（体力/知识/决策/创作等）、\textbf{获得奖励的频次}。\\
+把「频次（高/低）」「本金（高/低）」「劳动（高/低）」组合起来，可演化出多种经济模型；文中重点展开其中\textbf{6 种}（另外两种“低频次、低劳动”的模型文中表示暂不具现实意义，略）。
+\end{DefBox}
+
+% -------------------------
+\subsection{1) 高频次｜高本金｜高劳动：资本 \& 机器人密集型}
+
+\begin{KeyBox}{典型案例（文中）}
+Bitcoin 与各类 Mining Networks；新生代包括 Chainlink、The Graph、Render Network 等。
+\end{KeyBox}
+
+\begin{HowBox}{怎么 work（结构特征）}
+\begin{itemize}
+  \item 高频奖励：产出与结算频繁（持续竞争、持续产出）。
+  \item 高本金：参与需要大量资本投入（设备/算力/基础设施或等价资源）。
+  \item 高劳动：劳动更多体现为\textbf{标准化计算/验证工作}与持续运营投入。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{优点（文中）}
+\begin{itemize}
+  \item 网络沉淀的经济价值大，有机会形成 \textbf{Fat Protocol}。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{缺点与风险（文中）}
+\begin{itemize}
+  \item 网络经济体内卷：计算标准化、军备竞赛激烈。
+  \item 资本竞争强：组织化机构林立，\textbf{散户参与度低}。
+  \item 更适合 \textbf{B 端}产品而非 C 端大众产品。
+\end{itemize}
+\end{WarnBox}
+
+\begin{HowBox}{设计建议（文中）}
+\begin{itemize}
+  \item 在验证工作的算法中引入更高的数学难度与随机性，避免大参与者的非对称优势无序增长，降低基尼系数。
+  \item 不适合一开始就采用：门槛太高会挡住大量参与者，容易变成少数人控制的游戏；早期应\textbf{降低门槛}，后续再逐步提高。
+\end{itemize}
+\end{HowBox}
+
+% -------------------------
+\subsection{2) 高频次｜高本金｜低劳动：资本密集型}
+
+\begin{KeyBox}{典型案例（文中）}
+POS 网络、Staking 平台、Liquidity Mining 网络、以资产证明为准入门槛的网络等。
+\end{KeyBox}
+
+\begin{KeyBox}{优点（文中）}
+\begin{itemize}
+  \item 参与者劳动成本低，资本效率被放大，是有效筹集资本与流动性的一类网络。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{缺点与风险（文中）}
+\begin{itemize}
+  \item 存在被巨鲸挟持的风险：收益不达预期时巨鲸撤资，网络价值下跌，进入\textbf{死亡螺旋}。
+\end{itemize}
+\end{WarnBox}
+
+\begin{HowBox}{设计建议（文中）}
+\begin{itemize}
+  \item 引入更多参与者相互博弈，提高忠诚度（如用 POAP 做治理/参与奖励）。
+  \item 设计长期价值锁定机制（例如引入投票权机制）。
+  \item 长期方向：引入更多工作量与劳动是必然趋势。
+\end{itemize}
+\end{HowBox}
+
+% -------------------------
+\subsection{3) 高频次｜低本金｜高劳动：劳动密集型}
+
+\begin{KeyBox}{典型案例（文中）}
+Play-to-Earn、Move-to-Earn、Learn-to-Earn 等。
+\end{KeyBox}
+
+\begin{KeyBox}{优点（文中）}
+\begin{itemize}
+  \item 门槛低：不需要很有钱，有劳动付出即可换取奖励。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{缺点与风险（文中）}
+\begin{itemize}
+  \item 劳动不容易量化，需要找到背后的商业模式承接价值。
+\end{itemize}
+\end{WarnBox}
+
+\begin{HowBox}{设计建议（文中）}
+\begin{itemize}
+  \item 引入智能硬件与预言机等\textbf{防作弊}技术。
+  \item 价值创造两条路：
+    \begin{itemize}
+      \item 向内：设计更复杂、随机的游戏化商业生态。
+      \item 向外：寻找外部性的经济价值。
+    \end{itemize}
+\end{itemize}
+\end{HowBox}
+
+% -------------------------
+\subsection{4) 高频次｜低本金｜低劳动：流量巨大但价值较低}
+
+\begin{KeyBox}{典型案例（文中）}
+Sleep-to-Earn、Read-to-Earn 等。
+\end{KeyBox}
+
+\begin{KeyBox}{优点（文中）}
+\begin{itemize}
+  \item 门槛极低，受众巨大，容易获得大量参与者。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{缺点与风险（文中）}
+\begin{itemize}
+  \item 参与者画像不精准（谁都能完成简单动作），劳动价值与资本贡献都低，容易变成低价值网络。
+\end{itemize}
+\end{WarnBox}
+
+\begin{HowBox}{设计建议（文中）}
+\begin{itemize}
+  \item 提高本金或劳动门槛，尽量找到明确的垂直场景，让简单劳动更有意义。
+  \item 适当增加本金投入：让作恶者有成本，否则可罚没本金。
+\end{itemize}
+\end{HowBox}
+
+% -------------------------
+\subsection{5) 低频次｜低本金｜高劳动：技能密集型}
+
+\begin{KeyBox}{典型案例（文中）}
+Research-to-Earn、Code-to-Earn、Sing-to-Earn 等。
+\end{KeyBox}
+
+\begin{KeyBox}{优点（文中）}
+\begin{itemize}
+  \item 用户精准、劳动技术含量高，并且更可能存在商业模式。
+\end{itemize}
+\end{KeyBox}
+
+\begin{WarnBox}{缺点与风险（文中）}
+\begin{itemize}
+  \item 参与者精英化、规模难做大；任务难量化且奖励结算困难。
+\end{itemize}
+\end{WarnBox}
+
+\begin{HowBox}{设计建议（文中）}
+\begin{itemize}
+  \item 将复杂技能任务\textbf{拆分为更大众化的小任务}再组合，提高结算频次、简化动作。
+  \item 文中举例：与其把股票分析师整体做成 Research-to-Earn，不如拆成负责收集信息的 Read-to-Earn + 给出意见的 Comment-to-Earn。
+\end{itemize}
+\end{HowBox}
+
+% -------------------------
+\subsection{6) 低频次｜高本金｜高劳动：接近 Venture DAO（较少见）}
+
+\begin{KeyBox}{文中定位}
+这种模型不常见，比较接近 \textbf{Venture DAO}：参与者共同出钱、共同做投资策略、一起分红。
+\end{KeyBox}
+
+\begin{WarnBox}{难点（文中）}
+\begin{itemize}
+  \item 确认与激励频次低；工作量难衡量；任务极度不标准化，难以达成共识，因此难形成规模。
+\end{itemize}
+\end{WarnBox}
+
+\begin{WarnBox}{文中说明：为何只讲 6 种？}
+文中提到另外两种\textbf{低频次、低劳动}模型：参与者既不额外付出劳动、奖励频次也低，暂不具备符合 Web3 精神的现实意义，且几乎没有现实案例，因此不展开。
+\end{WarnBox}
+
+% -------------------------
+\subsection{文中例子：Move-to-Earn（STEPN）}
+
+\begin{DefBox}{STEPN（Move-to-Earn）}
+Move-to-Earn：通过运动获取收益。文中以 STEPN 为代表项目，强调其用「运动 + 奖励」吸引大量 Web2 用户进入。
+\end{DefBox}
+
+\begin{KeyBox}{通证与 NFT 结构（文中）}
+\begin{itemize}
+  \item \textbf{双通证}：经济通证 \textbf{GST} 与治理通证 \textbf{GMT}（鞋 1--29 级主要获得 GST，升到 30 级后可获得 GMT）。
+  \item \textbf{准入}：至少购买一双\textbf{鞋子 NFT}才有 Earn 资格。
+  \item \textbf{鞋子类型}：步行者/慢跑者/速跑者/训练者（对应最佳配速范围，影响收益）。
+  \item \textbf{属性}：效率（GST 产出）、运气（掉落概率）、舒适度（GMT 效率）、耐久度（磨损）。
+  \item \textbf{供给起点}：市场上鞋子 NFT 由最初 10,000 双创世鞋“铸造/创造”而来；质量分级：普通/罕见/稀有/史诗/传奇。
+  \item \textbf{能量机制}：运动消耗能量；能量耗尽无法获得奖励；能量按固定节奏恢复；鞋子数量增加会提高每日能量上限。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{产出与消耗场景（文中）}
+\begin{itemize}
+  \item \textbf{产出}：运动是主要产出场景（规划个人/马拉松/后台模式等），还有租赁系统（出租/承租 NFT 分成收益）。
+  \item \textbf{消耗}：修复（用 GST 保持高效产出）、升级（GST+GMT 提升属性）、创造/铸造（GST+GMT 产出鞋盒）。
+  \item \textbf{设计目的}：相比产出更强调消耗场景，让收益尽量留在体系中，维持正循环，避免通胀。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{文中总结的“吸引力”}
+用户既能锻炼身体又能获得收益；若用户量增长，还可能带来碳中和等外部性效应（文中表述为“一举多得”）。
+\end{KeyBox}
+
+% -------------------------
+\subsection{文中例子：Learn-to-Earn（Let me speak）}
+
+\begin{DefBox}{Let me speak（Learn-to-Earn）}
+Learn-to-Earn：通过学习获得通证收益。Let me speak 的核心是：购买角色 NFT（类似“英语老师”）获得 Earn 资格，通过学习获得奖励。
+\end{DefBox}
+
+\begin{KeyBox}{通证与 NFT（文中）}
+\begin{itemize}
+  \item \textbf{双通证}：治理通证 \textbf{LMS} 与经济通证 \textbf{LSTARS}（文中提到截至 2022/05 LMS 暂未发行）。
+  \item \textbf{角色 NFT 分级}：普通/罕见/稀有/史诗/传奇；质量不同带来属性差异。
+  \item \textbf{关键参数（文中解释）}：天赋（学习赚钱效率）、回报率（不同等级收益水平）、签证长度（有效期；到期需重新购买或铸造；可延长次数与天数在文中给出）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{HowBox}{产出与消耗场景（文中）}
+\begin{itemize}
+  \item \textbf{产出}：学习获得 LSTAR；NFT 可租赁（出租/承租分成）。
+  \item \textbf{消耗}：消耗 LSTAR 铸造新角色 NFT、延长签证；未来 LMS 作为升级与治理投票等消耗/用途。
+\end{itemize}
+\end{HowBox}
+
+\begin{WarnBox}{前提条件（文中强调）}
+该模式的正向作用（促进学习动力与乐趣）建立在通证经济体系\textbf{健康}的前提下；否则用户信心不足，参与意愿下降。
+\end{WarnBox}
+
+% =========================================================
+\section{更多 Web3 领域的例子（文中提到的用法）}
+
+\subsection{SocialFi（社交化金融）}
+
+\begin{DefBox}{SocialFi 是什么？（文中定义）}
+\textbf{SocialFi} = Social + Finance：在区块链上结合社交与金融，针对 Web2 平台控制用户数据、用户收益少的问题，强调把\textbf{数据所有权归还用户}。
+\end{DefBox}
+
+\begin{KeyBox}{文中例子：CyberConnect（去中心化社交图谱）}
+\begin{itemize}
+  \item 目标：让用户在不同 Web3 平台间无缝迁移社交数据（关注关系/粉丝）。
+  \item 形态：网页 App，可用 MetaMask 连接；功能包括关注、检索关注者/追随者名单、推荐关注者。
+  \item 文中备注：暂未发行通证，但可观察到行业里 Personal Tokens / Community Tokens / Social Platform Tokens 等分类。
+\end{itemize}
+\end{KeyBox}
+
+\subsection{NFTFi（NFT + Finance）}
+
+\begin{DefBox}{NFTFi 在解决什么？（文中逻辑）}
+当 NFT 被大量囤积却缺乏应用场景时，NFTFi 尝试把 NFT 与金融结合，提供\textbf{额外使用场景与增值空间}（如抵押借贷、租赁等）。
+\end{DefBox}
+
+\begin{HowBox}{文中例子：BendDAO（NFT 抵押借贷）}
+\begin{itemize}
+  \item 机制：把蓝筹 NFT 抵押进 NFT 池，转换为 boundNFT，并按抵押率即时借出 ETH（随借随还，无需撮合期限）。
+  \item 风控：NFT 地板价波动大；文中提到触及清算线后有 48 小时保护期，期间还款可避免被清算。
+  \item 供需：出借人提供 ETH 流动性赚利息；借款人用 NFT 抵押即时借 ETH，形成供需关系。
+\end{itemize}
+\end{HowBox}
+
+\begin{KeyBox}{NFT 租赁（文中提到）}
+文中提到可租赁 NFT 的提案 \textbf{ERC-4907} 已通过，但是否大规模应用仍未知。
+\end{KeyBox}
+
+\subsection{更多案例（文中“破圈/营销/新通证形态”）}
+
+\begin{KeyBox}{Netflix《爱、死亡与机器人》NFT 寻宝（文中）}
+\begin{itemize}
+  \item 玩法：在剧集画面/广告牌/社交媒体中随机出现线索（如二维码），扫码可在 OpenSea 购买对应主题 NFT。
+  \item 特征：无限增发，更多作为收藏品；对 Netflix 来说既有铸造收入，也能提升话题热度（营销破圈）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{KeyBox}{Web2 的 X-to-Earn 类比：蚂蚁森林（文中）}
+\begin{itemize}
+  \item 用户低碳行为积攒“绿色能量”（文中把它类比为一种通证）。
+  \item 将“绿色能量”兑换为种树等公益行动；公园门票/露营收入可返还给贡献者（文中描述其形成一个小型经济闭环）。
+\end{itemize}
+\end{KeyBox}
+
+\begin{DefBox}{SBT（灵魂绑定通证，文中提到的概念）}
+文中引用维塔利克提出的 \textbf{SBT（Soulbound Token）}：个体可发行主题 SBT 发送给朋友；接收者\textbf{无法转发}，从而形成链上关系网络，可用于\textbf{去中心化社会}与\textbf{身份自证}，并被认为在金融应用上有广阔想象空间。
+\end{DefBox}
+
+% =========================================================
+\section{最后的考点清单（自测用）}
+
+\begin{KeyBox}{Q1：通证经济（Tokenomics）三大支柱是什么？}
+A：\textbf{供给}（上限/已生成/净增速/销毁）＋\textbf{需求}（实用/收益/投机/收藏等）＋\textbf{分配}（激励从哪来、何时发、激励什么行为）。
+\end{KeyBox}
+
+\begin{KeyBox}{Q2：紧缩型 vs 膨胀型供给模型的核心优劣？}
+A：紧缩型通过稀缺性维护价值，但易囤积、抑制流通；膨胀型促进流通使用，但增发带来贬值压力。
+\end{KeyBox}
+
+\begin{KeyBox}{Q3：为什么分配时间表很重要？文中给了哪些“对用户友好”的特征？}
+A：时间表体现团队信心与绑定程度。对用户友好的特征：\textbf{团队 vesting 更长}、\textbf{团队 cliff 更晚}、\textbf{至少 50\% 通证分配给社区}。
+\end{KeyBox}
+
+\begin{WarnBox}{最后一句总结（照背）}
+通证经济是 Web3 的发动机：用供给/需求/分配把激励、使用与价值创造连成闭环；但设计一旦失衡（增发失控、需求虚弱、分配不公或安全事件），就可能引发信心崩塌与\textbf{死亡螺旋}。
+\end{WarnBox}
+
+\end{document}
