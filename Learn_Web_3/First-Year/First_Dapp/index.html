@@ -1,43 +1,192 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <head>
-      <!-- pre-existing code -->
-
-      <style>
-        body {
-          text-align: center;
-          font-family: Arial, Helvetica, sans-serif;
-        }
-
-        div {
-          width: 20%;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: column;
-        }
-
-        button {
-          width: 100%;
-          margin: 10px 0px 5px 0px;
-        }
-      </style>
-    </head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LearnWeb3 First dApp</title>
+
+    <style>
+      body {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      div {
+        width: 20%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+      }
+      button {
+        width: 100%;
+        margin: 10px 0px 5px 0px;
+      }
+      input {
+        padding: 8px;
+      }
+      #status {
+        margin-top: 12px;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+    </style>
   </head>
+
   <body>
     <div>
       <h1>This is my dApp!</h1>
       <p>Here we can set or get the mood:</p>
-      <label for="mood">Input Mood:</label> <br />
-      <input type="text" id="mood" />
+
+      <label for="mood">Input Mood:</label><br />
+      <input type="text" id="mood" placeholder="e.g. happy" />
 
       <button onclick="getMood()">Get Mood</button>
       <button onclick="setMood()">Set Mood</button>
+
       <p id="showMood"></p>
+      <p id="status"></p>
     </div>
+
+    <script type="module">
+      import {
+        createWalletClient,
+        createPublicClient,
+        custom,
+        getContract,
+      } from "https://esm.sh/viem";
+      import { sepolia } from "https://esm.sh/viem/chains";
+
+      // ✅ Your deployed contract address (Sepolia)
+      const MoodContractAddress = "0x8089Ad39704F3Bc5f9b85C4BE4427631A137e58e";
+
+      // ✅ ABI (matches your MoodDiary contract)
+      const MoodContractABI = [
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_mood",
+              type: "string",
+            },
+          ],
+          name: "setMood",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMood",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      const statusEl = document.getElementById("status");
+      const showMoodEl = document.getElementById("showMood");
+
+      function setStatus(msg) {
+        statusEl.textContent = msg || "";
+      }
+
+      // ✅ Ensure MetaMask exists
+      if (!window.ethereum) {
+        setStatus("MetaMask not detected. Please install MetaMask.");
+        throw new Error("MetaMask not detected");
+      }
+
+      // ✅ Ensure Sepolia network (chainId 11155111 = 0xaa36a7)
+      const chainId = await window.ethereum.request({ method: "eth_chainId" });
+      if (chainId !== "0xaa36a7") {
+        setStatus("Please switch MetaMask network to Sepolia, then refresh.");
+        // Optional: try to prompt switch automatically (may fail if not added)
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0xaa36a7" }],
+          });
+          setStatus("Switched to Sepolia. Refreshing...");
+          location.reload();
+        } catch (e) {
+          // user can switch manually
+        }
+      }
+
+      // ✅ Create clients
+      const publicClient = createPublicClient({
+        chain: sepolia,
+        transport: custom(window.ethereum),
+      });
+
+      const walletClient = createWalletClient({
+        chain: sepolia,
+        transport: custom(window.ethereum),
+      });
+
+      // ✅ Request wallet connection
+      setStatus("Connecting wallet...");
+      const [address] = await walletClient.requestAddresses();
+      setStatus(`Connected: ${address.slice(0, 6)}...${address.slice(-4)}`);
+
+      // ✅ Contract instance: read with public, write with wallet
+      const MoodContract = getContract({
+        address: MoodContractAddress,
+        abi: MoodContractABI,
+        client: { public: publicClient, wallet: walletClient },
+      });
+
+      // ✅ Expose functions for onclick (module scope -> window)
+      window.getMood = async function () {
+        try {
+          setStatus("Reading mood from contract...");
+          const mood = await MoodContract.read.getMood();
+          showMoodEl.innerText = `Your Mood: ${mood}`;
+          setStatus("Read successful.");
+        } catch (err) {
+          console.error(err);
+          setStatus("Read failed. Check console for details.");
+        }
+      };
+
+      window.setMood = async function () {
+        try {
+          const mood = document.getElementById("mood").value.trim();
+          if (!mood) {
+            setStatus("Please enter a mood first.");
+            return;
+          }
+
+          setStatus("Sending transaction (MetaMask will pop up)...");
+          const hash = await MoodContract.write.setMood([mood], {
+            account: address,
+          });
+
+          setStatus(
+            `Tx sent: ${hash.slice(0, 10)}... Waiting for confirmation...`,
+          );
+
+          // Wait for confirmation (mined)
+          await publicClient.waitForTransactionReceipt({ hash });
+
+          setStatus("Transaction confirmed! Reading updated mood...");
+          const updated = await MoodContract.read.getMood();
+          showMoodEl.innerText = `Your Mood: ${updated}`;
+          setStatus("Done ✅");
+        } catch (err) {
+          console.error(err);
+          setStatus("Write failed or rejected. Check console for details.");
+        }
+      };
+
+      // Optional: auto-read on load
+      // window.getMood();
+    </script>
   </body>
 </html>

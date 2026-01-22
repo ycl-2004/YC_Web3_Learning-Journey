@@ -1,0 +1,402 @@
+# 1) HTML 骨架：网页的外壳
+
+```html
+<!doctype html>
+<html lang="en">
+```
+
+* `<!doctype html>`：告诉浏览器这是 HTML5。
+* `lang="en"`：网页语言标记（SEO/辅助工具会用到）。
+
+---
+
+# 2) `<head>`：页面设定 + 样式
+
+```html
+<meta charset="UTF-8" />
+```
+
+* 字符编码 UTF-8（避免中文/特殊符号乱码）。
+
+```html
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+```
+
+* 旧式兼容性设定（现代浏览器几乎无感，但保留不坏）。
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+```
+
+* 手机/响应式显示用（让页面在手机不会被缩放得怪怪的）。
+
+```html
+<title>LearnWeb3 First dApp</title>
+```
+
+* 浏览器标签页标题。
+
+---
+
+## CSS：纯前端排版，与区块链无关
+
+```css
+body { text-align: center; font-family: ... }
+div { width: 20%; margin: 0 auto; display:flex; flex-direction: column; }
+button { width: 100%; margin: ... }
+input { padding: 8px; }
+#status { margin-top: 12px; font-size: 14px; opacity: 0.9; }
+```
+
+* 这些只是让 UI 看起来整齐：
+
+  * `div` 变成纵向排版（column）
+  * `width:20%` 让它窄窄居中
+  * `#status` 专门显示连接/交易状态
+
+---
+
+# 3) `<body>`：UI 元素（你会点的按钮/输入框）
+
+```html
+<input type="text" id="mood" placeholder="e.g. happy" />
+```
+
+* `id="mood"`：JS 之后会用它读你输入的文字：
+
+  ```js
+  document.getElementById("mood").value
+  ```
+
+```html
+<button onclick="getMood()">Get Mood</button>
+<button onclick="setMood()">Set Mood</button>
+```
+
+* 点击按钮会调用全局函数 `getMood()` / `setMood()`。
+* **重点**：因为你的 JS 用的是 `type="module"`，所以你后来把函数挂到 `window.getMood`、`window.setMood`，这样 `onclick` 才找得到。
+
+```html
+<p id="showMood"></p>
+<p id="status"></p>
+```
+
+* `showMood`：显示“链上读到的 mood”
+* `status`：显示当前状态（连接中、发送交易、等待确认、完成等）
+
+---
+
+# 4) `<script type="module">`：dApp 的核心（连钱包、连合约、读写链）
+
+## 4.1 为什么是 `type="module"`？
+
+```html
+<script type="module">
+```
+
+* 让你可以用 `import ... from ...` 直接加载 viem（ES module）。
+* 也允许你在顶层使用 `await`（例如请求 MetaMask 地址）。
+* **副作用**：模块内声明的函数不会自动变成全局，因此你要 `window.getMood = ...`。
+
+---
+
+# 5) 引入 viem：你的“区块链 API 工具箱”
+
+```js
+import {
+  createWalletClient,
+  createPublicClient,
+  custom,
+  getContract,
+} from "https://esm.sh/viem";
+import { sepolia } from "https://esm.sh/viem/chains";
+```
+
+这些分别做什么：
+
+* `createWalletClient`：用来做**需要钱包签名**的操作（写入、发交易）。
+* `createPublicClient`：用来做**只读**操作（读链、查交易是否确认）。
+* `custom(window.ethereum)`：把 MetaMask 注入的 provider 当作 transport（桥）。
+* `getContract`：用 ABI + 地址创建一个“合约对象”，让你可以用 `.read.xxx()` / `.write.xxx()` 调用函数。
+* `sepolia`：告诉 viem 你要连接的链参数（chainId、RPC 规则等）。
+
+---
+
+# 6) 合约地址 & ABI：前端知道“要找谁、怎么叫它”
+
+```js
+const MoodContractAddress = "0x8089...";
+```
+
+* 这就是你 Remix 部署出来的合约地址。
+* **合约地址 = 链上某个“程序”的地址**（不是你的钱包地址）。
+
+```js
+const MoodContractABI = [ ... ];
+```
+
+* ABI 就是“接口说明书”：
+
+  * 合约有哪些函数
+  * 每个函数参数类型是什么
+  * 返回值是什么
+  * view / nonpayable 等属性是什么
+* 没 ABI，前端就不知道怎么把 `getMood()` 编成 EVM call data。
+
+---
+
+# 7) 取 DOM 元素：准备更新 UI 文本
+
+```js
+const statusEl = document.getElementById("status");
+const showMoodEl = document.getElementById("showMood");
+```
+
+* 以后会把文字显示到这些 `<p>` 里。
+
+```js
+function setStatus(msg) {
+  statusEl.textContent = msg || "";
+}
+```
+
+* 小工具函数：简化“更新状态文字”。
+
+---
+
+# 8) 检查 MetaMask 是否存在
+
+```js
+if (!window.ethereum) {
+  setStatus("MetaMask not detected. Please install MetaMask.");
+  throw new Error("MetaMask not detected");
+}
+```
+
+* `window.ethereum` 是 MetaMask 注入到页面里的对象。
+* 没有它就没办法连接钱包，也无法签名交易。
+* `throw` 是直接停止脚本运行（避免后续报一堆莫名其妙错误）。
+
+---
+
+# 9) 确保网络是 Sepolia（超关键）
+
+```js
+const chainId = await window.ethereum.request({ method: "eth_chainId" });
+if (chainId !== "0xaa36a7") {
+  setStatus("Please switch MetaMask network to Sepolia, then refresh.");
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0xaa36a7" }],
+    });
+    setStatus("Switched to Sepolia. Refreshing...");
+    location.reload();
+  } catch (e) { }
+}
+```
+
+你在做什么：
+
+* 先问 MetaMask：你现在在哪条链？
+* Sepolia 的 chainId 是 `11155111`，十六进制就是 `0xaa36a7`。
+* 如果不是 Sepolia：
+
+  * 先提示用户切网
+  * 也尝试用 `wallet_switchEthereumChain` 自动弹窗切网
+  * 成功后 `location.reload()` 重载页面，让后面的 client 用对链
+
+**为什么重要？**
+
+* 合约地址在 Sepolia 才存在
+* 如果你连到 Mainnet 或别的链，读合约会回 `0x`（你之前遇到过）
+
+---
+
+# 10) 创建两个 client：读写分工（你的代码很专业）
+
+```js
+const publicClient = createPublicClient({
+  chain: sepolia,
+  transport: custom(window.ethereum),
+});
+
+const walletClient = createWalletClient({
+  chain: sepolia,
+  transport: custom(window.ethereum),
+});
+```
+
+这两者差异：
+
+* `publicClient`：
+
+  * 用来 `read`（不用签名）
+  * 用来等交易确认 `waitForTransactionReceipt`
+* `walletClient`：
+
+  * 用来 `write`（需要签名）
+  * 会触发 MetaMask 弹窗
+
+**为什么要分开？**
+
+* 读写逻辑不同：写要用户授权签名，读不需要
+* 用分工的方式更稳定，也更符合 viem 的推荐用法
+
+---
+
+# 11) 请求用户钱包地址（连接网站）
+
+```js
+setStatus("Connecting wallet...");
+const [address] = await walletClient.requestAddresses();
+setStatus(`Connected: ${address.slice(0, 6)}...${address.slice(-4)}`);
+```
+
+* `requestAddresses()` 会弹 MetaMask “Connect”。
+* `address` 是你的钱包地址，用来作为写入交易的 `account`。
+* 你用 slice 显示前后几位，这是常见 UX（不显示完整地址）。
+
+---
+
+# 12) 创建合约实例：让 ABI + 地址变成“可调用对象”
+
+```js
+const MoodContract = getContract({
+  address: MoodContractAddress,
+  abi: MoodContractABI,
+  client: { public: publicClient, wallet: walletClient },
+});
+```
+
+这行完成了最核心的事情：
+
+* 把“合约地址 + ABI + client”组合起来
+* 让你可以这样调用：
+
+  * `MoodContract.read.getMood()`
+  * `MoodContract.write.setMood(...)`
+
+---
+
+# 13) `window.getMood`：读链（不会弹 MetaMask）
+
+```js
+window.getMood = async function () {
+  try {
+    setStatus("Reading mood from contract...");
+    const mood = await MoodContract.read.getMood();
+    showMoodEl.innerText = `Your Mood: ${mood}`;
+    setStatus("Read successful.");
+  } catch (err) {
+    console.error(err);
+    setStatus("Read failed. Check console for details.");
+  }
+};
+```
+
+发生了什么：
+
+1. 更新状态文字：正在读取
+2. 调用链上 view 函数：`getMood()`
+3. 把回传值显示到 `<p id="showMood">`
+4. 成功后更新状态
+5. 失败则打印 error，提示去 console 看详情
+
+**关键概念：**
+
+* read 是 `eth_call`，不花 gas，不签名，所以不会弹钱包。
+
+---
+
+# 14) `window.setMood`：写链（会弹 MetaMask）
+
+```js
+window.setMood = async function () {
+  try {
+    const mood = document.getElementById("mood").value.trim();
+    if (!mood) { setStatus("Please enter a mood first."); return; }
+
+    setStatus("Sending transaction (MetaMask will pop up)...");
+    const hash = await MoodContract.write.setMood([mood], { account: address });
+
+    setStatus(`Tx sent: ${hash.slice(0, 10)}... Waiting for confirmation...`);
+
+    await publicClient.waitForTransactionReceipt({ hash });
+
+    setStatus("Transaction confirmed! Reading updated mood...");
+    const updated = await MoodContract.read.getMood();
+    showMoodEl.innerText = `Your Mood: ${updated}`;
+    setStatus("Done ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus("Write failed or rejected. Check console for details.");
+  }
+};
+```
+
+这段非常“完整”，包含了真实 dApp 必备的流程：
+
+### (1) 读输入框
+
+```js
+const mood = document.getElementById("mood").value.trim();
+```
+
+### (2) 输入验证
+
+空字串就不送交易（省 gas、避免无意义 tx）
+
+### (3) 发交易（写链）
+
+```js
+const hash = await MoodContract.write.setMood([mood], { account: address });
+```
+
+* 这一步会弹 MetaMask
+* 用户确认后交易广播到 Sepolia
+* 返回交易 hash（还没确认）
+
+### (4) 等交易“挖到区块里”
+
+```js
+await publicClient.waitForTransactionReceipt({ hash });
+```
+
+这一步超级重要：
+
+* 不等确认就立刻读，会经常读到旧状态（你之前就会怀疑“怎么没更新”）
+
+### (5) 交易确认后再读一次
+
+```js
+const updated = await MoodContract.read.getMood();
+```
+
+### (6) 更新 UI
+
+显示最新 mood，然后状态显示 Done
+
+---
+
+# 15) 可选：页面加载就自动读取
+
+```js
+// window.getMood();
+```
+
+* 你把它注释掉了
+* 如果你想“打开网页就自动显示当前 mood”，取消注释就行。
+
+---
+
+# 总结：这份代码在 dApp 的本质是什么？
+
+你这份文件做的事情可以用一句话概括：
+
+> **用 MetaMask 提供身份与签名，用 viem 把网页变成合约的遥控器：**
+>
+> * `Get Mood` → 免费读取链上状态
+> * `Set Mood` → 发送交易写入链上状态（需 gas）
+
+---

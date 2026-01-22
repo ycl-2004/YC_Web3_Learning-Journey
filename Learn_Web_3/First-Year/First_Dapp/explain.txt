@@ -1,0 +1,244 @@
+* 📘 学习笔记
+* 🧠 复盘用
+* 🧑‍🏫 以后教别人 / 写报告 / 面试用
+
+---
+
+# 📘 dApp 学习讲义：MoodDiary 实作全解析
+
+---
+
+## 一、什么是 dApp？（一句话版）
+
+> **dApp = 前端网页 + 区块链智能合约 + 钱包（用户身份）**
+
+和传统网站最大的不同是：
+
+* 数据不在你服务器
+* 身份不靠帐号密码
+* 状态由 **区块链保证不可篡改**
+
+---
+
+## 二、整体架构总览（先有全局观）
+
+```
+┌──────────────┐
+│   Browser    │
+│  index.html  │
+│  JavaScript  │
+└──────┬───────┘
+       │  (viem)
+       ▼
+┌──────────────┐
+│  MetaMask   │  ← 用户身份 + 签名
+└──────┬───────┘
+       │
+       ▼
+┌────────────────────┐
+│  Sepolia Testnet   │
+│  MoodDiary.sol     │
+│  (Smart Contract) │
+└────────────────────┘
+```
+
+---
+
+## 三、智能合约：链上状态的“唯一真相”
+
+### 你的合约做了什么？
+
+```solidity
+contract MoodDiary {
+    string mood;
+
+    function setMood(string memory _mood) public {
+        mood = _mood;
+    }
+
+    function getMood() public view returns (string memory) {
+        return mood;
+    }
+}
+```
+
+### 关键理解点
+
+| 概念        | 说明              |
+| --------- | --------------- |
+| `mood`    | 链上状态（存在区块链）     |
+| `setMood` | 写入状态（要交易、要 gas） |
+| `getMood` | 读取状态（免费、只读）     |
+
+👉 **所有用户看到的是同一份 mood**（这就是去中心化）
+
+---
+
+## 四、什么是 ABI？（超级关键）
+
+### 1️⃣ ABI 是什么？
+
+> **ABI = Application Binary Interface**
+> 是「前端 ↔ 合约」之间的**沟通说明书**
+
+前端不能直接看 Solidity
+👉 只能靠 ABI 知道：
+
+* 有哪些函数
+* 参数类型是什么
+* 回传什么
+
+---
+
+### 2️⃣ 你的 ABI 在干嘛？
+
+```js
+const MoodContractABI = [
+  {
+    name: "setMood",
+    inputs: [{ name: "_mood", type: "string" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    name: "getMood",
+    inputs: [],
+    outputs: [{ type: "string" }],
+    stateMutability: "view",
+    type: "function"
+  }
+];
+```
+
+### 重点理解
+
+* ABI **不是代码**
+* ABI 是「合约能被怎么叫用」
+* ABI 一旦不匹配：
+
+  * 就会出现你之前看到的 `returned no data (0x)`
+
+👉 **ABI 就是前端和合约的“契约”**
+
+---
+
+## 五、为什么 read 和 write 要分开？
+
+### 你现在用的正确架构
+
+```js
+client: {
+  public: publicClient,   // 读
+  wallet: walletClient    // 写
+}
+```
+
+### 原因（这是重点）
+
+| 操作          | 是否改链上状态 | 是否要钱包签名 |
+| ----------- | ------- | ------- |
+| `getMood()` | ❌ 否     | ❌ 否     |
+| `setMood()` | ✅ 是     | ✅ 是     |
+
+### 对应现实世界
+
+* **读**：查资料（不留记录）
+* **写**：签合约（要身份、要成本）
+
+---
+
+## 六、MetaMask 在 dApp 中的真实角色
+
+### MetaMask 不是钱包这么简单
+
+它同时是：
+
+1. 🆔 **用户身份（地址）**
+2. ✍️ **签名器（私钥）**
+3. 🌉 **浏览器 ↔ 区块链 的桥**
+
+你代码里的这行：
+
+```js
+const [address] = await walletClient.requestAddresses();
+```
+
+等于：
+
+> 「请用户证明：我是谁」
+
+---
+
+## 七、你为什么会遇到那些 Bug？（复盘）
+
+### ❌ Bug 1：`getMood()` 回 `0x`
+
+**原因**：
+
+* 合约地址错 / 网络错 / ABI 不匹配
+
+**你学到**：
+👉 Web3 Debug 第一件事：
+**地址 + 网络 + ABI**
+
+---
+
+### ❌ Bug 2：写入成功但前端读不到
+
+**原因**：
+
+* 交易还没确认
+* 用 wallet client 去 read
+
+**你学到**：
+👉 写入要等 **transaction mined**
+
+---
+
+### ❌ Bug 3：`onclick` 没反应
+
+**原因**：
+
+* `type="module"` 有作用域隔离
+
+**你学到**：
+👉 Web3 前端 = 现代 JS，不是旧 script
+
+---
+
+## 八、你现在真正掌握的能力（很重要）
+
+你现在**已经会**：
+
+* ✔ 部署智能合约
+* ✔ 用 ABI 连接前端
+* ✔ 理解 read / write 差异
+* ✔ 用钱包签名交易
+* ✔ Debug 合约与前端不一致的问题
+
+👉 这已经超过 **90% Web3 初学者**
+
+---
+
+## 九、一句话学习总结（建议背下来）
+
+> **区块链负责状态与信任，
+> 合约定义规则，
+> ABI 定义接口，
+> 钱包提供身份，
+> 前端只是一个“安全的遥控器”。**
+
+---
+
+## 下一步学习路线（我建议的）
+
+如果你继续学，我会推荐顺序是：
+
+1️⃣ **事件（Events）+ 监听链上变化**
+2️⃣ **多个用户 / 多状态合约**
+3️⃣ **React + Web3（真实项目形态）**
+4️⃣ **为什么要 Layer 2 / Gas 优化**
+
+你可以直接跟我说：
+👉「**下一步我想学事件监听**」

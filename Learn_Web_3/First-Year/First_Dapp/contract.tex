@@ -1,0 +1,436 @@
+\documentclass[11pt,a4paper]{article}
+
+% ===== 中文支持（关键）=====
+\usepackage{ctex} % ⭐ 一行解决中文问题（Overleaf 已内建）
+
+% ===== 其他套件 =====
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\geometry{margin=1in}
+
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{LearnWeb3 First dApp}
+\rhead{Code Walkthrough}
+\cfoot{\thepage}
+
+% ---- Styling ----
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+
+% ---- Code listing setup ----
+\lstdefinelanguage{HTML}{
+  sensitive=true,
+  morecomment=[s]{<!--}{-->},
+  morestring=[b]",
+  morekeywords={
+    <!doctype,html,head,meta,title,style,body,div,h1,p,label,br,input,button,script
+  }
+}
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{black!20},
+  backgroundcolor=\color{black!2},
+  numbers=left,
+  numberstyle=\tiny\color{black!50},
+  xleftmargin=2em,
+  framexleftmargin=1.5em,
+  tabsize=2,
+  showstringspaces=false
+}
+
+% ---- Document ----
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{MoodDiary dApp：\;index.html 全部解析}}\\[6pt]
+  {\small（本讲义为 Overleaf / \LaTeX\ 版本，可直接编译成 PDF）}
+\end{center}
+\vspace{0.5em}
+
+\section{目标与整体概念}
+
+本 dApp 的核心目标是：用前端网页通过 \textbf{MetaMask}（用户身份+签名）与 \textbf{Sepolia 测试网}上的 \textbf{MoodDiary 智能合约}交互，实现：
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Get Mood}：读取链上状态（\texttt{getMood()}，\textbf{read / view}，不弹钱包、不花 gas）
+  \item \textbf{Set Mood}：写入链上状态（\texttt{setMood(string)}，\textbf{write / transaction}，弹钱包、需要 gas）
+\end{itemize}
+
+\section{1) HTML 骨架：网页外壳}
+
+\begin{lstlisting}[language=HTML]
+<!doctype html>
+<html lang="en">
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{<!doctype html>}：声明 HTML5，避免浏览器用旧渲染模式。
+  \item \texttt{lang="en"}：页面语言标记（SEO / 辅助工具 / 翻译等会用到）。
+\end{itemize}
+
+\section{2) \texttt{<head>}：页面设定与样式}
+
+\subsection{Meta 标签（显示与兼容性）}
+
+\begin{lstlisting}[language=HTML]
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LearnWeb3 First dApp</title>
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{charset="UTF-8"}：避免中文/特殊字符乱码。
+  \item \texttt{X-UA-Compatible}：旧式兼容性声明（现代浏览器影响很小）。
+  \item \texttt{viewport}：手机端显示比例正确（响应式基础）。
+  \item \texttt{title}：浏览器标签页标题。
+\end{itemize}
+
+\subsection{CSS：纯前端排版（与区块链逻辑无关）}
+
+\begin{lstlisting}[language=HTML]
+<style>
+  body { text-align: center; font-family: Arial, Helvetica, sans-serif; }
+  div { width: 20%; margin: 0 auto; display: flex; flex-direction: column; }
+  button { width: 100%; margin: 10px 0px 5px 0px; }
+  input { padding: 8px; }
+  #status { margin-top: 12px; font-size: 14px; opacity: 0.9; }
+</style>
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{div} 使用 \texttt{flex} + \texttt{column}，让输入框/按钮纵向排列。
+  \item \texttt{width:20\%} + \texttt{margin:0 auto}：让内容窄窄居中。
+  \item \texttt{\#status}：专门显示“连接中 / 发交易 / 等确认 / 完成”等状态文字。
+\end{itemize}
+
+\section{3) \texttt{<body>}：UI 元素（用户会操作的部分）}
+
+\subsection{输入框：用户输入 mood}
+
+\begin{lstlisting}[language=HTML]
+<input type="text" id="mood" placeholder="e.g. happy" />
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{id="mood"}：后续 JS 用 \texttt{document.getElementById("mood").value} 读用户输入。
+\end{itemize}
+
+\subsection{按钮：调用 get / set}
+
+\begin{lstlisting}[language=HTML]
+<button onclick="getMood()">Get Mood</button>
+<button onclick="setMood()">Set Mood</button>
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item 点击按钮会调用全局函数 \texttt{getMood()} / \texttt{setMood()}。
+  \item \textbf{重点：}由于后面使用 \texttt{<script type="module">}，模块作用域下的函数默认不是全局，因此需要显式挂到 \texttt{window.getMood} / \texttt{window.setMood}，让 \texttt{onclick} 能找到。
+\end{itemize}
+
+\subsection{输出区：显示 mood 与状态}
+
+\begin{lstlisting}[language=HTML]
+<p id="showMood"></p>
+<p id="status"></p>
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{showMood}：显示链上读到的 mood（例如 \texttt{Your Mood: happy}）。
+  \item \texttt{status}：显示当前流程状态（连接钱包、发送交易、等待确认等）。
+\end{itemize}
+
+\section{4) \texttt{<script type="module">}：dApp 核心逻辑}
+
+\subsection{4.1 为什么要用 module？}
+
+\begin{lstlisting}[language=HTML]
+<script type="module">
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item 允许使用 ES Module 的 \texttt{import ... from ...} 直接引入 viem。
+  \item 允许顶层使用 \texttt{await}（例如请求钱包地址）。
+  \item \textbf{副作用：}模块内变量/函数默认不挂在全局，若要让 HTML 的 \texttt{onclick="..."} 调到，需要 \texttt{window.getMood = ...}。
+\end{itemize}
+
+\section{5) 引入 viem：区块链接口工具}
+
+\begin{lstlisting}[language=JavaScript]
+import {
+  createWalletClient,
+  createPublicClient,
+  custom,
+  getContract,
+} from "https://esm.sh/viem";
+import { sepolia } from "https://esm.sh/viem/chains";
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{createWalletClient}：用于 \textbf{写入}（需要钱包签名的交易）。
+  \item \texttt{createPublicClient}：用于 \textbf{读取}与等待交易确认（不需要签名）。
+  \item \texttt{custom(window.ethereum)}：使用 MetaMask 注入的 provider 作为 transport（桥接到链）。
+  \item \texttt{getContract}：用 ABI+地址创建合约实例，支持 \texttt{.read} / \texttt{.write} 调用。
+  \item \texttt{sepolia}：链配置（chainId、网络参数等）。
+\end{itemize}
+
+\section{6) 合约地址与 ABI：告诉前端“找谁、怎么叫它”}
+
+\subsection{合约地址}
+
+\begin{lstlisting}[language=JavaScript]
+const MoodContractAddress = "0x8089Ad39704F3Bc5f9b85C4BE4427631A137e58e";
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item 这是你在 Remix 部署到 Sepolia 后得到的 \textbf{合约地址}。
+  \item \textbf{合约地址}是链上“程序”的位置（\emph{不是}你的钱包地址）。
+\end{itemize}
+
+\subsection{ABI（接口说明书）}
+
+\begin{lstlisting}[language=JavaScript]
+const MoodContractABI = [
+  {
+    inputs: [{ internalType: "string", name: "_mood", type: "string" }],
+    name: "setMood",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getMood",
+    outputs: [{ internalType: "string", name: "", type: "string" }],
+    stateMutability: "view",
+    type: "function",
+  },
+];
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item ABI = \textbf{前端与合约沟通的契约/说明书}，描述函数签名与参数类型。
+  \item ABI 不匹配会导致：读函数回 \texttt{0x}（无数据）或调用失败。
+\end{itemize}
+
+\section{7) 取得 DOM 元素：更新画面文字}
+
+\begin{lstlisting}[language=JavaScript]
+const statusEl = document.getElementById("status");
+const showMoodEl = document.getElementById("showMood");
+
+function setStatus(msg) {
+  statusEl.textContent = msg || "";
+}
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{statusEl} / \texttt{showMoodEl}：用于把信息写回页面。
+  \item \texttt{setStatus}：让更新状态文字变得更简洁。
+\end{itemize}
+
+\section{8) 检查 MetaMask 是否存在}
+
+\begin{lstlisting}[language=JavaScript]
+if (!window.ethereum) {
+  setStatus("MetaMask not detected. Please install MetaMask.");
+  throw new Error("MetaMask not detected");
+}
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{window.ethereum} 是 MetaMask 注入到网页的对象。
+  \item 没有它就无法连接钱包、无法签名交易，因此直接 \texttt{throw} 停止执行更安全。
+\end{itemize}
+
+\section{9) 确保网络是 Sepolia（关键防踩坑）}
+
+\begin{lstlisting}[language=JavaScript]
+const chainId = await window.ethereum.request({ method: "eth_chainId" });
+if (chainId !== "0xaa36a7") {
+  setStatus("Please switch MetaMask network to Sepolia, then refresh.");
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0xaa36a7" }],
+    });
+    setStatus("Switched to Sepolia. Refreshing...");
+    location.reload();
+  } catch (e) {}
+}
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{eth\_chainId}：询问当前连接的链。
+  \item Sepolia chainId（十六进制）为 \texttt{0xaa36a7}。
+  \item 若用户不在 Sepolia：
+    \begin{itemize}
+      \item 提示用户切网
+      \item 尝试自动触发 MetaMask 切网
+      \item 成功后刷新页面，确保后续 client 走对网络
+    \end{itemize}
+  \item \textbf{为什么重要：}合约地址只在对应网络存在；如果连错链，读合约常见表现是返回 \texttt{0x} 或调用失败。
+\end{itemize}
+
+\section{10) 创建两个 client：read / write 分工}
+
+\begin{lstlisting}[language=JavaScript]
+const publicClient = createPublicClient({
+  chain: sepolia,
+  transport: custom(window.ethereum),
+});
+
+const walletClient = createWalletClient({
+  chain: sepolia,
+  transport: custom(window.ethereum),
+});
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{publicClient}：负责 \textbf{读取}（\texttt{eth\_call}）与等待交易确认。
+  \item \texttt{walletClient}：负责 \textbf{写入}（发交易、弹 MetaMask 签名）。
+  \item 分工清晰、稳定，也更符合 viem 的常见用法。
+\end{itemize}
+
+\section{11) 请求用户钱包地址（连接网站）}
+
+\begin{lstlisting}[language=JavaScript]
+setStatus("Connecting wallet...");
+const [address] = await walletClient.requestAddresses();
+setStatus(`Connected: ${address.slice(0, 6)}...${address.slice(-4)}`);
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{requestAddresses()} 会触发 MetaMask 弹窗，用户点 Connect 后返回地址列表。
+  \item \texttt{address} 将用于写入交易的 \texttt{account} 参数。
+  \item 使用 \texttt{slice} 只显示地址头尾，属于常见 UX。
+\end{itemize}
+
+\section{12) 创建合约实例：把 ABI + Address 变成可调用对象}
+
+\begin{lstlisting}[language=JavaScript]
+const MoodContract = getContract({
+  address: MoodContractAddress,
+  abi: MoodContractABI,
+  client: { public: publicClient, wallet: walletClient },
+});
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item 这一步把“合约地址 + ABI + client”组合起来，得到可直接调用的对象。
+  \item 后续使用：
+    \begin{itemize}
+      \item \texttt{MoodContract.read.getMood()}
+      \item \texttt{MoodContract.write.setMood(...)}
+    \end{itemize}
+\end{itemize}
+
+\section{13) \texttt{window.getMood}：读链（不弹 MetaMask）}
+
+\begin{lstlisting}[language=JavaScript]
+window.getMood = async function () {
+  try {
+    setStatus("Reading mood from contract...");
+    const mood = await MoodContract.read.getMood();
+    showMoodEl.innerText = `Your Mood: ${mood}`;
+    setStatus("Read successful.");
+  } catch (err) {
+    console.error(err);
+    setStatus("Read failed. Check console for details.");
+  }
+};
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{read} 调用本质是 \texttt{eth\_call}：不改变链上状态、不消耗 gas、不需要签名，所以不会弹钱包。
+  \item 成功后把 mood 显示在 \texttt{\#showMood}，状态显示在 \texttt{\#status}。
+\end{itemize}
+
+\section{14) \texttt{window.setMood}：写链（弹 MetaMask + 等确认）}
+
+\begin{lstlisting}[language=JavaScript]
+window.setMood = async function () {
+  try {
+    const mood = document.getElementById("mood").value.trim();
+    if (!mood) {
+      setStatus("Please enter a mood first.");
+      return;
+    }
+
+    setStatus("Sending transaction (MetaMask will pop up)...");
+    const hash = await MoodContract.write.setMood([mood], { account: address });
+
+    setStatus(`Tx sent: ${hash.slice(0, 10)}... Waiting for confirmation...`);
+
+    await publicClient.waitForTransactionReceipt({ hash });
+
+    setStatus("Transaction confirmed! Reading updated mood...");
+    const updated = await MoodContract.read.getMood();
+    showMoodEl.innerText = `Your Mood: ${updated}`;
+    setStatus("Done ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus("Write failed or rejected. Check console for details.");
+  }
+};
+\end{lstlisting}
+
+\subsection*{流程拆解（为什么这样写）}
+\begin{enumerate}[leftmargin=1.8em]
+  \item 读取输入框 mood，并进行非空验证（避免无意义交易、节省 gas）。
+  \item 调用 \texttt{write.setMood}：
+    \begin{itemize}
+      \item 会弹 MetaMask
+      \item 用户确认后广播交易
+      \item 返回 \textbf{交易 hash}（此时还未确认）
+    \end{itemize}
+  \item 用 \texttt{waitForTransactionReceipt} 等待交易被打包确认（避免读到旧状态）。
+  \item 交易确认后再次调用 \texttt{getMood()}，并更新 UI 显示最新状态。
+\end{enumerate}
+
+\section{15) 可选：页面加载自动读取}
+
+\begin{lstlisting}[language=JavaScript]
+// window.getMood();
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item 取消注释后，页面一打开就会自动读取链上 mood 并显示。
+\end{itemize}
+
+\section{总结：这份 dApp 的本质}
+
+一句话概括：
+
+\begin{quote}
+\textbf{用 MetaMask 提供身份与签名，用 viem 把网页变成合约的遥控器：}\\
+\texttt{Get Mood} $\rightarrow$ 免费读取链上状态；\quad
+\texttt{Set Mood} $\rightarrow$ 发送交易写入链上状态（需要 gas）。
+\end{quote}
+
+\section*{附：建议的下一步（可选提升）}
+\begin{itemize}[leftmargin=1.5em]
+  \item 把 ABI 独立成 \texttt{abi.json}（更像真实项目结构）
+  \item 把 JS 独立成 \texttt{app.js}（可维护性更好）
+  \item 增加 loading/disable 按钮（等待确认时禁用重复点击）
+  \item 合约加入 \texttt{event MoodChanged(address user, string mood)} 并在前端监听事件，实现自动更新
+\end{itemize}
+
+\end{document}
