@@ -1,0 +1,79 @@
+DOM Notes (for your dApp)
+
+1) DOM 是什么？
+- DOM = Document Object Model
+- 浏览器把 HTML 解析成「一棵可以被 JavaScript 操作的对象树」
+- 每一个 HTML 标签在浏览器里都会变成一个 DOM 节点（node / element）
+- JavaScript 不能直接改硬盘上的 HTML 文件，而是通过 DOM 改“浏览器当前显示的网页”
+
+2) DOM 长什么样？
+- DOM 是树状结构（父子关系）
+  document
+   └ html
+      └ body
+         └ div
+            ├ input#mood
+            ├ p#showMood
+            └ p#status
+- 你看到的网页 = 浏览器把 DOM 渲染出来的结果
+
+3) DOM 在 dApp 里扮演什么角色？
+- 区块链只负责状态与交易，不负责画面
+- 智能合约不会显示文字，MetaMask 也不会帮你更新 UI
+- “链上结果要让用户看到” → 必须靠前端 JS 修改 DOM
+- 所以：DOM 是前端把链上数据呈现给用户的关键桥梁
+
+4) 你在代码里用到的 DOM（对应你的 index.html）
+
+(1) 取得 DOM 元素（抓到页面上的标签）
+- 用法：
+  document.getElementById("status")
+- 意思：
+  在 DOM 树里找到 id="status" 的元素，并回传一个 DOM 对象
+
+- 你代码中的例子：
+  const statusEl = document.getElementById("status");
+  const showMoodEl = document.getElementById("showMood");
+
+(2) 更新 DOM 的文字（让画面改变）
+- 用法：
+  element.textContent = "..."
+- 你代码中的例子：
+  statusEl.textContent = "Connecting wallet...";
+  showMoodEl.innerText = `Your Mood: ${mood}`;
+
+(3) 从 input 读取用户输入
+- 用法：
+  document.getElementById("mood").value
+- 你代码中的例子：
+  const mood = document.getElementById("mood").value.trim();
+
+(4) 封装成函数（让 UI 更新更好维护）
+- 你代码中的例子：
+  function setStatus(msg) {
+    statusEl.textContent = msg || "";
+  }
+- 好处：
+  以后你只写 setStatus("...")，不用每次重复操作 DOM
+
+5) dApp 的完整链路（DOM 在最后一步）
+用户点击按钮
+ → JS 调用 viem
+   → viem 调用合约 / 发交易
+     → 区块链回传结果（mood / tx hash / receipt）
+       → JS 拿到结果
+         → JS 修改 DOM（showMood / status）
+           → 用户看到画面更新
+
+6) 常见 DOM 操作（你之后会常看到）
+- 找元素：document.getElementById(), document.querySelector()
+- 改文字：.textContent, .innerText
+- 改 HTML：.innerHTML
+- 读输入：.value
+- 绑定事件：.addEventListener()
+- 禁用按钮：button.disabled = true
+
+7) 重要对照：DOM ≠ HTML 文件
+- HTML 文件：硬盘上的静态文本
+- DOM：浏览器内存里的“正在运行的网页结构”
+- 你看到网页变化，是 DOM 变了，不是 HTML 文件被改了

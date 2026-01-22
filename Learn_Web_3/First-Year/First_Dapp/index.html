@@ -2,25 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- 中文 -->
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- 旧式兼容性设定（现代浏览器几乎无感，但保留不坏） -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 响应式设计：宽度等于设备宽度，初始缩放比例1 -->
     <title>LearnWeb3 First dApp</title>
 
     <style>
+      /* 简单样式，居中对齐 */
       body {
         text-align: center;
         font-family: Arial, Helvetica, sans-serif;
       }
+
+      /* 容器样式 */
       div {
         width: 20%;
         margin: 0 auto;
         display: flex;
         flex-direction: column;
       }
+      /* 按钮和输入框样式 */
       button {
         width: 100%;
         margin: 10px 0px 5px 0px;
       }
+      /* 输入框样式 */
       input {
         padding: 8px;
       }
@@ -30,6 +39,7 @@
         opacity: 0.9;
       }
     </style>
+    <!-- 内联样式，简单起见 -->
   </head>
 
   <body>
@@ -37,17 +47,40 @@
       <h1>This is my dApp!</h1>
       <p>Here we can set or get the mood:</p>
 
+      <!-- Input field for mood -->
       <label for="mood">Input Mood:</label><br />
+
+      <!-- Input field for mood -->
       <input type="text" id="mood" placeholder="e.g. happy" />
 
+      <!-- Buttons for getting and setting mood -->
+      <!-- 重点：因为你的 JS 用的是 type="module"，所以你后来把函数挂到
+      window.getMood、window.setMood，这样 onclick 才找得到 这些函数  -->
       <button onclick="getMood()">Get Mood</button>
       <button onclick="setMood()">Set Mood</button>
 
+      <!-- Display area for mood and status -->
+      <!--显示“链上读到的 mood” -->
       <p id="showMood"></p>
+
+      <!--显示“链上读到的 mood” 显示当前状态（连接中、发送交易、等待确认、完成等）-->
       <p id="status"></p>
     </div>
 
     <script type="module">
+      // 重点：由于是 type="module"，外部 onclick 无法直接访问此处函数
+      //必须手动暴露给全局 window 对象
+      // 让你可以用 import ... from ... 直接加载 viem（ES module）
+      // 也允许你在顶层使用 await（例如请求 MetaMask 地址）。
+      // 副作用：模块内声明的函数不会自动变成全局，因此你要 window.getMood = ...
+      // 来暴露给 onclick 使用。
+
+      // createWalletClient：用来做需要钱包签名的操作（写入、发交易）。
+      // createPublicClient：用来做只读操作（读取链上数据）。
+      // custom(window.ethereum): 把 MetaMask 注入的 provider 当作 transport
+      // getContract：用 ABI + 地址创建一个“合约对象”，
+      //            让你可以用 .read.xxx() / .write.xxx() 调用函数。
+      // sepolia：告诉 viem 你要连接的链参数（chainId、RPC 规则等
       import {
         createWalletClient,
         createPublicClient,
@@ -57,9 +90,16 @@
       import { sepolia } from "https://esm.sh/viem/chains";
 
       // ✅ Your deployed contract address (Sepolia)
+      // 这就是你 Remix 部署出来的合约地址
+      //合约地址 = 链上某个“程序”的地址（不是你的钱包地址）
       const MoodContractAddress = "0x8089Ad39704F3Bc5f9b85C4BE4427631A137e58e";
 
       // ✅ ABI (matches your MoodDiary contract)
+      // ABI 就是“接口说明书”：
+      // 合约有哪些函数
+      // 每个函数参数类型是什么
+      // 返回值是什么
+      // view / nonpayable 等属性是什么
       const MoodContractABI = [
         {
           inputs: [
@@ -89,9 +129,13 @@
         },
       ];
 
+      // 取 DOM 元素：准备更新 UI 文本
+      // DOM = 浏览器把 HTML 变成“可以被 JavaScript 操作的对象树”
+      // 以后会把文字显示到这些 <p> 里
       const statusEl = document.getElementById("status");
       const showMoodEl = document.getElementById("showMood");
 
+      // 小工具函数：简化“更新状态文字”。
       function setStatus(msg) {
         statusEl.textContent = msg || "";
       }
@@ -103,6 +147,9 @@
       }
 
       // ✅ Ensure Sepolia network (chainId 11155111 = 0xaa36a7)
+      // 为什么重要？
+      // 合约地址在 Sepolia 才存在
+      // 如果你连到 Mainnet 或别的链，读合约会回 0x
       const chainId = await window.ethereum.request({ method: "eth_chainId" });
       if (chainId !== "0xaa36a7") {
         setStatus("Please switch MetaMask network to Sepolia, then refresh.");
@@ -120,22 +167,30 @@
       }
 
       // ✅ Create clients
+      // publicClient：用来 read（不用签名）用来等交易确认 waitForTransactionReceipt
       const publicClient = createPublicClient({
         chain: sepolia,
         transport: custom(window.ethereum),
       });
 
+      // walletClient： 用来 write（需要签名）会触发 MetaMask 弹窗
       const walletClient = createWalletClient({
         chain: sepolia,
         transport: custom(window.ethereum),
       });
 
       // ✅ Request wallet connection
+      // 你用 slice 显示前后几位，这是常见 UX（不显示完整地址，保护隐私）
+      // address 是你的钱包地址，用来作为写入交易的 account
       setStatus("Connecting wallet...");
       const [address] = await walletClient.requestAddresses();
       setStatus(`Connected: ${address.slice(0, 6)}...${address.slice(-4)}`);
 
       // ✅ Contract instance: read with public, write with wallet
+      // 把“合约地址 + ABI + client”组合起来
+      // 让你可以这样调用：
+      // MoodContract.read.getMood()
+      // MoodContract.write.setMood(...)
       const MoodContract = getContract({
         address: MoodContractAddress,
         abi: MoodContractABI,
@@ -143,11 +198,20 @@
       });
 
       // ✅ Expose functions for onclick (module scope -> window)
+      // window.getMood：读链（不会弹 MetaMask）
+      // read 是 eth_call，不花 gas，不签名，所以不会弹钱包
       window.getMood = async function () {
         try {
+          // 更新状态文字：正在读取
           setStatus("Reading mood from contract...");
+
+          // 调用合约的 getMood() 读取 mood
           const mood = await MoodContract.read.getMood();
+
+          // 显示读到的 mood
           showMoodEl.innerText = `Your Mood: ${mood}`;
+
+          // 更新状态文字：读取成功
           setStatus("Read successful.");
         } catch (err) {
           console.error(err);
@@ -158,12 +222,20 @@
       window.setMood = async function () {
         try {
           const mood = document.getElementById("mood").value.trim();
+
+          // 更新状态文字：正在发送交易
+          // 空字串就不送交易（省 gas、避免无意义 tx）
           if (!mood) {
             setStatus("Please enter a mood first.");
             return;
           }
 
           setStatus("Sending transaction (MetaMask will pop up)...");
+
+          // 这一步会弹 MetaMask
+          // 调用合约的 setMood(mood) 写入 mood
+          // 用户确认后交易广播到 Sepolia
+          // 返回交易 hash（还没确认）
           const hash = await MoodContract.write.setMood([mood], {
             account: address,
           });
@@ -173,10 +245,15 @@
           );
 
           // Wait for confirmation (mined)
+          // 不等确认就立刻读，会经常读到旧状态（你之前就会怀疑“怎么没更新”）
           await publicClient.waitForTransactionReceipt({ hash });
 
           setStatus("Transaction confirmed! Reading updated mood...");
+
+          // 交易确认后再读一次
           const updated = await MoodContract.read.getMood();
+
+          // 显示更新后的 mood
           showMoodEl.innerText = `Your Mood: ${updated}`;
           setStatus("Done ✅");
         } catch (err) {
