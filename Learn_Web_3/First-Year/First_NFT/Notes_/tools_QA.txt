@@ -162,3 +162,4 @@ Notes — Alchemy & Etherscan 的用途（NFTVtwo 專案）
 - Alchemy：提供 RPC → 讓你能部署、送交易、上鏈
 - Etherscan：提供瀏覽器 → 讓你查交易/事件/合約狀態、驗證 source code
 - Etherscan API Key：讓你用 Foundry CLI 自動 verify 合約
+

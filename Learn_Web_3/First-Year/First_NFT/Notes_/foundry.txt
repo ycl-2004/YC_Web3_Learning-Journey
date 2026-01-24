@@ -1,0 +1,121 @@
+Foundry 使用筆記（Web3 / Solidity）
+
+一、Foundry 是什麼
+Foundry 是一套以「命令列（CLI）」為核心的 Solidity 開發工具鏈，
+主要用來：
+- 編譯（compile）智慧合約
+- 測試（test）智慧合約
+- 部署（deploy）智慧合約
+- 與鏈上合約互動（read / write）
+- 在 Etherscan 上驗證合約（verify）
+
+它常被用在正式 Web3 專案中，取代或搭配 Remix / Hardhat。
+
+
+二、Foundry 的四個核心工具
+
+1. forge（主要工具）
+forge 是整個 Foundry 的核心，負責「開發流程」。
+
+常見用途：
+- 編譯合約
+  forge build
+
+- 執行測試
+  forge test
+
+- 部署合約到測試網 / 主網
+  forge create --rpc-url ... --private-key ...
+
+- 執行部署腳本
+  forge script ... --broadcast
+
+- 驗證合約到 Etherscan
+  forge verify-contract ...
+
+
+2. cast（鏈上互動工具）
+cast 用來「直接跟區塊鏈互動」，不用寫前端。
+
+常見用途：
+- 讀取合約資料（不花 gas）
+  例如：tokenURI、ownerOf、balanceOf
+
+- 呼叫合約函式（會送交易、花 gas）
+  例如：setBaseURI、mint、transfer
+
+- 編碼 / 解碼 ABI、查看交易資料、區塊資料
+
+
+3. anvil（本機測試鏈）
+anvil 會在你電腦上開一條「本機 Ethereum」。
+
+用途：
+- 快速測試合約（不用真的上 Sepolia）
+- 免費、速度快、可隨便重置
+- 在部署到測試網前先確認邏輯正確
+
+
+4. chisel（可選）
+Solidity 的互動式 REPL。
+用途較進階，通常拿來快速試 Solidity 語法或小段邏輯。
+
+
+三、為什麼要用 Foundry（重點優點）
+
+- 速度快（編譯與測試非常快）
+- 完全工程化（適合正式專案）
+- 不依賴瀏覽器（不需要一直開 Remix）
+- 與 CI / GitHub / 部署流程整合方便
+- 業界常用（研究、DeFi、NFT 專案）
+
+
+四、你在 NFTVtwo 專案中實際用到 Foundry 的地方
+
+1. 編寫合約
+- 撰寫 NFTVtwo.sol
+- 使用 OpenZeppelin 的 ERC721、Ownable、Strings
+
+2. 編譯合約
+- 使用 forge build
+- 確保 Solidity 版本與 pragma 相符
+
+3. 部署合約
+- 使用 forge create
+- 部署到 Sepolia 測試網
+- constructor 沒有參數 → 不需要 --constructor-args
+
+4. 驗證合約
+- 使用 forge verify-contract
+- 透過 Etherscan API Key
+- 成功後 Etherscan 顯示：
+  - 綠色勾勾（Source Code Verified）
+  - 出現 Read Contract / Write Contract 分頁
+
+5. 測試 tokenURI
+- 在 Etherscan → Read Contract
+- 呼叫 tokenURI(1)
+- 回傳 GitHub raw URL
+- 打開 JSON → image 欄位能顯示圖片
+
+
+五、Foundry 在整個 Web3 工具鏈的位置
+
+- Foundry：開發、部署、驗證（工程工具）
+- Alchemy：提供 RPC（讓你連到區塊鏈）
+- Etherscan：區塊鏈瀏覽器（查交易、驗證合約）
+- GitHub raw URL：NFT metadata 與圖片來源
+- OpenSea / Wallet：讀取 tokenURI 顯示 NFT
+
+
+六、總結一句話
+Foundry 是讓你「不用前端、不靠 Remix，也能完整完成一個
+專業級 Solidity / NFT 專案」的核心工具。
+
+你已經實際完成：
+- 合約撰寫
+- Sepolia 部署
+- Etherscan 驗證
+- tokenURI 與 metadata 驗證
+
+這代表你已經在用「真正工程師等級」的 Web3 工作流。
