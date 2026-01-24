@@ -1,0 +1,175 @@
+REAL-LIFE EXAMPLES — How ERC-20 functions work (simple, realistic)
+
+We’ll use a pretend token called YC_V1.
+Assume:
+- Alice has 10 YC_V1
+- Bob has 0 YC_V1
+- A Shop (smart contract/app) sells a digital item for 2 YC_V1
+
+------------------------------------------------------------
+1) name() / symbol() / decimals()
+------------------------------------------------------------
+
+Real life analogy: the label on the money.
+
+- name()  = “YC Version 1 Token”  (full official name)
+- symbol() = “YC_V1”              (short ticker like “USD”)
+- decimals() = 18                 (like saying “we count in cents… but way smaller”)
+
+Why it matters:
+- Wallets and apps display the token correctly:
+  “You have 3.5 YC_V1” instead of a huge integer.
+
+------------------------------------------------------------
+2) totalSupply() — “How many exist in total?”
+------------------------------------------------------------
+
+Real life analogy: how many gift cards were printed.
+
+Example:
+- When you deploy, you mint 10 tokens to yourself.
+- totalSupply() returns 10 tokens (internally it’s 10 * 10^18 units)
+
+Used by:
+- People checking if the token is scarce or unlimited
+- Token dashboards / explorers
+
+------------------------------------------------------------
+3) balanceOf(address) — “How many does this person have?”
+------------------------------------------------------------
+
+Real life analogy: checking someone’s wallet balance.
+
+Example:
+- balanceOf(Alice) = 10
+- balanceOf(Bob)   = 0
+
+Used by:
+- MetaMask showing your balance
+- Apps checking if you can afford something
+
+------------------------------------------------------------
+4) transfer(to, value) — “Send tokens directly”
+------------------------------------------------------------
+
+Real life analogy: handing cash to your friend.
+
+Example:
+Alice sends Bob 3 tokens.
+
+Action:
+- Alice calls transfer(Bob, 3)
+
+Result:
+- Alice balance: 10 → 7
+- Bob balance:   0 → 3
+- A Transfer event is logged (like a receipt)
+
+When to use:
+- Paying a friend
+- Sending tokens to another wallet you own
+
+Important:
+- This is “direct send”. No permissions involved.
+
+------------------------------------------------------------
+5) approve(spender, value) — “Give spending permission”
+------------------------------------------------------------
+
+Real life analogy: giving your friend a permission slip / spending limit.
+
+Imagine the Shop needs to pull tokens from you when you buy something.
+But the Shop cannot take tokens unless you allow it.
+
+Example:
+Alice wants to buy an item for 2 tokens from Shop.
+
+Step 1 (permission):
+- Alice calls approve(Shop, 2)
+
+Meaning:
+- “Shop is allowed to spend up to 2 of my tokens.”
+
+Result:
+- No tokens moved yet!
+- Only permission is recorded.
+
+Why this exists:
+- Smart contracts can’t “click MetaMask” for you.
+- Approve is how you say “I allow this contract to take X tokens.”
+
+------------------------------------------------------------
+6) allowance(owner, spender) — “How much permission is still left?”
+------------------------------------------------------------
+
+Real life analogy: checking how much money your permission slip still allows.
+
+Example:
+After approve(Shop, 2):
+- allowance(Alice, Shop) = 2
+
+After Shop spends 2 tokens:
+- allowance(Alice, Shop) = 0
+
+Used by:
+- Apps showing “Approved amount”
+- You checking if you accidentally approved too much
+
+------------------------------------------------------------
+7) transferFrom(from, to, value) — “Spender spends for you (if approved)”
+------------------------------------------------------------
+
+Real life analogy: your friend uses the permission slip to pay.
+
+Continuing the Shop example:
+
+Step 2 (payment):
+- The Shop calls transferFrom(Alice, Shop, 2)
+
+This is the Shop taking payment from Alice.
+
+Result:
+- Alice balance: 7 → 5 (she paid 2)
+- Shop balance: increases by 2
+- allowance(Alice, Shop): 2 → 0
+- Transfer event logged
+
+When to use:
+- Buying on a DEX (Uniswap-style swaps)
+- Depositing into a staking contract
+- Paying a game contract
+- Any “contract pulls tokens from you” situation
+
+------------------------------------------------------------
+BIG IDEA (why ERC-20 is powerful)
+------------------------------------------------------------
+
+There are TWO common ways tokens move:
+
+A) Direct sending (person → person)
+   transfer(Bob, 3)
+   Like handing cash directly.
+
+B) Permission-based spending (person → contract/app)
+   approve(Shop, 2)
+   then Shop uses transferFrom(Alice, Shop, 2)
+   Like giving a spending limit to an app.
+
+This is why wallets + exchanges can support “almost any token”:
+they all speak the same ERC-20 language.
+
+------------------------------------------------------------
+Mini story: Uniswap-style swap (super common)
+------------------------------------------------------------
+
+Alice wants to swap 5 YC_V1 for another token on a DEX.
+
+1) Alice approves the DEX contract:
+   approve(DEX, 5)
+
+2) DEX contract pulls tokens from Alice:
+   transferFrom(Alice, DEX, 5)
+
+3) DEX sends Alice the other token (separate transfer in that other token)
+
+This is how most DeFi apps work.

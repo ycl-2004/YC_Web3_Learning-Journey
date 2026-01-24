@@ -1,0 +1,155 @@
+LW3Token.sol（用 Remix + OpenZeppelin 寫 ERC-20）這段在做什麼？｜超白話逐行解釋
+
+0) 先用一句話講完
+你寫的是「一個最基本的 ERC-20 代幣合約」：
+- 代幣名字、代號由部署者決定
+- 部署時一次鑄造（mint）10 顆代幣給部署者本人
+- ERC-20 的大部分功能（轉帳、查餘額、總供給…）直接用 OpenZeppelin 幫你寫好的安全版本
+
+------------------------------------------------------------
+1) 完整程式碼
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol";
+
+contract LW3Token is ERC20 {
+    constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {
+        _mint(msg.sender, 10 * 10 ** 18);
+    }
+}
+
+------------------------------------------------------------
+2) 逐行拆解（小學生也能懂版）
+
+(1) // SPDX-License-Identifier: MIT
+這是一個「授權聲明」。
+意思是：這份程式碼用 MIT 授權（別人可以使用、修改，但要遵守 MIT 規則）。
+它不影響合約功能，但很多工具會要求你加上，避免法律/授權不清楚。
+
+(2) pragma solidity ^0.8.19;
+這是在說：「請用 Solidity 0.8.19 以上版本來編譯。」
+^0.8.19 表示：0.8.19、0.8.20、0.8.21…都可以（但不會跳到 0.9.x）。
+目的：確保語法與安全特性一致（0.8.x 也內建整數溢位檢查，比較安全）。
+
+(3) import ".../ERC20.sol";
+import 就像「把別人的程式碼拿來用」。
+OpenZeppelin (OZ) 是很有名的安全合約庫，他們的 ERC20 合約：
+- 經過大量測試
+- 很多人用過
+- 比你自己從零寫 ERC-20 更安全、更少 bug
+
+所以這行代表：
+「我要直接使用 OZ 寫好的 ERC-20 標準功能。」
+
+(4) contract LW3Token is ERC20 { ... }
+這行代表你正在宣告一個新合約：LW3Token。
+is ERC20 表示「LW3Token 繼承 ERC20」（像 OOP 的 extends）。
+效果：
+- ERC20 裡面所有公開功能（transfer、balanceOf、approve…）你都自動擁有
+- 你只要寫你自己的客製化部分就好
+
+簡單比喻：
+ERC20 像是一台已經做好的「代幣機器」，
+你做的 LW3Token 是在那台機器上貼牌 + 做少量設定。
+
+------------------------------------------------------------
+3) constructor 那段為什麼長得怪？在做什麼？
+
+constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {
+    _mint(msg.sender, 10 * 10 ** 18);
+}
+
+(1) constructor(...) 是什麼？
+constructor 是「建構子」：合約部署（deploy）那一刻只會執行一次。
+你在 deploy 時要輸入兩個東西：
+- _name：代幣全名（例如 "LW3 Token"）
+- _symbol：代幣代號（例如 "LW3"）
+
+string memory 的意思（不需要背，但知道概念）：
+- string 是文字
+- memory 表示這個參數在執行期間暫時放在記憶體
+
+(2) 為什麼 constructor 後面還有：ERC20(_name, _symbol)？
+這個就是你說的「怪語法」重點。
+
+因為你「繼承」了 ERC20，而 ERC20 自己也有 constructor，
+而 ERC20 的 constructor 需要 name 與 symbol。
+
+所以你必須在部署你的合約時，同時「初始化父合約 ERC20」：
+- 你收 _name、_symbol
+- 立刻把它們傳給 ERC20 的 constructor
+
+白話：你在告訴 ERC20：
+「你的名字就是 _name，你的代號就是 _symbol。」
+
+如果你不做這件事，ERC20 可能就沒有被正確設定名稱/代號。
+
+------------------------------------------------------------
+4) _mint(msg.sender, 10 * 10 ** 18); 到底在幹嘛？
+
+(1) _mint 是什麼？
+_mint 是 ERC20 裡面的一個「內部函數」（internal function）。
+internal 的意思：
+- 只有合約內部可以叫它
+- 外面的人不能直接呼叫 _mint（避免任何人隨便印錢）
+
+功能：
+「創造新的代幣，並把它加到某個地址的餘額裡，總供給也會增加。」
+
+(2) msg.sender 是誰？
+msg.sender 是 EVM 自動提供的變數，代表：
+「這筆交易的發送者地址」
+
+部署合約時，發送部署交易的人就是你，
+所以 msg.sender 在 deploy 當下就是你的錢包地址。
+
+所以這行的第一個參數代表：
+把新鑄造的代幣給「部署者本人」。
+
+(3) 為什麼是 10 * 10 ** 18，不是 10？
+這是最容易卡住的點：ERC-20 不用小數點，而是用「最小單位」。
+
+關鍵原因：Solidity 不用浮點數（沒有 0.1 那種），也不適合用浮點表示錢。
+因為浮點會有誤差，例如：
+(1/3) * 3 可能變成 0.999999999（不是精準的 1）
+錢如果算錯就很嚴重。
+
+所以 ERC-20 的做法像「美金用 cents」：
+- $1 = 100 cents
+- 0.33 美元 = 33 cents（不是 0.33）
+
+同理，ERC-20 預設 decimals = 18：
+- 1 個完整代幣（1 token）= 10^18 個最小單位
+- 最小單位就像 “token 的 1 個原子”
+
+因此：
+- 你想 mint 10 個完整 token
+- 就要 mint 10 * (10^18) 個最小單位
+也就是 10 * 10 ** 18
+
+小學生版比喻：
+你不是在數「10 元」，你是在數「10 元 = 1000 個 1 分」那種概念。
+ERC-20 的「1 分」非常非常小：1 token 有 10^18 個「分」。
+
+------------------------------------------------------------
+5) 這份合約部署後，你得到什麼？
+
+部署後你會擁有：
+- ERC-20 的基本功能（不用自己寫）：
+  - 查總供給 totalSupply
+  - 查某地址餘額 balanceOf
+  - 轉帳 transfer
+  - 授權 approve / allowance / transferFrom
+- 部署當下，你的地址會收到：
+  - 10 顆 token（實際是 10 * 10^18 最小單位）
+
+------------------------------------------------------------
+6) 小提醒（很重要但一句話就懂）
+這個合約「只有在部署時鑄造一次」。
+因為你只在 constructor 叫 _mint。
+部署完後，外面的人無法再 mint（因為你沒有寫任何公開的 mint 函數）。
+
+如果你之後想「讓某個人可以再鑄造」，你就需要自己加一個 public mint 函數（通常要加權限控制，例如 onlyOwner），不然會變成任何人都能印錢。
+
+（你之後如果要寫進你的 LaTeX 文件，我也可以用你同一個 box 格式幫你排版成教學頁面。）

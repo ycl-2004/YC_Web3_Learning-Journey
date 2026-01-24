@@ -1,0 +1,105 @@
+ERC-20 INHERITANCE & TRANSFER LOGIC — SIMPLE NOTES
+
+==================================================
+1) Where do transfer / approve functions come from?
+==================================================
+
+The logic for:
+- transfer(...)
+- approve(...)
+- allowance(...)
+- transferFrom(...)
+
+is ALREADY written inside the OpenZeppelin ERC20 contract.
+
+When your contract is written as:
+
+contract LW3Token is ERC20
+
+this means:
+- Your contract INHERITS ERC20
+- All ERC-20 functions are automatically included
+- You do NOT need to re-write them
+
+This is similar to:
+- A class extending another class in OOP
+- A child getting methods from a parent
+
+==================================================
+2) What did YOU write vs what ERC20 provides?
+==================================================
+
+YOU wrote:
+- The contract name (LW3Token / YC_V1)
+- The constructor inputs (_name, _symbol)
+- The initial mint:
+  _mint(msg.sender, 10 * 10**18);
+
+This means:
+- You decided the token name and symbol
+- You decided who gets the first tokens
+- You decided how many tokens exist initially
+
+--------------------------------------------------
+
+OpenZeppelin ERC20 automatically gives you:
+
+- transfer(to, amount)
+  → send tokens directly to someone
+
+- balanceOf(address)
+  → check how many tokens an address has
+
+- totalSupply()
+  → check how many tokens exist in total
+
+- approve(spender, amount)
+  → allow another account or contract to spend your tokens
+
+- allowance(owner, spender)
+  → check how much spending permission remains
+
+- transferFrom(from, to, amount)
+  → spender moves tokens using approval
+
+- Transfer event
+- Approval event
+
+You did NOT have to write any of these.
+
+==================================================
+3) What happens internally when transfer() runs?
+==================================================
+
+When transfer(to, amount) is called:
+
+1) The contract checks:
+   - Does the sender have enough balance?
+
+2) If yes:
+   - Sender balance is reduced
+   - Receiver balance is increased
+
+3) A Transfer event is emitted:
+   - This acts like a blockchain receipt
+
+Because of this:
+- MetaMask can show token balances
+- Etherscan can show transfer history
+- Wallets and apps work automatically
+
+==================================================
+4) Why is this useful?
+==================================================
+
+Because all ERC-20 tokens follow the same rules:
+- Wallets don’t need special code per token
+- Exchanges can support many tokens easily
+- Apps like Uniswap work with thousands of tokens
+
+Your small contract + OpenZeppelin ERC20 =
+a fully functional token system.
+
+==================================================
+END OF NOTES
+==================================================

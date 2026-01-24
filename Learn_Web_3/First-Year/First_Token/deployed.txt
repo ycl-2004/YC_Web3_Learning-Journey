@@ -1,0 +1,166 @@
+NOTES — After Creating Your ERC-20 Token
+Topic: How friends can get the token, how to send it, and which network to use
+
+==================================================
+1. Which Network Should I Use?
+==================================================
+
+Use: **Sepolia Test Network**
+
+Reason:
+- Sepolia is a test network (not real money)
+- ETH on Sepolia is free (from faucets)
+- Safe for learning and experimenting
+- Used commonly with Remix + MetaMask tutorials
+
+Important:
+- You AND your friends must all be on the SAME network
+- Do NOT use Ethereum Mainnet unless you understand real financial risks
+
+Checklist:
+- MetaMask → Network → Sepolia Test Network
+- Remix → Injected Provider (MetaMask) → Sepolia
+
+==================================================
+2. Why Do Only I Have Tokens Right Now?
+==================================================
+
+In your contract, you wrote:
+
+_mint(msg.sender, 10 * 10 ** 18);
+
+What this means:
+- Tokens are created only ONCE
+- This happens when the contract is deployed
+- msg.sender = the address that deployed the contract (YOU)
+- Total supply = 10 tokens
+
+Important:
+- Your contract does NOT allow minting again
+- No one else can create new tokens
+- Tokens can only be transferred between users
+
+==================================================
+3. How Can My Friends Get My Token?
+==================================================
+
+Method used: **Transfer tokens from your wallet**
+
+Steps:
+1. Ask your friend for their Ethereum address
+   (example: 0x1234...abcd)
+2. Make sure:
+   - Their MetaMask is on Sepolia
+3. Open MetaMask
+4. Select your ERC-20 token
+5. Click Send
+6. Paste your friend’s address
+7. Enter amount (example: 1 token)
+8. Confirm transaction
+
+Result:
+- Your balance decreases
+- Your friend’s balance increases
+- Transfer is recorded on the blockchain
+
+==================================================
+4. How Do Friends See the Token in MetaMask?
+==================================================
+
+Problem:
+- MetaMask does NOT automatically show custom ERC-20 tokens
+
+Solution: **Import token manually**
+
+Steps for your friend:
+1. Open MetaMask
+2. Switch to Sepolia Test Network
+3. Go to Assets tab
+4. Click “Import Tokens”
+5. Paste your Token Contract Address
+6. MetaMask auto-detects:
+   - Token name
+   - Symbol
+   - Decimals (18)
+7. Click Add Token
+
+Now your friend can:
+- See the token
+- Receive tokens
+- Send tokens to others
+
+==================================================
+5. How Are Tokens Sent Technically?
+==================================================
+
+When you send tokens, MetaMask calls:
+
+transfer(to, amount)
+
+This ERC-20 function:
+- Moves tokens from sender to receiver
+- Emits a Transfer event
+- Updates balances on-chain
+
+You can view transfers on:
+- Sepolia Etherscan
+- Search your contract address
+- Click “Transfers” tab
+
+==================================================
+6. Can Friends Mint Tokens for Themselves?
+==================================================
+
+Answer: **NO (with your current contract)**
+
+Reason:
+- _mint() is an internal function
+- Only callable inside the contract
+- No public mint function exists
+
+This is GOOD for beginners:
+- Prevents unlimited token creation
+- Keeps supply fixed
+- Avoids accidental security issues
+
+==================================================
+7. How Would Minting for Friends Work (Concept)?
+==================================================
+
+To allow minting, you would need:
+- A public mint or faucet function
+- Permission control (owner-only or limited amount)
+
+Example idea (NOT implemented now):
+- Only owner can mint
+- Or each address can mint once
+- Or faucet gives fixed amount
+
+This would require:
+- Writing a new contract version (e.g., V2)
+- Deploying a new token
+
+==================================================
+8. What Should I Tell My Friends? (Quick Message)
+==================================================
+
+1. Install MetaMask
+2. Switch network to Sepolia Test Network
+3. Send me your Sepolia address
+4. Import token using the contract address
+5. I will send you some tokens
+
+==================================================
+9. Summary (One-Page Review)
+==================================================
+
+- Network used: Sepolia Test Network
+- Only deployer receives tokens initially
+- Tokens are shared by sending (transfer)
+- Friends must import token manually
+- No minting after deployment
+- All actions are visible on Etherscan
+
+==================================================
+END OF NOTES
+==================================================
