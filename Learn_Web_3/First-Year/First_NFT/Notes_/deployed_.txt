@@ -1,0 +1,3 @@
+Deployer: 0xf47dE1c6226eb740B67F0ca7a0DA933860243B7d
+Deployed to: 0xfC57DeA7AA24dD340bf5ead30D4c1b66F89D156F
+Transaction hash: 0xf24e1d926b86c82d8d6d2134b4ce1ebef31245b46ebc4a0dcaf0b02dd6a3843b
