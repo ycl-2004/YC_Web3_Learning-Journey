@@ -107,3 +107,58 @@ tokenId = 1 的 NFT 已依 ERC-721 標準合法鑄造，並成功分配給本人
 - 合約 ownership 與 NFT 所有權皆正確歸屬本人  
 
 Etherscan 驗證結果顯示本次 NFTVtwo 的部署與鑄造流程完整、正確且符合 ERC-721 標準。
+
+Notes — Alchemy & Etherscan 的用途（NFTVtwo 專案）
+
+1) Alchemy 是什麼？用來做什麼？
+- Alchemy 提供「RPC 節點服務」：讓你的本機 Foundry/Forge 可以連上 Sepolia（或主網）送出交易。
+- 你在 .env 裡面的 SEPOLIA_RPC_URL 通常就是從 Alchemy Dashboard 拿到的。
+- 你用 forge create / forge script / cast send 時：
+  → Foundry 會透過 Alchemy 的 RPC 把「部署、mint、交易」廣播到鏈上。
+- 簡單說：
+  ✅ Alchemy = 你的「上鏈入口」（讓程式/終端機能跟區塊鏈溝通）
+
+2) Etherscan 是什麼？用來做什麼？
+- Etherscan 是「區塊鏈瀏覽器」：讓你查看合約、交易、事件、NFT mint 記錄、Token Transfers 等。
+- 部署後你用 Etherscan 來確認：
+  - 合約地址是否存在（Contract Address）
+  - 交易是否成功（Transaction Hash / Status）
+  - ERC-721 的 Transfer 事件是否從 0x0 mint 到你地址（Mint 證據）
+  - Ownable 的 OwnershipTransferred 是否把 owner 設成你（Owner 證據）
+- 合約驗證（Verify Contract）成功後，Etherscan 會多出：
+  - Contract → Code（可讀的 source code）
+  - Contract → Read Contract（可直接查 tokenURI、ownerOf、name 等）
+  - Contract → Write Contract（連錢包後可呼叫寫入函式，如 setBaseURI 若有）
+- 簡單說：
+  ✅ Etherscan = 你的「公開驗證與檢查工具」（看交易是否成功、合約是否可驗證、可讀可查）
+
+3) 為什麼要做 Verify（驗證合約）？
+- 沒驗證：Etherscan 只能看到 bytecode（看不懂的機器碼），也不能用 Read Contract 直接查 tokenURI
+- 驗證後：Etherscan 會把你提供的 source code 編譯一次，並和鏈上的 bytecode 比對
+  - 比對成功 → 代表「鏈上跑的程式」就是你上傳的程式
+- 這會提升：
+  - 透明度（別人可檢查你的合約到底做了什麼）
+  - 可用性（能用 Read Contract 查 tokenURI，方便 debug NFT metadata）
+  - 信任度（對使用者或自己做專案紀錄都更完整）
+
+4) Etherscan API Key 的用途是什麼？
+- 你在終端機用 forge verify-contract 時，需要一把 Etherscan API Key
+- 用途：讓 Foundry 幫你「自動把 source code 送去 Etherscan」做驗證
+- 對應指令範例：
+  forge verify-contract --chain sepolia --etherscan-api-key $ETHERSCAN_API_KEY <contractAddress> src/NFTVtwo.sol:NFTVtwo
+- 簡單說：
+  ✅ Etherscan API Key = 讓你用 CLI 自動驗證合約，而不是手動貼 code 到網站
+
+5) .env 這份檔案通常放什麼？（為什麼要 source .env）
+- .env 通常放敏感資訊，不要公開：
+  - SEPOLIA_RPC_URL（Alchemy 的 RPC）
+  - PRIVATE_KEY（部署/交易的私鑰）
+  - ETHERSCAN_API_KEY（驗證用）
+- 在終端機輸入：
+  source .env
+  代表把這些變數載入到目前 session，之後 $SEPOLIA_RPC_URL / $PRIVATE_KEY 才能被 forge 指令使用
+
+總結（超短版）
+- Alchemy：提供 RPC → 讓你能部署、送交易、上鏈
+- Etherscan：提供瀏覽器 → 讓你查交易/事件/合約狀態、驗證 source code
+- Etherscan API Key：讓你用 Foundry CLI 自動 verify 合約

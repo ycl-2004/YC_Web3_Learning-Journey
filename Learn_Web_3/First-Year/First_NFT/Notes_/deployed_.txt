@@ -24,6 +24,42 @@ cast call 0x7113ea6F258705c4B270B095151926dE904fc150 "tokenURI(uint256)" 1 --rpc
 查 owner（確認 NFT 在你錢包）
 cast call 0x7113ea6F258705c4B270B095151926dE904fc150 "ownerOf(uint256)" 1 --rpc-url $SEPOLIA_RPC_URL
 
+forge create \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --broadcast \
+  src/NFTVtwo.sol:NFTVtwo
+Final one with correct base url
+
 Deployer: 0xf47dE1c6226eb740B67F0ca7a0DA933860243B7d
-Deployed to: 0xe3dd2De1615De55388Dad4887e613fa06729De2E
-Transaction hash: 0x49373f916e3d8a9508a32a850c5189fe8bbdd8e778632da4adfa8c18c856eef3
+Deployed to: 0x76CDB7D96A08E8F54dF2d4b59167Db214994e442
+Transaction hash: 0xe58966262a4935ec231744bda11b3bef1ebd45b380312707f6502e3afcd0af87
+
+Submitting verification for [src/NFTVtwo.sol:NFTVtwo] 0x76CDB7D96A08E8F54dF2d4b59167Db214994e442.
+Submitted contract for verification:
+        Response: `OK`
+        GUID: `uiadsagmjcqfnigavgrlpsgpfexvyqaa5twhxlafqgpxpuktx1`
+        URL: https://sepolia.etherscan.io/address/0x76cdb7d96a08e8f54df2d4b59167db214994e442
+
+
+#-------------------------------------------------------------
+如果constructor 無參數
+#-------------------------------------------------------------
+source .env
+forge create \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --broadcast \
+  src/NFTVtwo.sol:NFTVtwo
+
+
+#-------------------------------------------------------------
+如果constructor 有參數
+#-------------------------------------------------------------
+source .env
+forge create \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --broadcast \
+  src/NFTVtwo.sol:NFTVtwo \
+  --constructor-args "https://raw.githubusercontent.com/ycl-2004/YC_Web3_Learning-Journey/main/Learn_Web_3/First-Year/First_NFT/Notes_/"
