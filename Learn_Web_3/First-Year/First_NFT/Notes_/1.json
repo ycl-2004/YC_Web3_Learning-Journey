@@ -1,0 +1,9 @@
+{
+  "name": "NFTee Certificate #1",
+  "description": "這是一張示範用的 NFT 證書：部署時 mint 給部署者地址，展示 tokenId + owner + metadata 的概念。",
+  "image": "https://raw.githubusercontent.com/ycl-2004/YC_Web3_Learning-Journey/146343d672b8cec586d1b507228fe194b9e2eb11/Learn_Web_3/First-Year/First_NFT/Notes_/test_img.png",
+  "attributes": [
+    { "trait_type": "Version", "value": "V2" },
+    { "trait_type": "Rights", "value": "Demo / Learning" }
+  ]
+}
