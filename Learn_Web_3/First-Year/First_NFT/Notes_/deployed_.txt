@@ -3,3 +3,27 @@ Deployed to: 0xfC57DeA7AA24dD340bf5ead30D4c1b66F89D156F
 Transaction hash: 0xf24e1d926b86c82d8d6d2134b4ce1ebef31245b46ebc4a0dcaf0b02dd6a3843b
 
 https://raw.githubusercontent.com/ycl-2004/YC_Web3_Learning-Journey/146343d672b8cec586d1b507228fe194b9e2eb11/Learn_Web_3/First-Year/First_NFT/Notes_/test_img.png
+
+
+
+// NFT V2
+
+https://raw.githubusercontent.com/ycl-2004/YC_Web3_Learning-Journey/main/Learn_Web_3/First-Year/First_NFT/Notes_/
+
+https://raw.githubusercontent.com/ycl-2004/YC_Web3_Learning-Journey/main/Learn_Web_3/First-Year/First_NFT/Notes_/1.json
+
+
+// result
+Deployer: 0xf47dE1c6226eb740B67F0ca7a0DA933860243B7d 
+Deployed to: 0x7113ea6F258705c4B270B095151926dE904fc150 
+Transaction hash: 0x5468a2d5be059314c47289ba039b5e5e0e4330585d605edb8b6c347787bd99ae
+
+用 Foundry 直接查 tokenURI
+cast call 0x7113ea6F258705c4B270B095151926dE904fc150 "tokenURI(uint256)" 1 --rpc-url $SEPOLIA_RPC_URL
+
+查 owner（確認 NFT 在你錢包）
+cast call 0x7113ea6F258705c4B270B095151926dE904fc150 "ownerOf(uint256)" 1 --rpc-url $SEPOLIA_RPC_URL
+
+Deployer: 0xf47dE1c6226eb740B67F0ca7a0DA933860243B7d
+Deployed to: 0xe3dd2De1615De55388Dad4887e613fa06729De2E
+Transaction hash: 0x49373f916e3d8a9508a32a850c5189fe8bbdd8e778632da4adfa8c18c856eef3

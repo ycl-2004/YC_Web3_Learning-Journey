@@ -1,0 +1,142 @@
+NFTVtwo.sol – NFT Metadata Version Build Log
+============================================
+
+Purpose
+-------
+本次任務的目標是：
+在既有 ERC-721 NFT 合約基礎上，建立「有實際 metadata 內容」的 NFT，
+讓每一顆 NFT 不只是鏈上的 tokenId，而是能對應到一份可讀的 JSON 證書
+（包含名稱、描述、圖片與權利說明）。
+
+本次只處理 NFTVtwo.sol，不涉及前一版 NFTVone。
+
+
+Environment & Tools
+-------------------
+- Blockchain: Ethereum Sepolia Testnet
+- Smart contract framework: Foundry
+- NFT standard: ERC-721 (OpenZeppelin)
+- Access control: Ownable (OpenZeppelin)
+- Metadata hosting: GitHub (raw.githubusercontent.com)
+- RPC provider: Alchemy
+- Wallet authentication: private key (via .env, not committed)
+
+
+Step 1 – 建立 NFTVtwo.sol（加入 Metadata 能力）
+------------------------------------------------
+在 foundry-app/src/ 內新增合約 NFTVtwo.sol。
+
+此版本合約相較於 NFTVone，新增了以下功能：
+1. baseTokenURI（metadata 底址）
+2. tokenURI(tokenId) 組合邏輯
+3. 可由合約 owner 更新 metadata 底址（setBaseURI）
+
+核心設計：
+- tokenURI = baseTokenURI + tokenId + ".json"
+- 每一顆 NFT 對應一個獨立 JSON 檔案
+
+
+Step 2 – 準備 Metadata（JSON 證書）
+-----------------------------------
+在本地與 GitHub 專案中建立 Notes_/1.json。
+
+JSON 內容包含：
+- name：NFT 名稱
+- description：此 NFT 證明的內容 / 權利
+- image：指向圖片的 URL（raw GitHub）
+
+此 JSON 本質上就是：
+「NFT 的數位證書內容」
+
+
+Step 3 – 上傳 Metadata 與圖片到 GitHub
+---------------------------------------
+將以下檔案 commit 並 push 到 GitHub：
+- Notes_/1.json
+- Notes_/test_img.png
+
+取得 GitHub raw base URL，例如：
+https://raw.githubusercontent.com/ycl-2004/YC_Web3_Learning-Journey/<commit_hash>/Learn_Web_3/First-Year/First_NFT/Notes_/
+
+注意：
+- 傳給合約的是「資料夾層級的 base URL」
+- 不包含 1.json，因為合約會自行拼接 tokenId
+
+
+Step 4 – 部署 NFTVtwo.sol（Foundry）
+------------------------------------
+在 foundry-app 目錄中執行：
+
+1. 載入環境變數
+   source .env
+
+2. 編譯合約
+   forge build
+
+3. 部署合約（並傳入 baseTokenURI）
+   forge create \
+     --rpc-url $SEPOLIA_RPC_URL \
+     --private-key $PRIVATE_KEY \
+     --broadcast \
+     src/NFTVtwo.sol:NFTVtwo \
+     "<baseTokenURI>"
+
+部署時發生的事情：
+- 合約被部署到 Sepolia
+- constructor 立即執行
+- tokenId = 1 的 NFT 被 mint 給部署者地址
+- 合約 owner 被設為部署者地址
+
+
+Step 5 – 鏈上驗證（Etherscan）
+------------------------------
+在 Sepolia Etherscan 上檢查合約地址：
+
+1. Events → Transfer
+   - from: 0x000...000
+   - to: 我的地址
+   - tokenId: 1
+   → 證明 NFT 是「從無到有」被成功鑄造
+
+2. Events → OwnershipTransferred
+   - previousOwner: 0x000...000
+   - newOwner: 我的地址
+   → 證明我擁有合約管理權（Ownable）
+
+
+Step 6 – Metadata 驗證
+----------------------
+手動在瀏覽器開啟：
+<baseTokenURI>/1.json
+
+確認：
+- JSON 正確載入
+- image 欄位可顯示圖片
+
+合約邏輯上：
+- tokenURI(1) → 正確回傳該 JSON URL
+- NFT 已成功「鏈上 token ↔ 鏈下 metadata」連結
+
+
+Final Result
+------------
+本次 NFTVtwo.sol 成果如下：
+
+✔ 成功撰寫具 metadata 能力的 ERC-721 合約  
+✔ 成功部署至 Ethereum Sepolia Testnet  
+✔ 成功 mint 一顆 NFT（tokenId = 1）  
+✔ NFT 有明確 owner（我的錢包地址）  
+✔ NFT 可解析 tokenURI → JSON metadata  
+✔ metadata 與圖片可透過 GitHub raw 存取  
+✔ 完成一個最小但完整的 NFT 發行流程（MVP）  
+
+總結一句話：
+NFTVtwo 是一個「可驗證、可轉讓、可附帶內容的數位證書系統」，
+而本次流程已完整跑通從合約 → metadata → 鏈上驗證的全鏈路。
+
+forge create \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --broadcast \
+  src/NFTVtwo.sol:NFTVtwo \
+  --constructor-args "https://raw.githubusercontent.com/ycl-2004/YC_Web3_Learning-Journey/<commit>/Learn_Web_3/First-Year/First_NFT/Notes_/"
