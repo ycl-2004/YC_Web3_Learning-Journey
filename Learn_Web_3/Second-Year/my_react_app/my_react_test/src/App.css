@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #fff1f3; /* soft blush */
+  color: #3b2f2f; /* warm dark brown */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  font-family: sans-serif;
+}
+
+.wrapper {
+  width: 450px;
+  padding: 30px;
+  background-color: #e6cbe3; /* creamy romantic */
+  border-radius: 5px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.create-form {
+  height: 40px;
+  width: 100%;
+  margin: 25px 0px;
+  border: 1px solid #d4a5c1; /* muted mauve */
+  border-radius: 5px;
+
+  display: flex;
+}
+
+.create-form > input {
+  outline: none;
+  border: none;
+  background: none;
+  color: rgb(137, 38, 183);
+
+  height: 100%;
+  width: 100%;
+  border: none;
+  padding-left: 10px;
+  font-size: 16px;
+  border-radius: 5px 0px 0px 5px;
+}
+
+.create-form > button {
+  height: 100%;
+  width: 50px;
+  border: none;
+  background-color: #d4a5c1; /* muted mauve */
+  color: white;
+  font-weight: bold;
+  border-radius: 0px 5px 5px 0px;
+  cursor: pointer;
+}
+
+.todo {
+  background-color: rgb(201, 154, 227);
+  height: 40px;
+  padding: 0 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.completed {
+  opacity: 0.4;
+  text-decoration: line-through 3px black;
+}
