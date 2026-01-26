@@ -1,0 +1,87 @@
+YC Todo — Tools / Environment / Platforms Used
+=============================================
+
+This document lists all tools, environments, and platforms used in the
+YC Todo macOS menubar application project.
+
+------------------------------------------------------------
+1) Frontend / UI
+------------------------------------------------------------
+- React (JavaScript library for UI)
+- Vite (Frontend build tool & dev server)
+- HTML / CSS
+- JavaScript (ES6+)
+- localStorage (browser storage for persisting todos and timers)
+
+------------------------------------------------------------
+2) Desktop App Framework
+------------------------------------------------------------
+- Tauri (v2)
+  - Used to wrap the web frontend into a native macOS application
+  - Provides window management, tray/menubar integration, and system APIs
+
+------------------------------------------------------------
+3) Backend / System Layer
+------------------------------------------------------------
+- Rust
+  - Used for Tauri backend logic (tray icon, window behavior, app lifecycle)
+- Cargo
+  - Rust package manager and build system
+
+------------------------------------------------------------
+4) Menubar / Tray Integration
+------------------------------------------------------------
+- Tauri Tray API (tray-icon feature)
+- macOS menubar (Accessory app / no Dock icon)
+- Template PNG icon for menubar (white + transparent)
+
+------------------------------------------------------------
+5) Build & Packaging
+------------------------------------------------------------
+- Node.js
+- npm
+- Tauri CLI
+- macOS .app bundle
+- macOS .dmg installer
+
+------------------------------------------------------------
+6) Operating System & Platform
+------------------------------------------------------------
+- macOS (Apple Silicon / aarch64)
+- macOS Gatekeeper (app security / verification)
+- macOS Finder & Applications directory
+
+------------------------------------------------------------
+7) Development Environment
+------------------------------------------------------------
+- Visual Studio Code (VS Code)
+- macOS Terminal (zsh)
+- Homebrew (used to install tools such as ImageMagick)
+
+------------------------------------------------------------
+8) Assets & Media
+------------------------------------------------------------
+- PNG images (UI icons, tray icon template)
+- ICNS (macOS app icon format)
+- Image processing tools:
+  - sips (macOS built-in)
+  - ImageMagick (for generating .ico and resized icons)
+
+------------------------------------------------------------
+9) Version Control / Project Structure
+------------------------------------------------------------
+- Git (project stored in a local Git repository)
+- Standard Vite + Tauri project structure
+
+------------------------------------------------------------
+10) Execution Modes
+------------------------------------------------------------
+- Development mode:
+  - `npx tauri dev`
+  - Requires VS Code / terminal
+- Production mode:
+  - `npx tauri build`
+  - Generates standalone macOS application
+
+------------------------------------------------------------
+(End)
