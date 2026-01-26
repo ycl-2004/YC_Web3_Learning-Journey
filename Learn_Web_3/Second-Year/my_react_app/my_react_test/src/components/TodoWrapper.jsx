@@ -137,6 +137,8 @@ function TodoWrapper() {
   const [showSoundPanel, setShowSoundPanel] = useState(false);
 
   const audioRef = useRef(null);
+  const [isSoundPlaying, setIsSoundPlaying] = useState(false);
+
   //const fileInputRef = useRef(null);
 
   // click outside to close sound panel
@@ -193,6 +195,91 @@ function TodoWrapper() {
       alert("mp3 play failed: " + String(e));
       return false;
     }
+  };
+
+  const syncAudioState = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    setIsSoundPlaying(!a.paused && !a.ended);
+  };
+
+  const playSoundNow = async () => {
+    if (!soundDataUrl) return;
+
+    try {
+      const a = ensureAudio();
+
+      // ✅ 设置 src/音量（如果 src 变了或没设过）
+      if (a.src !== soundDataUrl) a.src = soundDataUrl;
+      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+
+      // 如果是暂停状态，直接继续；否则从头播
+      if (a.paused) {
+        const p = a.play();
+        if (p && typeof p.then === "function") await p;
+      } else {
+        // 正在播：也可以选择不处理；我这里让它从头重播更符合 “Play” 直觉
+        a.currentTime = 0;
+        const p = a.play();
+        if (p && typeof p.then === "function") await p;
+      }
+
+      syncAudioState();
+    } catch (e) {
+      console.error("[sound] playSoundNow failed:", e);
+      alert("Play failed: " + String(e));
+    }
+  };
+
+  const togglePauseResume = async () => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    try {
+      if (!a.paused) {
+        a.pause();
+        syncAudioState();
+        return;
+      }
+
+      // paused -> resume
+      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+      const p = a.play();
+      if (p && typeof p.then === "function") await p;
+
+      syncAudioState();
+    } catch (e) {
+      console.error("[sound] togglePauseResume failed:", e);
+    }
+  };
+
+  const restartSound = async () => {
+    if (!soundDataUrl) return;
+
+    try {
+      const a = ensureAudio();
+      if (a.src !== soundDataUrl) a.src = soundDataUrl;
+
+      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+      a.currentTime = 0;
+
+      const p = a.play();
+      if (p && typeof p.then === "function") await p;
+
+      syncAudioState();
+    } catch (e) {
+      console.error("[sound] restartSound failed:", e);
+    }
+  };
+
+  const stopSound = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    try {
+      a.pause();
+      a.currentTime = 0;
+    } catch {}
+    syncAudioState();
   };
 
   const onPickMp3 = async () => {
@@ -415,6 +502,33 @@ function TodoWrapper() {
     notifiedRef.current = false;
   }, [activeId, status]);
 
+  // ----------------------------- music part
+  useEffect(() => {
+    const a = ensureAudio();
+
+    const onPlay = () => syncAudioState();
+    const onPause = () => syncAudioState();
+    const onEnded = () => syncAudioState();
+
+    a.addEventListener("play", onPlay);
+    a.addEventListener("pause", onPause);
+    a.addEventListener("ended", onEnded);
+
+    return () => {
+      a.removeEventListener("play", onPlay);
+      a.removeEventListener("pause", onPause);
+      a.removeEventListener("ended", onEnded);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+  }, [soundVolume]);
+
   // -----------------------------
   // CRUD
   // -----------------------------
@@ -539,7 +653,7 @@ function TodoWrapper() {
           <div className="header-badges" ref={soundPanelWrapRef}>
             <button
               type="button"
-              className="badge badge-music"
+              className="badge badge-circle badge-music"
               onClick={() => setShowSoundPanel((v) => !v)}
               aria-label="Sound settings"
               title={soundName ? `Sound: ${soundName}` : "Set timer sound"}
@@ -547,7 +661,9 @@ function TodoWrapper() {
               🎵
             </button>
 
-            <span className={`badge ${isLocked ? "badge-timer" : ""}`}>
+            <span
+              className={`badge badge-circle ${isLocked ? "badge-timer" : ""}`}
+            >
               {headerRight}
             </span>
 
@@ -583,10 +699,28 @@ function TodoWrapper() {
                   <button
                     type="button"
                     className="btn ghost"
-                    onClick={() => playAlarmSound()}
+                    onClick={playSoundNow}
                     disabled={!soundDataUrl}
                   >
-                    Test
+                    Play
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={togglePauseResume}
+                    disabled={!soundDataUrl}
+                  >
+                    {isSoundPlaying ? "Pause" : "Resume"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={restartSound}
+                    disabled={!soundDataUrl}
+                  >
+                    Restart
                   </button>
 
                   <button

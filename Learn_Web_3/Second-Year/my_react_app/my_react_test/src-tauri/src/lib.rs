@@ -68,6 +68,8 @@ pub fn run() {
     .plugin(tauri_plugin_fs::init())
     .plugin(tauri_plugin_nspopover::init())
     // .invoke_handler(...) 你原本的 command 保留
+    .invoke_handler(tauri::generate_handler![pick_audio])
+
     .setup(|app| {
       // ✅ macOS: menubar app (no Dock)
       #[cfg(target_os = "macos")]
