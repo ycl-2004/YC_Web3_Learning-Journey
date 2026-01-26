@@ -64,15 +64,10 @@ async fn pick_audio(app: tauri::AppHandle) -> Result<Option<String>, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
-    // ✅ plugins
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_fs::init())
     .plugin(tauri_plugin_nspopover::init())
-
-    // ✅ register commands
-    .invoke_handler(tauri::generate_handler![pick_audio])
-
-    // ✅ single setup (DON'T duplicate .setup())
+    // .invoke_handler(...) 你原本的 command 保留
     .setup(|app| {
       // ✅ macOS: menubar app (no Dock)
       #[cfg(target_os = "macos")]
@@ -80,42 +75,62 @@ pub fn run() {
         app.set_activation_policy(ActivationPolicy::Accessory);
       }
 
-      // ✅ get main window (label must be "main" in tauri.conf.json)
+      // ✅ main window -> popover
       let window = app
         .get_webview_window("main")
         .expect("missing window label=main");
 
-      // ✅ convert to native popover
       window.to_popover(ToPopoverOptions {
         is_fullsize_content: true,
       });
 
-      // ✅ tray is created by tauri.conf.json (id="main")
-      let tray = app
-        .tray_by_id("main")
-        .expect("missing trayIcon id=main in tauri.conf.json");
+      
+      // tray (created by tauri.conf.json)
+      let tray = app.tray_by_id("main").expect("missing trayIcon id=main");
 
+      // build menu
+      let version_str = format!("Version {}", env!("CARGO_PKG_VERSION"));
+      let version_item = tauri::menu::MenuItem::with_id(app, "version", version_str, false, None::<&str>)?;
+      let quit_item = tauri::menu::MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+      let menu = tauri::menu::Menu::with_items(
+        app,
+        &[
+          &version_item,
+          &tauri::menu::PredefinedMenuItem::separator(app)?,
+          &quit_item,
+        ],
+      )?;
+
+      // attach menu
+      tray.set_menu(Some(menu))?;
+
+      // ✅ IMPORTANT: prevent left click from showing menu
+      tray.set_show_menu_on_left_click(false)?;
+
+      // menu events
+      let app_handle_for_menu = app.handle().clone();
+      tray.on_menu_event(move |_tray, event| {
+        if event.id().as_ref() == "quit" {
+          app_handle_for_menu.exit(0);
+        }
+      });
+
+      // left click toggles popover
       let handle = app.handle().clone();
-
       tray.on_tray_icon_event(move |_, event| {
-        if let TrayIconEvent::Click {
-          button,
-          button_state,
-          ..
-        } = event
-        {
-          // ✅ only handle Left mouse Up (avoid Down/Up double trigger)
-          if button != MouseButton::Left || button_state != MouseButtonState::Up {
-            return;
-          }
-
-          if !handle.is_popover_shown() {
-            handle.show_popover();
-          } else {
-            handle.hide_popover();
+        if let tauri::tray::TrayIconEvent::Click { button, button_state, .. } = event {
+          if button == tauri::tray::MouseButton::Left
+            && button_state == tauri::tray::MouseButtonState::Up
+          {
+            if !handle.is_popover_shown() {
+              handle.show_popover();
+            } else {
+              handle.hide_popover();
+            }
           }
         }
       });
+
 
       Ok(())
     })
