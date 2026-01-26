@@ -7,40 +7,22 @@
   box-sizing: border-box;
 }
 
-:root {
-  --bg: #fff1f3;
-  --card: #e6cbe3;
-  --card-2: rgba(255, 255, 255, 0.22);
-  --ink: #3b2f2f;
+#root {
+  width: 100%;
+  height: 100%;
+}
 
-  --accent: rgb(137, 38, 183);
-  --mauve: rgba(212, 165, 193, 0.95);
-  --mauve-2: rgba(212, 165, 193, 0.35);
-
-  --row: rgba(201, 154, 227, 0.95);
-
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.14);
-  --shadow-md: 0 10px 22px rgba(0, 0, 0, 0.12);
-  --shadow-sm: 0 6px 14px rgba(0, 0, 0, 0.1);
-
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --radius-sm: 12px;
-
-  --ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background:
-    radial-gradient(
-      1200px 500px at 50% -20%,
-      rgba(137, 38, 183, 0.18),
-      transparent 60%
-    ),
-    var(--bg);
+  background: transparent; /* ✅ 不要用 body 背景，不然露出左右空白 */
   color: var(--ink);
-  display: flex;
-  justify-content: center;
   font-family:
     ui-sans-serif,
     system-ui,
@@ -50,28 +32,37 @@ body {
     Arial,
     "Apple Color Emoji",
     "Segoe UI Emoji";
-  padding: 8px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: block;
+  overflow: hidden;
 }
 
 /* -----------------------------
    Card
 ----------------------------- */
 .menu-card {
-  width: 340px;
-  max-height: 460px;
-  background: linear-gradient(
-    180deg,
-    rgba(230, 203, 227, 0.96),
-    rgba(230, 203, 227, 0.9)
-  );
+  width: 100%; /* ✅ 吃满 popover 宽度 */
+  height: 100%;
+  max-height: none;
+
+  background:
+    radial-gradient(
+      1200px 500px at 50% -20%,
+      rgba(137, 38, 183, 0.18),
+      transparent 60%
+    ),
+    linear-gradient(180deg, rgba(230, 203, 227, 0.96), rgba(230, 203, 227, 0.9));
+
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 24px;
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(8px);
   position: relative;
+
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -241,7 +232,10 @@ body {
    List + scrollbar
 ----------------------------- */
 .todo-list {
-  max-height: 280px;
+  /* ✅ 自动吃剩余高度，超出就滚 */
+  flex: 1;
+  min-height: 0;
+
   overflow: auto;
   padding: 4px 8px 4px 4px;
   scroll-behavior: smooth;
@@ -535,6 +529,9 @@ body {
 ----------------------------- */
 .footer-bar {
   margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+
   display: flex;
   justify-content: flex-end;
   gap: 8px;
