@@ -1,8 +1,10 @@
 import CreateForm from "./CreateForm";
 import Todo from "./Todo";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { readFile } from "@tauri-apps/plugin-fs";
 
-const STORAGE_KEY = "menubar_todo_v1";
+const STORAGE_KEY = "menubar_todo_v1"; // ✅ 保留
 
 function formatTime(seconds) {
   const s = Math.max(0, seconds);
@@ -112,6 +114,117 @@ function TodoWrapper() {
   const nextTodoToStart = incompleteTodos[0] || null;
 
   // -----------------------------
+  // Sound settings (mp3 alarm)
+  // -----------------------------
+  const [soundDataUrl, setSoundDataUrl] = useState(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const data = raw ? safeParse(raw, null) : null;
+    return data?.ui?.sound?.dataUrl ?? null;
+  });
+
+  const [soundName, setSoundName] = useState(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const data = raw ? safeParse(raw, null) : null;
+    return data?.ui?.sound?.name ?? "";
+  });
+
+  const [soundVolume, setSoundVolume] = useState(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const data = raw ? safeParse(raw, null) : null;
+    return data?.ui?.sound?.volume ?? 0.6; // 0..1
+  });
+
+  const [showSoundPanel, setShowSoundPanel] = useState(false);
+
+  const audioRef = useRef(null);
+  //const fileInputRef = useRef(null);
+
+  // click outside to close sound panel
+  const soundPanelWrapRef = useRef(null);
+  useEffect(() => {
+    const onDown = (e) => {
+      if (!showSoundPanel) return;
+      if (!soundPanelWrapRef.current) return;
+      if (soundPanelWrapRef.current.contains(e.target)) return;
+      setShowSoundPanel(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [showSoundPanel]);
+
+  const ensureAudio = () => {
+    if (!audioRef.current) audioRef.current = new Audio();
+    return audioRef.current;
+  };
+
+  const playAlarmSound = async () => {
+    if (!soundDataUrl) {
+      console.warn("[alarm] no soundDataUrl");
+      return false;
+    }
+
+    try {
+      const a = ensureAudio();
+
+      // ✅ 先停掉旧的
+      try {
+        a.pause();
+        a.currentTime = 0;
+      } catch {}
+
+      a.src = soundDataUrl;
+
+      // 这里用你选的音量
+      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+
+      console.log("[alarm] play()", {
+        srcPrefix: String(soundDataUrl).slice(0, 30),
+        volume: a.volume,
+        readyState: a.readyState,
+      });
+
+      const p = a.play();
+      if (p && typeof p.then === "function") await p;
+
+      console.log("[alarm] ✅ playing");
+      return true;
+    } catch (e) {
+      console.error("[alarm] ❌ play failed:", e);
+      alert("mp3 play failed: " + String(e));
+      return false;
+    }
+  };
+
+  const onPickMp3 = async () => {
+    try {
+      console.log("[Upload MP3] clicked");
+
+      const path = await invoke("pick_audio"); // Rust 回传 string 或 null
+      console.log("[Upload MP3] picked:", path);
+      if (!path) return;
+
+      setSoundName(path.split("/").pop() || "sound");
+
+      const bytes = await readFile(path);
+
+      // ✅ 关键：bytes 转成 Uint8Array，确保 Blob 正确
+      const uint8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+      const blob = new Blob([uint8], { type: "audio/mpeg" });
+
+      const url = URL.createObjectURL(blob);
+      setSoundDataUrl(url);
+    } catch (e) {
+      console.error("[Upload MP3] error:", e);
+      console.error("Upload dialog failed", e);
+    }
+  };
+
+  const clearSound = () => {
+    setSoundDataUrl(null);
+    setSoundName("");
+  };
+
+  // -----------------------------
   // Notification
   // -----------------------------
   const notifiedRef = useRef(false);
@@ -129,23 +242,22 @@ function TodoWrapper() {
     }
   };
 
-  const fireNotification = async ({ title, body }) => {
+  const fireNotification = async ({ title, body, beep = true }) => {
     const ok = await requestNotificationPermission();
 
     if (ok) {
       try {
         new Notification(title, { body });
-      } catch {
-        // ignore
-      }
+      } catch {}
     }
 
-    // fallback: flash title + beep
     const originalTitle = document.title;
     document.title = `⏰ ${title}`;
     setTimeout(() => {
       document.title = originalTitle;
     }, 2500);
+
+    if (!beep) return;
 
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -164,9 +276,7 @@ function TodoWrapper() {
           ctx.close();
         }, 180);
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
   };
 
   // -----------------------------
@@ -182,17 +292,13 @@ function TodoWrapper() {
     const timer = data?.timer;
     if (!timer) return;
 
-    // If we were running, restore endAt and compute remaining now
     if (timer.status === "running" && timer.endAt && timer.activeId) {
       endAtRef.current = timer.endAt;
 
       const secLeft = Math.ceil((timer.endAt - nowMs()) / 1000);
       if (secLeft <= 0) {
-        // time already passed while app was closed -> finish immediately
         setRemainingSec(0);
-        // finish after state is ready
         setTimeout(() => {
-          // only finish if still same active
           finishActive(true);
         }, 0);
       } else {
@@ -202,7 +308,6 @@ function TodoWrapper() {
       }
     }
 
-    // If paused, just keep remainingSec as stored (endAt not needed)
     if (timer.status === "paused" && timer.activeId) {
       endAtRef.current = null;
       setStatus("paused");
@@ -233,11 +338,25 @@ function TodoWrapper() {
       },
       ui: {
         showCompleted,
+        sound: {
+          dataUrl: soundDataUrl,
+          name: soundName,
+          volume: soundVolume,
+        },
       },
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  }, [todos, activeId, status, remainingSec, showCompleted]);
+  }, [
+    todos,
+    activeId,
+    status,
+    remainingSec,
+    showCompleted,
+    soundDataUrl,
+    soundName,
+    soundVolume,
+  ]);
 
   // -----------------------------
   // countdown tick (uses endAt when running)
@@ -246,7 +365,6 @@ function TodoWrapper() {
     if (status !== "running") return;
     if (!activeId) return;
 
-    // if no endAt, reconstruct from remainingSec
     if (!endAtRef.current) {
       endAtRef.current = nowMs() + remainingSec * 1000;
     }
@@ -261,26 +379,34 @@ function TodoWrapper() {
         return;
       }
       setRemainingSec(secLeft);
-    }, 250); // smoother update, but still cheap
+    }, 250);
 
     return () => clearInterval(timer);
   }, [status, activeId, remainingSec]);
 
-  // when remainingSec hits 0 while running -> notify + auto finish (once)
+  // when remainingSec hits 0 while running -> play mp3 + notify + auto finish (once)
   useEffect(() => {
-    if (status !== "running") return;
-    if (remainingSec !== 0) return;
-    if (!activeTodo) return;
-    if (notifiedRef.current) return;
+    const run = async () => {
+      if (status !== "running") return;
+      if (remainingSec !== 0) return;
+      if (!activeTodo) return;
+      if (notifiedRef.current) return;
 
-    notifiedRef.current = true;
+      notifiedRef.current = true;
 
-    fireNotification({
-      title: "Time’s up!",
-      body: `Finished: ${activeTodo.content} (${activeTodo.minutes ?? 25}m)`,
-    });
+      const ok = await playAlarmSound();
 
-    finishActive(true);
+      fireNotification({
+        title: "Time’s up!",
+        body: `Finished: ${activeTodo.content} (${activeTodo.minutes ?? 25}m)`,
+        beep: !ok, // ✅ mp3失败才 beep
+      });
+
+      // 3) 完成任务
+      finishActive(true);
+    };
+
+    run();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remainingSec, status, activeTodo]);
 
@@ -369,7 +495,7 @@ function TodoWrapper() {
       setRemainingSec(Math.max(0, secLeft));
     }
 
-    endAtRef.current = null; // paused doesn't use endAt
+    endAtRef.current = null;
     setStatus("paused");
   };
 
@@ -390,14 +516,10 @@ function TodoWrapper() {
       ),
     );
 
-    // reset focus
     endAtRef.current = null;
     setStatus("idle");
     setActiveId(null);
     setRemainingSec(0);
-
-    // optional: auto open completed section briefly (I leave it off)
-    // if (fromAuto) setShowCompleted(false);
   };
 
   const headerRight = useMemo(() => {
@@ -413,9 +535,84 @@ function TodoWrapper() {
             <h1>Todo</h1>
           </div>
 
-          <span className={`badge ${isLocked ? "badge-timer" : ""}`}>
-            {headerRight}
-          </span>
+          {/* 🎵 + 3 badge */}
+          <div className="header-badges" ref={soundPanelWrapRef}>
+            <button
+              type="button"
+              className="badge badge-music"
+              onClick={() => setShowSoundPanel((v) => !v)}
+              aria-label="Sound settings"
+              title={soundName ? `Sound: ${soundName}` : "Set timer sound"}
+            >
+              🎵
+            </button>
+
+            <span className={`badge ${isLocked ? "badge-timer" : ""}`}>
+              {headerRight}
+            </span>
+
+            {showSoundPanel && (
+              <div className="sound-panel">
+                <div className="sound-row">
+                  <div className="sound-title">Timer Sound</div>
+                  <button
+                    type="button"
+                    className="sound-close"
+                    onClick={() => setShowSoundPanel(false)}
+                    aria-label="Close"
+                    title="Close"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="sound-meta">
+                  {soundName ? soundName : "No sound selected"}
+                </div>
+
+                <div className="sound-actions">
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={onPickMp3}
+                    disabled={false}
+                  >
+                    Upload MP3
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={() => playAlarmSound()}
+                    disabled={!soundDataUrl}
+                  >
+                    Test
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={clearSound}
+                    disabled={!soundDataUrl}
+                  >
+                    Clear
+                  </button>
+                </div>
+
+                <div className="sound-slider">
+                  <span className="muted">Volume</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={soundVolume}
+                    onChange={(e) => setSoundVolume(Number(e.target.value))}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <p className="subtitle">
@@ -427,7 +624,6 @@ function TodoWrapper() {
 
       <CreateForm addTodo={addTodo} isLocked={isLocked} />
 
-      {/* Only show incomplete tasks */}
       <div className="section-title">
         <span>Now</span>
         <span className="muted">{remainingCount} remaining</span>
@@ -455,7 +651,6 @@ function TodoWrapper() {
                 status={status}
                 onStart={() => {
                   if (!isActive) return startTodo(todo);
-                  // active: toggle running/paused
                   if (status === "running") return pauseActive();
                   if (status === "paused") return resumeActive();
                 }}
@@ -467,7 +662,6 @@ function TodoWrapper() {
         )}
       </div>
 
-      {/* Completed collapsible */}
       <div className="completed-panel">
         <button
           className="collapse-btn"

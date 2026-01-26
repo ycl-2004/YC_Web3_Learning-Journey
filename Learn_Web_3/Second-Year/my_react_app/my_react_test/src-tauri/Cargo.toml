@@ -23,6 +23,9 @@ log = "0.4"
 tauri = { version = "2.9.5", features = ["tray-icon"] }
 tauri-plugin-log = "2"
 tauri-plugin-positioner = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+
 
 # ✅ 只留这一条
 tauri-plugin-nspopover = { git = "https://github.com/freethinkel/tauri-nspopover-plugin.git", version = "4.0.1" }
