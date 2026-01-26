@@ -1,15 +1,17 @@
+/* =============================
+   YC Todo — Complete Theme CSS
+   (✅ Light/Dark via :root[data-theme="dark"]
+    ✅ Accent via --accent + --accent-glow
+    ✅ No duplicated .sound-panel / no hard-coded pink blocks)
+   ============================= */
+
 /* -----------------------------
-   Base
+   Base reset
 ----------------------------- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-#root {
-  width: 100%;
-  height: 100%;
 }
 
 html,
@@ -20,8 +22,12 @@ body,
   padding: 0;
 }
 
+#root {
+  width: 100%;
+}
+
 body {
-  background: transparent; /* ✅ 不要用 body 背景，不然露出左右空白 */
+  background: transparent;
   color: var(--ink);
   font-family:
     ui-sans-serif,
@@ -34,31 +40,83 @@ body {
     "Segoe UI Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  display: block;
   overflow: hidden;
 }
 
 /* -----------------------------
-   Card
+   Tokens (Light default)
+----------------------------- */
+:root {
+  /* Accent (JS will set these) */
+  --accent: #d4a5c1;
+  --accent-glow: rgba(212, 165, 193, 0.18);
+
+  /* Theme tokens */
+  --bg1: rgba(230, 203, 227, 0.96);
+  --bg2: rgba(230, 203, 227, 0.9);
+  --ink: rgba(20, 18, 18, 0.92);
+  --muted: rgba(20, 18, 18, 0.6);
+
+  --card-border: rgba(255, 255, 255, 0.35);
+  --stroke: rgba(0, 0, 0, 0.12);
+
+  --glass: rgba(255, 255, 255, 0.25);
+  --glass-strong: rgba(255, 255, 255, 0.86);
+
+  --shadow-lg: 0 18px 45px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 12px 26px rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 8px 18px rgba(0, 0, 0, 0.08);
+
+  --radius-md: 14px;
+  --radius-lg: 18px;
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* -----------------------------
+   Dark theme overrides
+----------------------------- */
+:root[data-theme="dark"] {
+  --bg1: rgba(26, 22, 28, 0.92);
+  --bg2: rgba(18, 16, 20, 0.88);
+  --ink: rgba(245, 243, 245, 0.92);
+  --muted: rgba(245, 243, 245, 0.62);
+
+  --card-border: rgba(255, 255, 255, 0.12);
+  --stroke: rgba(255, 255, 255, 0.16);
+
+  --glass: rgba(255, 255, 255, 0.1);
+  --glass-strong: rgba(25, 22, 28, 0.86);
+
+  --shadow-lg: 0 18px 45px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 12px 26px rgba(0, 0, 0, 0.28);
+  --shadow-sm: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+/* -----------------------------
+   Card (Popover container)
 ----------------------------- */
 .menu-card {
-  width: 100%; /* ✅ 吃满 popover 宽度 */
+  width: 100%;
   height: 100%;
   max-height: none;
 
   background:
     radial-gradient(
       1200px 500px at 50% -20%,
-      rgba(137, 38, 183, 0.18),
+      var(--accent-glow),
       transparent 60%
     ),
-    linear-gradient(180deg, rgba(230, 203, 227, 0.96), rgba(230, 203, 227, 0.9));
+    linear-gradient(180deg, var(--bg1), var(--bg2));
 
   border-radius: var(--radius-lg);
   padding: 24px;
+
   box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--card-border);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
   position: relative;
 
   display: flex;
@@ -72,11 +130,7 @@ body {
   inset: -120px -160px auto auto;
   width: 260px;
   height: 260px;
-  background: radial-gradient(
-    circle,
-    rgba(137, 38, 183, 0.18),
-    transparent 60%
-  );
+  background: radial-gradient(circle, var(--accent-glow), transparent 60%);
   filter: blur(6px);
   pointer-events: none;
 }
@@ -114,6 +168,15 @@ body {
   line-height: 1.25;
 }
 
+/* Right badges wrap */
+.header-badges {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Badge base */
 .badge {
   width: 42px;
   height: 42px;
@@ -123,21 +186,56 @@ body {
   align-items: center;
   justify-content: center;
 
-  padding: 0; /* ✅ 关键：去掉胶囊 padding */
+  padding: 0;
   line-height: 1;
 
   font-size: 12px;
   font-weight: 900;
 
-  background: rgba(212, 165, 193, 0.95);
+  background: var(--accent);
   color: #fff;
 
   box-shadow: 0 8px 18px rgba(212, 165, 193, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--card-border);
 }
 
 .badge-timer {
   font-variant-numeric: tabular-nums;
+}
+
+.badge-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Music badge */
+.badge-music {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  font-size: 18px;
+}
+
+.badge-music:hover {
+  filter: brightness(1.04);
 }
 
 /* -----------------------------
@@ -147,11 +245,14 @@ body {
   height: 42px;
   width: 100%;
   margin: 12px 0 12px;
+
   border: 1px solid rgba(212, 165, 193, 0.65);
   border-radius: var(--radius-md);
+
   display: flex;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.25);
+
+  background: var(--glass);
   box-shadow: var(--shadow-sm);
 }
 
@@ -174,29 +275,25 @@ body {
 }
 
 .create-form > input::placeholder {
-  color: rgba(59, 47, 47, 0.55);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
 }
 
 .time-select {
   border: none;
   outline: none;
-  background: rgba(255, 255, 255, 0.18);
+  background: color-mix(in srgb, var(--glass) 70%, transparent);
   padding: 0 12px;
   font-weight: 900;
   cursor: pointer;
-  color: rgba(59, 47, 47, 0.9);
-  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--ink);
+  border-left: 1px solid var(--card-border);
 }
 
 .create-form > button {
   height: 100%;
   width: 46px;
   border: none;
-  background: linear-gradient(
-    180deg,
-    rgba(212, 165, 193, 0.98),
-    rgba(212, 165, 193, 0.85)
-  );
+  background: var(--accent);
   color: white;
   font-weight: 900;
   font-size: 18px;
@@ -229,9 +326,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   font-size: 12px;
   font-weight: 900;
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .muted {
@@ -239,11 +337,17 @@ body {
   font-weight: 800;
 }
 
+/* Optional empty text */
+.empty {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 4px;
+}
+
 /* -----------------------------
    List + scrollbar
 ----------------------------- */
 .todo-list {
-  /* ✅ 自动吃剩余高度，超出就滚 */
   flex: 1;
   min-height: 0;
 
@@ -257,9 +361,9 @@ body {
 }
 
 .todo-list::-webkit-scrollbar-thumb {
-  background: rgba(212, 165, 193, 0.55);
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
   border-radius: 999px;
-  border: 3px solid rgba(230, 203, 227, 0.65);
+  border: 3px solid color-mix(in srgb, var(--bg2) 70%, transparent);
 }
 
 .todo-list::-webkit-scrollbar-track {
@@ -272,12 +376,14 @@ body {
 .todo {
   background: linear-gradient(
     180deg,
-    rgba(201, 154, 227, 0.98),
-    rgba(201, 154, 227, 0.9)
+    color-mix(in srgb, var(--accent) 35%, rgba(255, 255, 255, 1)),
+    color-mix(in srgb, var(--accent) 25%, rgba(255, 255, 255, 1))
   );
+
   min-height: 46px;
   padding: 10px 12px;
   margin-top: 10px;
+
   border-radius: var(--radius-lg);
   display: flex;
   justify-content: space-between;
@@ -285,11 +391,20 @@ body {
   gap: 10px;
 
   box-shadow: var(--shadow-md);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--card-border);
+
   transition:
     transform 160ms var(--ease),
     filter 160ms var(--ease),
     opacity 160ms var(--ease);
+}
+
+:root[data-theme="dark"] .todo {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 22%, rgba(30, 26, 34, 1)),
+    color-mix(in srgb, var(--accent) 16%, rgba(24, 20, 28, 1))
+  );
 }
 
 .todo:hover {
@@ -303,9 +418,9 @@ body {
 
 /* Focus editing ring */
 .todo.editing {
-  background: rgba(240, 217, 255, 0.75);
+  background: color-mix(in srgb, var(--accent) 18%, var(--glass-strong));
   box-shadow:
-    0 0 0 2px rgba(137, 38, 183, 0.55),
+    0 0 0 2px color-mix(in srgb, var(--accent) 60%, transparent),
     var(--shadow-md);
 }
 
@@ -341,16 +456,18 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--ink);
 }
 
 .todo-meta {
   font-size: 12px;
-  opacity: 0.75;
+  opacity: 0.8;
   font-weight: 900;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: var(--glass);
+  border: 1px solid var(--card-border);
+  color: var(--ink);
 }
 
 /* actions */
@@ -361,8 +478,8 @@ body {
 }
 
 .icon-btn {
-  border: none;
-  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--card-border);
+  background: var(--glass);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -373,10 +490,11 @@ body {
     transform 120ms var(--ease),
     background 120ms var(--ease),
     opacity 120ms var(--ease);
+  color: var(--ink);
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
+  filter: brightness(1.05);
 }
 
 .icon-btn:active {
@@ -384,7 +502,7 @@ body {
 }
 
 .icon-btn.danger:hover {
-  background: rgba(255, 0, 0, 0.12);
+  background: color-mix(in srgb, red 12%, var(--glass));
 }
 
 .icon-btn:disabled {
@@ -394,12 +512,13 @@ body {
 
 /* completed */
 .completed {
-  opacity: 0.5;
+  opacity: 0.55;
   filter: saturate(0.9);
 }
 
 .completed .todo-text {
-  text-decoration: line-through 2px rgba(0, 0, 0, 0.45);
+  text-decoration: line-through 2px
+    color-mix(in srgb, var(--ink) 50%, transparent);
 }
 
 /* locked visual */
@@ -421,18 +540,18 @@ body {
 .edit-form input {
   height: 38px;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(212, 165, 193, 0.7);
-  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  background: var(--glass);
   outline: none;
   padding: 0 12px;
   font-size: 14px;
   color: var(--accent);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .edit-form input:focus {
-  border-color: rgba(137, 38, 183, 0.55);
-  box-shadow: 0 0 0 3px rgba(137, 38, 183, 0.18);
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .edit-row {
@@ -448,27 +567,29 @@ body {
   gap: 8px;
 }
 
-/* time */
-/* dropdown popover：更清楚、更像原生 */
+/* -----------------------------
+   Minute dropdown (if used)
+----------------------------- */
 .minute-pop {
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  background: var(--glass-strong);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   z-index: 9999;
+  color: var(--ink);
 }
 
 .minute-pop-header {
   padding: 10px 12px;
   font-size: 12px;
   font-weight: 700;
-  background: rgba(0, 0, 0, 0.04);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-bottom: 1px solid var(--stroke);
 }
 
 .minute-pop-list {
-  max-height: 180px; /* ✅ 你要的 approximating height */
+  max-height: 180px;
   overflow-y: auto;
   padding: 6px;
 }
@@ -477,6 +598,7 @@ body {
   width: 100%;
   border: 0;
   background: transparent;
+  color: var(--ink);
   padding: 10px 10px;
   border-radius: 10px;
   display: flex;
@@ -485,138 +607,33 @@ body {
 }
 
 .minute-item:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 .minute-item.active {
-  background: rgba(0, 0, 0, 0.12);
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
   font-weight: 700;
 }
 
 .minute-divider {
   height: 1px;
-  background: rgba(0, 0, 0, 0.12);
+  background: var(--stroke);
   margin: 6px;
 }
 
-.header-badges {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* 🎵 badge 跟数字 badge 同款 */
-.badge-music {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0; /* ✅ 防止 button 默认 padding */
-  line-height: 1;
-
-  border: 0;
-  cursor: pointer;
-
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  font-size: 18px;
-}
-
-.badge-music:hover {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.badge-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  line-height: 1;
-}
-
-/* Sound panel popover */
-.sound-panel {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 10px);
-  width: 260px;
-
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.16);
-  border-radius: 16px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-  padding: 12px;
-  z-index: 9999;
-}
-
-.sound-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.sound-title {
-  font-weight: 700;
-}
-
-.sound-close {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  opacity: 0.7;
-}
-
-.sound-meta {
-  margin-top: 6px;
-  font-size: 12px;
-  opacity: 0.75;
-  word-break: break-all;
-}
-
-.sound-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.sound-slider {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  align-items: center;
-  gap: 10px;
-}
-
-.sound-slider input[type="range"] {
-  width: 100%;
-}
-
-/* Bigger minute button */
 .minute-btn {
   margin-top: 5px;
   margin-right: 2px;
-  height: 30px; /* 原本 40 -> 44 */
-  min-width: 90px; /* 原本 ~84 -> 98 */
-  padding: 0 14px; /* 更舒服 */
+  height: 30px;
+  min-width: 90px;
+  padding: 0 14px;
   border-radius: 14px;
 
-  font-size: 15px; /* 字大一点 */
+  font-size: 15px;
   font-weight: 600;
 
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--stroke);
+  background: var(--glass-strong);
+  color: var(--ink);
 
   display: inline-flex;
   align-items: center;
@@ -627,26 +644,31 @@ body {
 }
 
 .minute-btn .chev {
-  font-size: 12px; /* 小一点更像系统箭头 */
+  font-size: 12px;
   opacity: 0.65;
   transform: translateY(1px);
 }
 
-/* buttons */
+/* -----------------------------
+   Buttons
+----------------------------- */
 .btn {
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid var(--card-border);
   padding: 8px 12px;
   border-radius: 12px;
   cursor: pointer;
+
   background: linear-gradient(
     180deg,
-    rgba(212, 165, 193, 0.98),
-    rgba(212, 165, 193, 0.85)
+    color-mix(in srgb, var(--accent) 92%, white),
+    color-mix(in srgb, var(--accent) 82%, white)
   );
+
   color: #fff;
   font-weight: 900;
   font-size: 12px;
-  box-shadow: 0 10px 22px rgba(212, 165, 193, 0.18);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 18%, transparent);
+
   transition:
     transform 120ms var(--ease),
     filter 120ms var(--ease),
@@ -667,9 +689,155 @@ body {
 }
 
 .btn.ghost {
-  background: rgba(255, 255, 255, 0.22);
-  color: rgba(59, 47, 47, 0.9);
+  background: var(--glass);
+  color: var(--ink);
   box-shadow: none;
+  border: 1px solid var(--card-border);
+}
+
+/* -----------------------------
+   Sound panel (ONLY ONE)
+----------------------------- */
+.sound-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 280px;
+  padding: 12px;
+  border-radius: 16px;
+
+  background: var(--glass-strong);
+  border: 1px solid var(--stroke);
+  color: var(--ink);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.sound-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sound-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.sound-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: var(--glass);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    transform 120ms var(--ease),
+    filter 120ms var(--ease);
+}
+.sound-close:hover {
+  filter: brightness(1.05);
+  transform: scale(1.04);
+}
+.sound-close:active {
+  transform: scale(0.98);
+}
+
+.sound-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Actions layout */
+.sound-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* Ghost buttons inside panel */
+.sound-panel .btn.ghost {
+  border-radius: 12px;
+  padding: 9px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Volume row */
+.sound-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sound-slider .muted {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  min-width: 58px;
+}
+
+/* Slider */
+.sound-slider input[type="range"] {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 14%, transparent);
+  outline: none;
+}
+
+.sound-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+
+  background: var(--glass-strong);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 120ms var(--ease);
+}
+
+.sound-slider input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.06);
+}
+
+.sound-slider input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
+.sound-slider input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--glass-strong);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
 }
 
 /* -----------------------------
@@ -681,8 +849,8 @@ body {
 
 .collapse-btn {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--card-border);
+  background: var(--glass);
   padding: 10px 12px;
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -697,6 +865,8 @@ body {
     transform 120ms var(--ease),
     filter 120ms var(--ease),
     opacity 120ms var(--ease);
+
+  color: var(--ink);
 }
 
 .collapse-btn:hover {
@@ -719,202 +889,22 @@ body {
   gap: 10px;
 }
 
-/* =========================
-   Sound Panel (Timer Sound)
-   ========================= */
-
-.sound-panel {
-  position: absolute;
-  right: 0;
-  top: 48px; /* 你可以微调，让它更贴近 🎵 */
-  width: 280px;
-  padding: 12px 12px 10px;
-  border-radius: 16px;
-
-  /* “白色但有层次”的玻璃卡片 */
-  background: rgba(255, 255, 255, 0.86);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.14),
-    0 2px 10px rgba(0, 0, 0, 0.08);
-
-  color: rgba(20, 20, 20, 0.92);
-  background: rgba(255, 245, 252, 0.82);
-}
-
-.sound-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.sound-title {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-}
-
-.sound-close {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.9);
-  color: rgba(0, 0, 0, 0.7);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition:
-    transform 0.12s ease,
-    background 0.12s ease;
-}
-.sound-close:hover {
-  background: rgba(255, 255, 255, 1);
-  transform: scale(1.04);
-}
-.sound-close:active {
-  transform: scale(0.98);
-}
-
-.sound-meta {
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.55);
-  margin-bottom: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Actions layout: 2 rows, 3 columns (auto wrap) */
-.sound-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-/* Make your existing .btn.ghost look good inside panel */
-.sound-panel .btn.ghost {
-  border-radius: 12px;
-  padding: 9px 8px; /* ✅ 更小 */
-  font-size: 10px; /* ✅ 更小 */
-  font-weight: 700;
-  letter-spacing: 0.2px;
-
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.78);
-  color: rgba(0, 0, 0, 0.75);
-
-  transition:
-    transform 0.12s ease,
-    background 0.12s ease,
-    box-shadow 0.12s ease,
-    opacity 0.12s ease;
-}
-
-.sound-panel .btn.ghost:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
-}
-
-.sound-panel .btn.ghost:active:not(:disabled) {
-  transform: translateY(0px);
-  box-shadow: none;
-}
-
-.sound-panel .btn.ghost:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Volume row */
-.sound-slider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.sound-slider .muted {
-  font-size: 12px;
-  font-weight: 700;
-  color: rgba(0, 0, 0, 0.55);
-  min-width: 58px;
-}
-
-/* Slider base */
-.sound-slider input[type="range"] {
-  width: 100%;
-  appearance: none;
-  -webkit-appearance: none;
-  height: 6px;
-  border-radius: 999px;
-
-  background: rgba(0, 0, 0, 0.12);
-  outline: none;
-}
-
-/* Slider thumb (WebKit) */
-.sound-slider input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.16);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-  cursor: pointer;
-  transition: transform 0.12s ease;
-}
-
-.sound-slider input[type="range"]::-webkit-slider-thumb:active {
-  transform: scale(1.05);
-}
-
-/* Slider track (Firefox) */
-.sound-slider input[type="range"]::-moz-range-track {
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.12);
-}
-
-.sound-slider input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.16);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-  cursor: pointer;
-}
-
-/* Optional: tighter on small panel */
-@media (max-width: 380px) {
-  .sound-panel {
-    width: 300px;
-  }
-}
-
 /* -----------------------------
    Footer controls
 ----------------------------- */
 .footer-bar {
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-top: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
 
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+/* Optional: small width */
+@media (max-width: 380px) {
+  .sound-panel {
+    width: 300px;
+  }
 }

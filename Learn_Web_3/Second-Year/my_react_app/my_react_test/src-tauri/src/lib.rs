@@ -1,13 +1,8 @@
-// src-tauri/src/lib.rs (or wherever app_lib::run() lives)
+// src-tauri/src/lib.rs
 
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{
-  tray::{MouseButton, MouseButtonState, TrayIconEvent},
-  ActivationPolicy, Manager,
-};
-
+use tauri::{ActivationPolicy, Emitter, Manager};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_nspopover::{AppExt as _, ToPopoverOptions, WindowExt as _};
@@ -18,19 +13,13 @@ use tauri_plugin_nspopover::{AppExt as _, ToPopoverOptions, WindowExt as _};
 async fn pick_audio(app: tauri::AppHandle) -> Result<Option<String>, String> {
   let (tx, rx) = std::sync::mpsc::channel::<Option<String>>();
 
-  // ✅ All UI-related operations must run on main thread
   let app_ui = app.clone();
   let _ = app.run_on_main_thread(move || {
-    // 1) Hide popover first so OpenPanel won't attach to popover (avoids white panel/crash)
+    // Hide popover first so OpenPanel won't attach to popover
     if app_ui.is_popover_shown() {
       app_ui.hide_popover();
     }
 
-    // ❌ IMPORTANT: Do NOT switch to ActivationPolicy::Regular here
-    // It will cause Dock icon to appear.
-    // Keep Accessory policy and just open the dialog.
-
-    // 2) Open file dialog (dialog v2 callback)
     let app_after = app_ui.clone();
     app_ui
       .dialog()
@@ -39,7 +28,7 @@ async fn pick_audio(app: tauri::AppHandle) -> Result<Option<String>, String> {
       .pick_file(move |path_opt| {
         let picked = path_opt.map(|p| p.to_string());
 
-        // 3) After select/cancel: restore menubar state (still on main thread)
+        // Restore menubar state (still on main thread)
         let app_restore = app_after.clone();
         let _ = app_after.run_on_main_thread(move || {
           #[cfg(target_os = "macos")]
@@ -53,7 +42,6 @@ async fn pick_audio(app: tauri::AppHandle) -> Result<Option<String>, String> {
       });
   });
 
-  // ✅ Wait for user selection/cancel (blocking wait in spawn_blocking)
   let picked = tauri::async_runtime::spawn_blocking(move || rx.recv().ok().flatten())
     .await
     .map_err(|_| "dialog join error".to_string())?;
@@ -67,9 +55,7 @@ pub fn run() {
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_fs::init())
     .plugin(tauri_plugin_nspopover::init())
-    // .invoke_handler(...) 你原本的 command 保留
     .invoke_handler(tauri::generate_handler![pick_audio])
-
     .setup(|app| {
       // ✅ macOS: menubar app (no Dock)
       #[cfg(target_os = "macos")]
@@ -86,38 +72,80 @@ pub fn run() {
         is_fullsize_content: true,
       });
 
-      
       // tray (created by tauri.conf.json)
       let tray = app.tray_by_id("main").expect("missing trayIcon id=main");
 
-      // build menu
+      // ---------- Menu items ----------
       let version_str = format!("Version {}", env!("CARGO_PKG_VERSION"));
-      let version_item = tauri::menu::MenuItem::with_id(app, "version", version_str, false, None::<&str>)?;
-      let quit_item = tauri::menu::MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-      let menu = tauri::menu::Menu::with_items(
+      let version_item =
+        MenuItem::with_id(app, "version", version_str, false, None::<&str>)?;
+      let quit_item =
+        MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+
+      // Theme items (flat)
+      let theme_system =
+        MenuItem::with_id(app, "theme_system", "Theme: System", true, None::<&str>)?;
+      let theme_light =
+        MenuItem::with_id(app, "theme_light", "Theme: Light", true, None::<&str>)?;
+      let theme_dark =
+        MenuItem::with_id(app, "theme_dark", "Theme: Dark", true, None::<&str>)?;
+
+      // Accent items (flat)
+      let accent_pink =
+        MenuItem::with_id(app, "accent_pink", "Accent: Pink", true, None::<&str>)?;
+      let accent_purple =
+        MenuItem::with_id(app, "accent_purple", "Accent: Purple", true, None::<&str>)?;
+      let accent_blue =
+        MenuItem::with_id(app, "accent_blue", "Accent: Blue", true, None::<&str>)?;
+      let accent_gray =
+        MenuItem::with_id(app, "accent_gray", "Accent: Gray", true, None::<&str>)?;
+
+      // Build menu
+      let menu = Menu::with_items(
         app,
         &[
           &version_item,
-          &tauri::menu::PredefinedMenuItem::separator(app)?,
+          &PredefinedMenuItem::separator(app)?,
+
+          &theme_system,
+          &theme_light,
+          &theme_dark,
+
+          &PredefinedMenuItem::separator(app)?,
+
+          &accent_pink,
+          &accent_purple,
+          &accent_blue,
+          &accent_gray,
+
+          &PredefinedMenuItem::separator(app)?,
           &quit_item,
         ],
       )?;
 
-      // attach menu
       tray.set_menu(Some(menu))?;
-
-      // ✅ IMPORTANT: prevent left click from showing menu
       tray.set_show_menu_on_left_click(false)?;
 
-      // menu events
+      // ---------- Menu events ----------
       let app_handle_for_menu = app.handle().clone();
       tray.on_menu_event(move |_tray, event| {
-        if event.id().as_ref() == "quit" {
-          app_handle_for_menu.exit(0);
+        match event.id().as_ref() {
+          "quit" => app_handle_for_menu.exit(0),
+
+          "theme_system" => { let _ = app_handle_for_menu.emit("settings://theme", "system"); }
+          "theme_light"  => { let _ = app_handle_for_menu.emit("settings://theme", "light"); }
+          "theme_dark"   => { let _ = app_handle_for_menu.emit("settings://theme", "dark"); }
+
+          "accent_pink"   => { let _ = app_handle_for_menu.emit("settings://accent", "#d4a5c1"); }
+          "accent_purple" => { let _ = app_handle_for_menu.emit("settings://accent", "#8e44ad"); }
+          "accent_blue"   => { let _ = app_handle_for_menu.emit("settings://accent", "#2d7ff9"); }
+          "accent_gray"   => { let _ = app_handle_for_menu.emit("settings://accent", "#4b4b4b"); }
+
+          _ => {}
         }
       });
 
-      // left click toggles popover
+      // ---------- Left click toggles popover ----------
       let handle = app.handle().clone();
       tray.on_tray_icon_event(move |_, event| {
         if let tauri::tray::TrayIconEvent::Click { button, button_state, .. } = event {
@@ -132,7 +160,6 @@ pub fn run() {
           }
         }
       });
-
 
       Ok(())
     })

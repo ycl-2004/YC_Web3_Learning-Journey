@@ -3,8 +3,10 @@ import Todo from "./Todo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { readFile } from "@tauri-apps/plugin-fs";
+import { listen } from "@tauri-apps/api/event";
 
 const STORAGE_KEY = "menubar_todo_v1"; // ✅ 保留
+const SETTINGS_KEY = "menubar_todo_settings_v1";
 
 function formatTime(seconds) {
   const s = Math.max(0, seconds);
@@ -31,6 +33,16 @@ function TodoWrapper() {
   // Load initial state from storage
   // -----------------------------
   const initialLoadedRef = useRef(false);
+
+  const [accent, setAccent] = useState(() => {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    return raw ? (safeParse(raw, null)?.accent ?? "#d4a5c1") : "#d4a5c1";
+  });
+
+  const [themeMode, setThemeMode] = useState(() => {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    return raw ? (safeParse(raw, null)?.themeMode ?? "system") : "system"; // "light" | "dark" | "system"
+  });
 
   const [todos, setTodos] = useState(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -502,6 +514,23 @@ function TodoWrapper() {
     notifiedRef.current = false;
   }, [activeId, status]);
 
+  useEffect(() => {
+    let unTheme, unAccent;
+
+    (async () => {
+      unTheme = await listen("settings://theme", (e) =>
+        setThemeMode(String(e.payload)),
+      );
+      unAccent = await listen("settings://accent", (e) =>
+        setAccent(String(e.payload)),
+      );
+    })();
+
+    return () => {
+      unTheme?.();
+      unAccent?.();
+    };
+  }, []);
   // ----------------------------- music part
   useEffect(() => {
     const a = ensureAudio();
@@ -528,6 +557,54 @@ function TodoWrapper() {
 
     a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
   }, [soundVolume]);
+
+  // -- Color --
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--accent", accent);
+
+    const applyTheme = (mode) => {
+      if (mode === "light") root.dataset.theme = "light";
+      else if (mode === "dark") root.dataset.theme = "dark";
+      else {
+        // system
+        const prefersDark = window.matchMedia?.(
+          "(prefers-color-scheme: dark)",
+        )?.matches;
+        root.dataset.theme = prefersDark ? "dark" : "light";
+      }
+    };
+
+    applyTheme(themeMode);
+
+    // system 模式下监听系统变化
+    let mq;
+    const onChange = () => themeMode === "system" && applyTheme("system");
+    if (themeMode === "system" && window.matchMedia) {
+      mq = window.matchMedia("(prefers-color-scheme: dark)");
+      mq.addEventListener?.("change", onChange);
+    }
+
+    return () => mq?.removeEventListener?.("change", onChange);
+  }, [accent, themeMode]);
+
+  useEffect(() => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ accent, themeMode }));
+  }, [accent, themeMode]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--accent", accent);
+
+    // 简单把 #RRGGBB -> rgba(r,g,b,0.18)
+    const hex = accent.replace("#", "");
+    if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      root.style.setProperty("--accent-glow", `rgba(${r}, ${g}, ${b}, 0.18)`);
+    }
+  }, [accent]);
 
   // -----------------------------
   // CRUD
