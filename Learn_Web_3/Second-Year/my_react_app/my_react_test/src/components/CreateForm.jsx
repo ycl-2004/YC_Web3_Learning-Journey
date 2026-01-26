@@ -1,4 +1,5 @@
 import { useState } from "react";
+import MinuteSelect from "./MinuteSelect";
 
 function CreateForm({ addTodo, isLocked }) {
   const [task, setTask] = useState("");
@@ -24,19 +25,12 @@ function CreateForm({ addTodo, isLocked }) {
         autoFocus
       />
 
-      <select
-        className="time-select"
+      <MinuteSelect
         value={minutes}
-        onChange={(e) => setMinutes(e.target.value)}
+        onChange={setMinutes}
         disabled={isLocked}
-        aria-label="Task minutes"
-      >
-        {[5, 10, 1, 20, 25, 30, 45, 60].map((m) => (
-          <option key={m} value={m}>
-            {m}m
-          </option>
-        ))}
-      </select>
+        ariaLabel="Task minutes"
+      />
 
       <button
         type="submit"

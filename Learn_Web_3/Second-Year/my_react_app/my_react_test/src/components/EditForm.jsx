@@ -1,8 +1,9 @@
 import { useState } from "react";
+import MinuteSelect from "./MinuteSelect";
 
 function EditForm({ todo, editTodo, toggleIsEditing, isLocked }) {
   const [task, setTask] = useState(todo.content);
-  const [minutes, setMinutes] = useState(todo.minutes ?? 25);
+  const [minutes, setMinutes] = useState(Number(todo.minutes ?? 25));
 
   const isValid = task.trim().length > 0;
 
@@ -24,19 +25,12 @@ function EditForm({ todo, editTodo, toggleIsEditing, isLocked }) {
       />
 
       <div className="edit-row">
-        <select
-          className="time-select"
+        <MinuteSelect
           value={minutes}
-          onChange={(e) => setMinutes(e.target.value)}
+          onChange={setMinutes}
           disabled={isLocked}
-          aria-label="Edit minutes"
-        >
-          {[5, 10, 15, 20, 25, 30, 45, 60].map((m) => (
-            <option key={m} value={m}>
-              {m}m
-            </option>
-          ))}
-        </select>
+          ariaLabel="Edit minutes"
+        />
 
         <div className="edit-actions">
           <button
