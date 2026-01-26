@@ -1,77 +1,53 @@
 use tauri::{
-  image::Image,
-  tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-  Manager,
+  tray::{MouseButton, MouseButtonState, TrayIconEvent},
+  ActivationPolicy, Manager,
 };
-use tauri_plugin_positioner::{Position, WindowExt};
-use std::{thread, time::Duration};
+
+use tauri_plugin_nspopover::{AppExt as _, ToPopoverOptions, WindowExt as _};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
-    .plugin(tauri_plugin_positioner::init())
+    // ✅ 先 init 插件
+    .plugin(tauri_plugin_nspopover::init())
     .setup(|app| {
+      // ✅ macOS: 不顯示 Dock（menubar app）
       #[cfg(target_os = "macos")]
       {
-        use tauri::ActivationPolicy;
         app.set_activation_policy(ActivationPolicy::Accessory);
       }
 
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
+      // ✅ 取 main window（tauri.conf.json 的 windows.label 必須是 "main"）
+      let window = app.get_webview_window("main").expect("missing window label=main");
 
-      let window = app.get_webview_window("main").unwrap();
+      // ✅ 把 window 轉成原生 popover（這才會像 Proton VPN 那樣浮在最上面）
+      window.to_popover(ToPopoverOptions {
+        is_fullsize_content: true,
+      });
 
-      // blur hide（延迟避免 Finder selection border）
-      {
-        let w = window.clone();
-        window.on_window_event(move |e| {
-          if let tauri::WindowEvent::Focused(false) = e {
-            let w2 = w.clone();
-            thread::spawn(move || {
-              thread::sleep(Duration::from_millis(120));
-              if !w2.is_focused().unwrap_or(false) {
-                let _ = w2.hide();
-              }
-            });
+      // ✅ tray 由 tauri.conf.json 建立（id = "main"）
+      let tray = app.tray_by_id("main").expect("missing trayIcon id=main in tauri.conf.json");
+      let handle = app.handle().clone();
+
+      tray.on_tray_icon_event(move |_, event| {
+        if let TrayIconEvent::Click {
+          button,
+          button_state,
+          ..
+        } = event
+        {
+          // ✅ 只吃左鍵放開（避免 Down/Up 觸發兩次）
+          if button != MouseButton::Left || button_state != MouseButtonState::Up {
+            return;
           }
-        });
-      }
 
-      // tray icon
-      let png_bytes = include_bytes!("../icons/n.png");
-      let dyn_img = image::load_from_memory(png_bytes)
-        .map_err(|e| format!("Failed to load tray icon PNG: {e}"))?;
-      let rgba = dyn_img.to_rgba8();
-      let (w, h) = rgba.dimensions();
-      let icon = Image::new_owned(rgba.into_raw(), w, h);
-
-      let _tray = TrayIconBuilder::new()
-        .icon(icon)
-        .on_tray_icon_event(|tray, event| {
-          if let TrayIconEvent::Click { button, button_state, .. } = event {
-            if button != MouseButton::Left || button_state != MouseButtonState::Up {
-              return;
-            }
-
-            let app = tray.app_handle();
-            let window = app.get_webview_window("main").unwrap();
-
-            if window.is_visible().unwrap_or(false) {
-              let _ = window.hide();
-            } else {
-              let _ = window.move_window(Position::TopRight);
-              let _ = window.show();
-              let _ = window.set_focus();
-            }
+          if !handle.is_popover_shown() {
+            handle.show_popover();
+          } else {
+            handle.hide_popover();
           }
-        })
-        .build(app)?;
+        }
+      });
 
       Ok(())
     })

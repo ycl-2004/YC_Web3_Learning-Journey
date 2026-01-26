@@ -10,24 +10,24 @@
     "beforeBuildCommand": "npm run build"
   },
   "app": {
+    "trayIcon": {
+      "id": "main",
+      "iconPath": "icons/n.png",
+      "iconAsTemplate": true
+    },
     "windows": [
       {
         "label": "main",
-        "title": "YC_ToDO",
+        "title": "YC ToDo",
         "width": 360,
         "height": 520,
         "resizable": false,
-        "fullscreen": false,
         "decorations": false,
         "transparent": false,
-        "visible": false,
-        "alwaysOnTop": true,
-        "skipTaskbar": true
+        "visible": false
       }
     ],
-    "security": {
-      "csp": null
-    }
+    "security": { "csp": null }
   },
   "bundle": {
     "active": true,
