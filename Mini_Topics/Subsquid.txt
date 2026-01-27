@@ -1,0 +1,77 @@
+这是一份为您整理的 Subsquid 核心要点笔记，涵盖了其定义、与 The Graph 的对比以及快速部署指南。
+
+---
+
+# Subsquid 核心指南 (.txt)
+
+## 1. 什么是 Subsquid？
+
+Subsquid 是一个**全栈區塊鏈索引解決方案**，旨在解決鏈上數據訪問難、成本高的問題。
+
+* **三大組成部分**：開源 SDK、專門的數據湖（Archives）以及托管服務（Aquarium）。
+* **核心優勢**：基於**批處理（Batch processing）**設計，索引速度可達每秒 50,000 區塊以上，遠超傳統的逐塊索引器。
+
+### 主要應用場景
+
+* **DApp 後端**：提供定製化的 GraphQL API，替代低效的 RPC 讀取請求，降低成本。
+* **數據管道**：為數據分析和取證準備、轉換、加載海量鏈上數據。
+* **監控儀表板**：為鏈上活動監測提供高度可定製的數據源。
+
+---
+
+## 2. Subsquid vs. The Graph
+
+根據技術對比，Subsquid 在靈活性和性能上具有顯著優勢：
+
+| 功能特性 | Subsquid | The Graph |
+| --- | --- | --- |
+| **編程語言** | TypeScript | AssemblyScript (編譯為 WASM) |
+| **索引速度** | ~1k - 50k bps | ~100 - 150 bps |
+| **數據目標** | **可自定義** | 僅限 Postgres |
+| **實時索引** | 支持（非最終化區塊） | 不支持 |
+| **離線數據** | 支持 | 不支持 |
+| **本地設置** | 簡單 | 需要存檔節點 (Archival Node) |
+| **支付方式** | 法幣、訂閱制 | GRT 代幣 (按查詢付費) |
+| **去中心化** | 自選（如 Kwil DB, Ceramic） | The Graph 網絡 |
+
+---
+
+## 3. 核心功能亮點
+
+* **EVM 索引**：對主流 EVM 鏈的日誌和交易進行極速批處理索引。
+* **API & IPFS 增強**：支持通過第三方 API 或 IPFS 查詢來富化索引數據。
+* **零停機更新**：支持生產環境別名，切換版本無需停機。
+* **GraphQL 訂閱**：支持 Live Query 更新。
+* **多鏈支持**：除了 EVM，還是最先進的 **Substrate** 數據索引 SDK，並支持 **WASM** 智能合約（!ink）。
+
+---
+
+## 4. 快速上手：7 步部署您的第一個 Squid
+
+以下示例展示如何部署一個索引以太坊主網「燃燒交易（Burn transactions）」的程序：
+
+1. **項目初始化**：
+使用模板創建項目並進入文件夾：
+`sqd init my-awesome-squid --template evm`
+2. **安裝依賴**：
+`npm ci`
+3. **設置網絡**：
+修改 `src/processor.ts` 以選擇目標 EVM 網絡。
+4. **生成類型代碼**：
+根據 Schema 生成模型：
+`sqd codegen` 和 `sqd typegen`
+5. **啟動數據庫**：
+使用 Docker 啟動本地 Postgres：
+`sqd up`
+6. **運行處理器**：
+開始抓取並將數據寫入數據庫：
+`sqd process`
+7. **啟動 GraphQL 服務**：
+開啟 API 查詢窗口：
+`sqd serve`
+
+> **提示**：啟動服務後，您可以在 GraphiQL 控制台執行查詢（例如按 `value_DESC` 排序查詢前 10 名的歷史燃燒記錄）。
+
+---
+
+您是否需要我針對其中某個步驟（例如 `processor.ts` 的具體配置或 `schema.graphql` 的編寫）為您提供更詳細的代碼示例？
