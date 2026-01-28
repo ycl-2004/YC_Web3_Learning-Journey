@@ -1,0 +1,49 @@
+=========================================
+Solidity: 合約權限管理 (Owner Setup) 筆記
+=========================================
+
+1. Constructor 構造函數法 (最推薦 / 標準做法)
+-----------------------------------------
+說明：在合約部署（Deploy）的瞬間執行一次，將部署者地址存入變數。
+優點：邏輯清晰，適合需要在部署時初始化多個參數的場景。
+
+代碼範例：
+address public owner;
+
+constructor() {
+    owner = msg.sender;
+}
+
+2. 直接初始化 (最乾淨俐落)
+-----------------------------------------
+說明：在宣告狀態變數的同時直接賦值。
+優點：代碼最少，適合邏輯簡單、不需要額外部署參數的合約。
+
+代碼範例：
+address public owner = msg.sender;
+
+3. 繼承 OpenZeppelin Ownable 庫 (專業推薦 / 業界標準)
+-----------------------------------------
+說明：引用經過社群審核的安全庫，直接繼承所有權限功能。
+優點：內建 `onlyOwner` 修改器（Modifier）、轉移所有權（transferOwnership）
+     與放棄所有權（renounceOwnership）功能，安全性最高。
+
+代碼範例：
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyContract is Ownable {
+    constructor() Ownable(msg.sender) {
+        // 父合約已處理 owner 賦值
+    }
+
+    // 使用 onlyOwner 限制權限
+    function emergencyStop() public onlyOwner {
+        // 只有擁有者能執行
+    }
+}
+
+-----------------------------------------
+總結建議：
+- 初學練習或簡易測試：用方式 2 (直接初始化)。
+- 正式專案 / 需考慮安全性：務必使用方式 3 (OpenZeppelin)。
+=========================================
