@@ -143,13 +143,18 @@ function TodoWrapper() {
   const [soundVolume, setSoundVolume] = useState(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     const data = raw ? safeParse(raw, null) : null;
-    return data?.ui?.sound?.volume ?? 0.6; // 0..1
+    return data?.ui?.sound?.volume ?? 1; // 0..3.5
   });
 
   const [showSoundPanel, setShowSoundPanel] = useState(false);
 
   const audioRef = useRef(null);
   const [isSoundPlaying, setIsSoundPlaying] = useState(false);
+
+  // ----------------------------- music part 音量控制
+  const audioCtxRef = useRef(null);
+  const gainRef = useRef(null);
+  const sourceRef = useRef(null); // MediaElementAudioSourceNode（避免重複 create）
 
   //const fileInputRef = useRef(null);
 
@@ -168,7 +173,28 @@ function TodoWrapper() {
 
   const ensureAudio = () => {
     if (!audioRef.current) audioRef.current = new Audio();
-    return audioRef.current;
+    const a = audioRef.current;
+
+    // 建立 WebAudio chain（只做一次）
+    if (!audioCtxRef.current) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      audioCtxRef.current = new Ctx();
+    }
+    const ctx = audioCtxRef.current;
+
+    // 只會成功建立一次 source（同一個 audio element 不能重複 createMediaElementSource）
+    if (!sourceRef.current) {
+      sourceRef.current = ctx.createMediaElementSource(a);
+    }
+
+    if (!gainRef.current) {
+      gainRef.current = ctx.createGain();
+      gainRef.current.gain.value = Number(soundVolume) || 1; // 初始
+      sourceRef.current.connect(gainRef.current);
+      gainRef.current.connect(ctx.destination);
+    }
+
+    return a;
   };
 
   const playAlarmSound = async () => {
@@ -189,7 +215,9 @@ function TodoWrapper() {
       a.src = soundDataUrl;
 
       // 这里用你选的音量
-      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+      a.volume = 1;
+      if (gainRef.current)
+        gainRef.current.gain.value = Number(soundVolume) || 1;
 
       console.log("[alarm] play()", {
         srcPrefix: String(soundDataUrl).slice(0, 30),
@@ -223,7 +251,9 @@ function TodoWrapper() {
 
       // ✅ 设置 src/音量（如果 src 变了或没设过）
       if (a.src !== soundDataUrl) a.src = soundDataUrl;
-      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+
+      a.volume = 1;
+      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 1));
 
       // 如果是暂停状态，直接继续；否则从头播
       if (a.paused) {
@@ -255,7 +285,8 @@ function TodoWrapper() {
       }
 
       // paused -> resume
-      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+      a.volume = 1;
+      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 1));
       const p = a.play();
       if (p && typeof p.then === "function") await p;
 
@@ -272,7 +303,8 @@ function TodoWrapper() {
       const a = ensureAudio();
       if (a.src !== soundDataUrl) a.src = soundDataUrl;
 
-      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+      a.volume = 1;
+      a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 1));
       a.currentTime = 0;
 
       const p = a.play();
@@ -555,7 +587,14 @@ function TodoWrapper() {
     const a = audioRef.current;
     if (!a) return;
 
-    a.volume = Math.max(0, Math.min(1, Number(soundVolume) || 0.6));
+    // HTML audio 保持滿
+    a.volume = 1;
+
+    // 用 gain 來放大（可以 > 1）
+    if (gainRef.current) {
+      const v = Number(soundVolume);
+      gainRef.current.gain.value = Number.isFinite(v) ? v : 1;
+    }
   }, [soundVolume]);
 
   // -- Color --
@@ -815,7 +854,7 @@ function TodoWrapper() {
                   <input
                     type="range"
                     min="0"
-                    max="1"
+                    max="3.5"
                     step="0.05"
                     value={soundVolume}
                     onChange={(e) => setSoundVolume(Number(e.target.value))}
