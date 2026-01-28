@@ -1,0 +1,61 @@
+┌───────────────────────────────────────────────┐
+│                 (1) 部署 Whitelist 合约        │
+│  constructor(maxWhitelistedAddresses = N)     │
+└───────────────┬───────────────────────────────┘
+                │  得到 whitelistContractAddress
+                v
+┌───────────────────────────────────────────────┐
+│ (2) 让用户加入白名单（Whitelist 合约交互）      │
+│  addAddressToWhitelist()                       │
+│   - require(没加过)                            │
+│   - require(numWhitelisted < max)              │
+│   - whitelistedAddresses[user] = true          │
+│   - numAddressesWhitelisted += 1               │
+└───────────────┬───────────────────────────────┘
+                │  白名单名单写入链上（mapping）
+                v
+┌───────────────────────────────────────────────┐
+│            (3) 部署 NFT 合约 CryptoDevs         │
+│  constructor(whitelistContractAddress)         │
+│   - whitelist = Whitelist(whitelistAddr)       │
+│   - reservedTokens = whitelist.maxWhitelisted..│
+└───────────────┬───────────────────────────────┘
+                │
+                v
+┌───────────────────────────────────────────────┐
+│                 (4) 用户 mint NFT               │
+│               调用 CryptoDevs.mint()           │
+└───────────────┬───────────────────────────────┘
+                │
+                v
+        ┌───────────────────────────────┐
+        │ 供给上限检查（总量 + 预留）     │
+        │ require(totalSupply +          │
+        │  reservedTokens - claimed < 20)│
+        └───────────────┬───────────────┘
+                        │通过
+                        v
+        ┌────────────────────────────────────────┐
+        │ 判断用户是否在白名单 & 付款情况         │
+        │ if whitelist.whitelistedAddresses(user)│
+        │    && msg.value < price                │
+        │   -> 白名单免费通道                     │
+        │ else                                   │
+        │   -> 公售付费通道(msg.value >= 0.01)    │
+        └───────────────┬────────────────────────┘
+                        │
+            ┌───────────┴───────────┐
+            │                       │
+            v                       v
+┌─────────────────────────┐   ┌─────────────────────────┐
+│ 白名单免费 mint 通道     │   │ 公售付费 mint 通道       │
+│ - require(balance==0)    │   │ - require(msg.value>=0.01)│
+│ - reservedClaimed += 1   │   │                         │
+└──────────────┬──────────┘   └──────────────┬──────────┘
+               │                             │
+               └──────────────┬──────────────┘
+                              v
+                 ┌──────────────────────────┐
+                 │ _safeMint(user, tokenId)  │
+                 │ tokenId = totalSupply()   │
+                 └──────────────────────────┘

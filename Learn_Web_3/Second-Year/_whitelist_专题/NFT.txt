@@ -1,0 +1,178 @@
+NFT 合约实作笔记（从 Writing the NFT Contract 开始）
+
+────────────────────────────────────
+0) 背景 / 目标（Writing the NFT Contract）
+────────────────────────────────────
+需求：
+1. CryptoDevs NFT 总量上限：20
+2. 每笔交易最多 mint 1 个 NFT（mint() 一次铸 1 个）
+3. 白名单用户可免费 mint
+4. 非白名单用户 mint 需支付 0.01 ETH
+5. 使用 OpenZeppelin ERC721 实作（ERC721Enumerable + Ownable）
+
+使用网络：Sepolia (chainId 11155111)
+
+已完成的前置合约：
+- Whitelist 合约已部署至 Sepolia
+- Whitelist 合约地址（已部署成功）：
+  0x3219661B4C1d64BE2Eb1877E43C613C86301774D
+
+────────────────────────────────────
+1) 安装 OpenZeppelin 并配置 remappings
+────────────────────────────────────
+在 foundry-app 目录执行：
+- forge install OpenZeppelin/openzeppelin-contracts
+- forge remappings > remappings.txt
+
+remappings.txt 中主要包含：
+- @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+- forge-std/=lib/forge-std/src/
+（以及 OZ 内部依赖相关 remap）
+
+备注：
+VS Code 仍出现红线（language server 对 remappings 支持不完整）
+但用 forge build 检查为准。
+
+────────────────────────────────────
+2) 建立 NFT 合约：src/CryptoDevs.sol
+────────────────────────────────────
+创建文件：src/CryptoDevs.sol
+
+关键 imports：
+- import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+- import "@openzeppelin/contracts/access/Ownable.sol";
+- import "./Whitelist.sol";
+
+核心逻辑摘要：
+- _price = 0.01 ether
+- maxTokenIds = 20
+- constructor(address whitelistContract):
+  - whitelist = Whitelist(whitelistContract)
+  - reservedTokens = whitelist.maxWhitelistedAddresses()
+- mint():
+  - 保留 reservedTokens 给 whitelist 用户
+  - whitelist 用户且 msg.value < _price → 免费 mint（并且限制 balanceOf(msg.sender)==0）
+  - 非 whitelist 用户必须 msg.value >= _price
+  - tokenId = totalSupply()
+  - _safeMint(msg.sender, tokenId)
+
+备注（重要）：
+Ownable 使用 OZ v5 写法：Ownable(msg.sender)
+
+────────────────────────────────────
+3) 中间遇到的问题 A：VS Code 显示红线 / “Expected string literal (path) …”
+────────────────────────────────────
+现象：
+VS Code 内 imports 处大量红线，报类似：
+Expected string literal (path), "*" or alias list…
+
+判断方式（以 forge 为准）：
+执行：
+- forge clean
+- forge build -vvv
+
+结果：
+forge build 成功，说明合约与 remappings 实际可编译。
+输出只有 note（lint 建议），不是 error，例如：
+- note[unaliased-plain-import]
+- note[screaming-snake-case-const]
+这些不影响编译与部署，可忽略。
+
+结论：
+红线属于 editor / language server 的 remappings 识别问题，
+不影响 foundry 实际编译部署流程。
+
+────────────────────────────────────
+4) 中间遇到的问题 B：forge create 部署方式在本机环境不稳定（Dry run enabled）
+────────────────────────────────────
+背景：
+之前在部署 Whitelist 时，forge create 即使加 --broadcast 仍出现：
+Warning: Dry run enabled, not broadcasting transaction
+导致拿不到合约地址。
+
+证明 RPC+私钥没问题：
+使用 cast send 成功上链（status 1），说明：
+- RPC 正常
+- PRIVATE_KEY 正常
+- 钱包有 Sepolia ETH
+问题集中在 forge create 触发 dry-run 行为。
+
+因此策略：
+后续部署统一改用更稳的方式：
+✅ forge script（正式且可控的部署方法）
+
+────────────────────────────────────
+5) 建立 NFT 部署脚本：script/DeployCryptoDevs.s.sol
+────────────────────────────────────
+创建文件：script/DeployCryptoDevs.s.sol
+
+脚本核心做法：
+- 从 .env 读取 PRIVATE_KEY（用 vm.envUint）
+  注意：vm.envUint 需要 0x 前缀的 private key
+- 把 Whitelist 合约地址传给 CryptoDevs constructor
+- startBroadcast → new CryptoDevs(whitelistAddress) → stopBroadcast
+
+Whitelist 地址写死为：
+0x3219661B4C1d64BE2Eb1877E43C613C86301774D
+
+────────────────────────────────────
+6) 部署 NFT 合约（script 方法）
+────────────────────────────────────
+执行指令：
+
+forge script script/DeployCryptoDevs.s.sol:DeployCryptoDevs \
+  --rpc-url "$SEPOLIA_RPC_URL" \
+  --broadcast \
+  --verify \
+  --etherscan-api-key "$ETHERSCAN_API_KEY"
+
+部署成功输出（关键结果）：
+- ✅ Tx Hash:
+  0xd331a0621fe012f538f9c9ee092635614ed82a7995784cb010582141314e29e1
+- ✅ NFT Contract Address:
+  0x4847AB3A8B3Aa95eE298297b49636167d5f575E8
+- Block: 10139226
+- Paid: 0.002870109438558154 ETH
+
+constructor args（ABI encoded）：
+0000000000000000000000003219661b4c1d64be2eb1877e43c613c86301774d
+
+────────────────────────────────────
+7) 中间遇到的问题 C：verify 阶段 “Unable to locate ContractCode …”
+────────────────────────────────────
+现象：
+Foundry 自动 verify 时多次出现：
+Could not detect deployment: Unable to locate ContractCode … (waiting…)
+
+原因：
+Etherscan 索引延迟 / Foundry 探测延迟。
+合约已部署成功（已拿到 Contract Address + block + paid），
+只是验证阶段需要等待或重试。
+
+结果：
+后续 Foundry 提交验证：
+- Response: OK
+- Pending in queue
+- 最终：Pass - Verified
+- Contract successfully verified
+- All (1) contracts were verified!
+
+────────────────────────────────────
+8) 最终状态（完成）
+────────────────────────────────────
+Whitelist 合约（已部署）：
+0x3219661B4C1d64BE2Eb1877E43C613C86301774D
+
+CryptoDevs NFT 合约（已部署 + Verified）：
+0x4847AB3A8B3Aa95eE298297b49636167d5f575E8
+
+后续可在 Sepolia Etherscan：
+- Read Contract: totalSupply / reservedTokens / reservedTokensClaimed
+- Write Contract: mint()
+
+Mint 规则回顾：
+- 白名单地址：可免费 mint（msg.value=0），且每地址只能拥有 1 个
+- 非白名单地址：mint() 需要支付 0.01 ETH
+- 总量上限 20，同时保留 whitelist reserved tokens
+
+完成 ✅

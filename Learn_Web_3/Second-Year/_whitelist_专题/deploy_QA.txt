@@ -1,0 +1,126 @@
+Whitelist 合約部署實作紀錄（改用 forge script 的原因與成功結果）
+
+────────────────────────────────────
+一、原本嘗試的方法（失敗）
+────────────────────────────────────
+一開始依照教學，嘗試使用以下方式部署合約：
+
+forge create src/Whitelist.sol:Whitelist \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --private-key $PRIVATE_KEY \
+  --constructor-args 10 \
+  --verify \
+  --broadcast
+
+但實際執行時，出現以下問題：
+
+- 即使加入 --broadcast
+- forge 仍持續顯示：
+  「Warning: Dry run enabled, not broadcasting transaction」
+- 無法取得 Deployed to: 0x... 的合約地址
+- 多次確認後，已排除以下可能：
+  - RPC URL 正確
+  - PRIVATE_KEY 格式正確（64 hex）
+  - 錢包內有 Sepolia ETH
+  - cast send 可成功送交易（證明 RPC 與私鑰正常）
+
+結論：
+forge create 在此環境 / 版本（forge 1.5.1）下
+因不明原因被強制進入 dry-run 模式，無法實際部署。
+
+────────────────────────────────────
+二、策略調整：改用 forge script（正式部署方式）
+────────────────────────────────────
+為避免持續糾纏 forge create 的 dry-run 問題，
+改用 Foundry 官方推薦、實務更穩定的部署方式：
+
+→ forge script
+
+此方式可明確控制：
+- 何時開始 broadcast
+- 使用哪個 private key
+- 部署流程是否真的上鏈
+
+────────────────────────────────────
+三、實際使用的部署 Script
+────────────────────────────────────
+建立檔案：
+
+script/DeployWhitelist.s.sol
+
+內容重點：
+- 使用 vm.envUint("PRIVATE_KEY")
+- 明確呼叫 vm.startBroadcast()
+- 在 script 中 new Whitelist(10)
+
+（PRIVATE_KEY 在 .env 中需為 0x 開頭 hex）
+
+────────────────────────────────────
+四、成功部署使用的指令（關鍵）
+────────────────────────────────────
+
+forge script script/DeployWhitelist.s.sol:DeployWhitelist \
+  --rpc-url "$SEPOLIA_RPC_URL" \
+  --broadcast \
+  --verify \
+  --etherscan-api-key "$ETHERSCAN_API_KEY"
+
+────────────────────────────────────
+五、成功部署後的關鍵輸出（工作證明）
+────────────────────────────────────
+終端機顯示：
+
+✅ [Success] Hash:
+0x0b303f444f88448081cf0ee06a45d3c3038ab0f772510952a1fc2bb88e607a1c
+
+Contract Address:
+0x3219661B4C1d64BE2Eb1877E43C613C86301774D
+
+Block:
+10139137
+
+Paid:
+0.000449125073825136 ETH
+
+→ 表示合約已成功部署至 Sepolia 測試網
+
+────────────────────────────────────
+六、Etherscan 驗證狀態說明
+────────────────────────────────────
+- forge script 嘗試自動 verify
+- 因 Etherscan 索引延遲，初次自動驗證失敗
+- 但不影響合約實際存在與可互動性
+- 後續可使用 forge verify-contract 或 Etherscan 手動驗證
+
+────────────────────────────────────
+七、後續操作：加入白名單（驗證合約功能）
+────────────────────────────────────
+1. 前往 Sepolia Etherscan
+2. 搜尋合約地址：
+   0x3219661B4C1d64BE2Eb1877E43C613C86301774D
+3. 進入 Contract → Read Contract
+   - numAddressesWhitelisted 初始為 0
+4. 進入 Contract → Write Contract
+   - Connect to Web3（MetaMask，Sepolia）
+   - 呼叫 addAddressToWhitelist()
+5. 交易成功後，回到 Read Contract
+   - numAddressesWhitelisted 顯示為 1
+
+────────────────────────────────────
+八、最終結論（重要）
+────────────────────────────────────
+1. 原本的 forge create 方法在實際環境中不可用
+2. 改用 forge script 是關鍵轉折點
+3. forge script 為更穩定、可控、實務導向的部署方式
+4. Whitelist 合約已成功：
+   - 部署
+   - 上鏈
+   - 可互動
+   - 功能驗證完成
+
+此紀錄保留作為：
+- 未來回顧
+- 除錯經驗
+- Web3 工程實務流程參考
+
+完成 ✅
