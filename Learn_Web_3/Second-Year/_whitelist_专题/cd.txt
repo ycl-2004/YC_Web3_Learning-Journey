@@ -1,0 +1,185 @@
+CryptoDevs NFT 合约代码详解（复习笔记）
+
+────────────────────────────────────
+一、合约整体在做什么？
+────────────────────────────────────
+CryptoDevs 是一个 ERC721 NFT 合约，结合了白名单机制，实现：
+
+1. NFT 总量上限为 20
+2. 白名单用户可以免费 mint
+3. 非白名单用户 mint 需要支付 0.01 ETH
+4. 白名单用户拥有“预留名额”，不会被公售用户挤掉
+5. 每个地址最多只能拥有 1 个 NFT
+6. 合约收取的 ETH 可由 owner 提领
+
+────────────────────────────────────
+二、import 与继承结构
+────────────────────────────────────
+import 使用了三个模块：
+
+1) ERC721Enumerable
+- 提供 ERC721 NFT 标准功能
+- 额外提供 totalSupply()、枚举 tokenId 等功能
+
+2) Ownable
+- 提供 owner() 与 onlyOwner
+- 用于限制 withdraw 权限
+
+3) Whitelist
+- 自己写的白名单合约
+- NFT 合约通过它判断地址是否在白名单
+
+合约继承：
+CryptoDevs is ERC721Enumerable, Ownable
+
+代表这是一个：
+- NFT 合约
+- 可查询总供应量
+- 有管理员（owner）
+
+────────────────────────────────────
+三、关键状态变量与设计意图
+────────────────────────────────────
+1) NFT 价格
+    uint256 constant public _price = 0.01 ether;
+
+- 非白名单 mint 所需价格
+- constant：不可更改
+- public：链上可读
+
+2) NFT 总量上限
+    uint256 constant public maxTokenIds = 20;
+
+- 系列 NFT 的最大数量
+- 永远不会超过 20
+
+3) 白名单合约实例
+    Whitelist whitelist;
+
+- 保存 Whitelist 合约的地址
+- 用于在 mint() 中查询资格
+
+4) 白名单预留名额机制
+    uint256 public reservedTokens;
+    uint256 public reservedTokensClaimed = 0;
+
+含义：
+- reservedTokens：为白名单预留的 NFT 数量
+- reservedTokensClaimed：白名单已经用掉的数量
+
+目的：
+防止公售用户把 NFT 全部 mint 完，导致白名单用户无法参与。
+
+────────────────────────────────────
+四、constructor：部署时做的事情
+────────────────────────────────────
+constructor(address whitelistContract)
+    ERC721("Crypto YC", "YCsec")
+    Ownable(msg.sender)
+
+1) 设置 NFT Collection 信息
+- 名称：Crypto YC
+- Symbol：YCsec
+
+2) 设置 owner
+- 部署合约的钱包地址 = owner
+
+3) 绑定白名单合约
+    whitelist = Whitelist(whitelistContract);
+
+- whitelistContract 是部署时传入的参数
+- NFT 合约“知道”白名单合约在哪里
+
+4) 计算白名单预留数量
+    reservedTokens = whitelist.maxWhitelistedAddresses();
+
+- 白名单最多多少人
+- 就为他们预留多少 NFT
+
+────────────────────────────────────
+五、mint() 函数完整逻辑解析
+────────────────────────────────────
+mint() 是整个合约的核心逻辑。
+
+【1】总量 + 预留名额检查（关键）
+    require(
+      totalSupply() + reservedTokens - reservedTokensClaimed < maxTokenIds,
+      "EXCEEDED_MAX_SUPPLY"
+    );
+
+解释：
+- totalSupply()：已 mint 的 NFT 数量
+- reservedTokens - reservedTokensClaimed：还没被白名单用掉的预留名额
+- 确保即使剩下的都是白名单用户来 mint，也不会超过 20
+
+作用：
+- 保障白名单用户的名额
+- 防止公售用户抢光
+
+【2】白名单免费 mint 分支
+条件：
+    whitelist.whitelistedAddresses(msg.sender)
+    && msg.value < _price
+
+代表：
+- 调用者在白名单中
+- 且没有付 0.01 ETH
+
+白名单通道限制：
+a) 每个地址只能有 1 个 NFT
+    require(balanceOf(msg.sender) == 0, "ALREADY_OWNED");
+
+b) 记录白名单已使用名额
+    reservedTokensClaimed += 1;
+
+【3】非白名单（或选择付费）通道
+    require(msg.value >= _price, "NOT_ENOUGH_ETHER");
+
+- 非白名单用户必须支付 0.01 ETH
+- 如果白名单用户愿意付费，也可以走这条路
+
+【4】实际铸造 NFT
+    uint256 tokenId = totalSupply();
+    _safeMint(msg.sender, tokenId);
+
+- tokenId 从 0 开始递增
+- _safeMint 确保接收方能安全接收 NFT
+
+────────────────────────────────────
+六、withdraw()：提款逻辑
+────────────────────────────────────
+function withdraw() public onlyOwner
+
+- 只有 owner 可以调用
+- 把合约里累积的 ETH 全部转给 owner
+
+实现方式：
+1) 取得合约余额
+    address(this).balance
+
+2) 使用 call 转账
+    _owner.call{value: amount}("")
+
+3) require(sent) 确保成功
+
+────────────────────────────────────
+七、这份合约满足了哪些需求？
+────────────────────────────────────
+✔ NFT 总量限制（20）
+✔ 白名单免费 mint
+✔ 非白名单付费 mint
+✔ 白名单名额预留机制
+✔ 每地址只能拥有 1 个 NFT
+✔ 收到的 ETH 可安全提领
+✔ 使用 OpenZeppelin，降低安全风险
+
+────────────────────────────────────
+八、学习重点总结
+────────────────────────────────────
+1) 白名单不只是“判断资格”，而是链上规则的一部分
+2) reservedTokens 是 NFT 项目中非常经典的工程设计
+3) mint() 中的 require 顺序非常重要
+4) OpenZeppelin 能大幅减少重复造轮子与安全漏洞
+5) 这是一个可以直接扩展到真实项目的 NFT 基础模板
+
+完成 ✅
