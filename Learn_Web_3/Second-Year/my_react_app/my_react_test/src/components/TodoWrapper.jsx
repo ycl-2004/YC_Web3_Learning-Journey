@@ -107,6 +107,100 @@ function TodoWrapper() {
 
   const isLocked = status === "running" || status === "paused";
 
+  // dragIdRef is used to store the id of the todo that is being dragged
+  // ✅ Drag reorder refs
+  const dragIdRef = useRef(null);
+  const hoverIdRef = useRef(null);
+  const draggingRef = useRef(false);
+  const pendingRef = useRef(null);
+
+  // ✅ reorder function（你原本的，保留）
+  const reorderTodos = (fromId, toId) => {
+    if (fromId === toId) return;
+
+    setTodos((prev) => {
+      const arr = [...prev];
+      const fromIndex = arr.findIndex((t) => t.id === fromId);
+      const toIndex = arr.findIndex((t) => t.id === toId);
+      if (fromIndex === -1 || toIndex === -1) return prev;
+
+      const [moved] = arr.splice(fromIndex, 1);
+      arr.splice(toIndex, 0, moved);
+      return arr;
+    });
+  };
+
+  const DRAG_THRESHOLD = 8; // 6~12 都行，越大越不容易誤觸
+
+  const pointerMoveHandler = (e) => {
+    const pending = pendingRef.current;
+    if (!pending) return;
+
+    // 還沒正式開始拖：檢查是否超過門檻
+    if (!draggingRef.current) {
+      const dx = e.clientX - pending.x;
+      const dy = e.clientY - pending.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist < DRAG_THRESHOLD) return;
+
+      // ✅ 到這裡才算「真的開始拖」
+      draggingRef.current = true;
+      dragIdRef.current = pending.id;
+      hoverIdRef.current = null;
+
+      document.body.classList.add("is-reordering");
+
+      // ✅ 一旦真的開始拖，就阻止文字選取/拖曳行為
+      e.preventDefault();
+    }
+
+    // 已在拖：做 reorder
+    if (dragIdRef.current == null) return;
+
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const todoEl = el?.closest?.("[data-todo-id]");
+    const hoverIdStr = todoEl?.getAttribute?.("data-todo-id");
+    if (!hoverIdStr) return;
+
+    const toId = Number(hoverIdStr);
+    if (Number.isNaN(toId)) return;
+
+    const fromId = dragIdRef.current;
+    if (fromId === toId) return;
+    if (hoverIdRef.current === toId) return;
+
+    hoverIdRef.current = toId;
+    reorderTodos(fromId, toId);
+  };
+
+  const pointerUpHandler = () => {
+    pendingRef.current = null;
+    draggingRef.current = false;
+    dragIdRef.current = null;
+    hoverIdRef.current = null;
+
+    document.body.classList.remove("is-reordering");
+
+    window.removeEventListener("pointermove", pointerMoveHandler);
+    window.removeEventListener("pointerup", pointerUpHandler);
+  };
+
+  const startPointerDrag = (id, startX, startY) => {
+    if (isLocked) return;
+
+    pendingRef.current = { id, x: startX, y: startY };
+
+    window.addEventListener("pointermove", pointerMoveHandler, {
+      passive: false,
+    });
+    window.addEventListener("pointerup", pointerUpHandler);
+  };
+
+  //--------------------------------
+  // End of reorderTodos
+  //--------------------------------
+
   const activeTodo = useMemo(
     () => todos.find((t) => t.id === activeId) || null,
     [todos, activeId],
@@ -879,38 +973,34 @@ function TodoWrapper() {
         <span className="muted">{remainingCount} remaining</span>
       </div>
 
-      <div className="todo-list">
-        {incompleteTodos.length === 0 ? (
-          <p className="empty">✨ No active tasks. Add one above.</p>
-        ) : (
-          incompleteTodos.map((todo) => {
-            const isActive = todo.id === activeId;
-            const canStart = !isLocked && nextTodoToStart?.id === todo.id;
+      {incompleteTodos.map((todo, index) => {
+        const isActive = todo.id === activeId;
+        const canStart = !isLocked && nextTodoToStart?.id === todo.id;
 
-            return (
-              <Todo
-                key={todo.id}
-                todo={todo}
-                deleteTodo={deleteTodo}
-                toggleComplete={toggleComplete}
-                toggleIsEditing={toggleIsEditing}
-                editTodo={editTodo}
-                isLocked={isLocked}
-                isActive={isActive}
-                canStart={canStart}
-                status={status}
-                onStart={() => {
-                  if (!isActive) return startTodo(todo);
-                  if (status === "running") return pauseActive();
-                  if (status === "paused") return resumeActive();
-                }}
-                onPause={pauseActive}
-                onFinish={() => finishActive(false)}
-              />
-            );
-          })
-        )}
-      </div>
+        return (
+          <Todo
+            key={todo.id}
+            todo={todo}
+            order={index + 1} // ✅ 1-based
+            deleteTodo={deleteTodo}
+            toggleComplete={toggleComplete}
+            toggleIsEditing={toggleIsEditing}
+            editTodo={editTodo}
+            isLocked={isLocked}
+            isActive={isActive}
+            canStart={canStart}
+            status={status}
+            onStart={() => {
+              if (!isActive) return startTodo(todo);
+              if (status === "running") return pauseActive();
+              if (status === "paused") return resumeActive();
+            }}
+            onPause={pauseActive}
+            onFinish={() => finishActive(false)}
+            onPointerDragStart={startPointerDrag}
+          />
+        );
+      })}
 
       <div className="completed-panel">
         <button
@@ -933,6 +1023,7 @@ function TodoWrapper() {
               <Todo
                 key={todo.id}
                 todo={todo}
+                hideOrder // ✅ 代表左邊顯示 ☑️
                 deleteTodo={deleteTodo}
                 toggleComplete={toggleComplete}
                 toggleIsEditing={toggleIsEditing}

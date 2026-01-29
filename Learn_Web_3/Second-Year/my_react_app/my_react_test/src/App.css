@@ -908,3 +908,124 @@ body {
     width: 300px;
   }
 }
+
+/* =============================
+   Pointer Drag Reorder (clean)
+   ============================= */
+
+/* -----------------------------------
+   Drag reorder (clean)
+----------------------------------- */
+
+/* default: don't show grab cursor everywhere */
+.todo {
+  cursor: default;
+}
+
+/* handle (single source of truth) */
+.todo .drag-handle {
+  width: 26px;
+  height: 26px;
+  border-radius: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--glass);
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+  cursor: grab;
+  opacity: 0.75;
+
+  transition:
+    transform 120ms var(--ease),
+    filter 120ms var(--ease),
+    opacity 120ms var(--ease);
+}
+
+.todo .drag-handle:hover {
+  opacity: 1;
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.todo .drag-handle:active {
+  cursor: grabbing;
+  transform: scale(0.96);
+}
+
+/* don't allow dragging locked rows */
+.todo.locked .drag-handle {
+  cursor: not-allowed;
+  opacity: 0.4;
+  filter: none;
+  transform: none;
+}
+
+/* while dragging, make the dragged one feel "picked up" */
+.todo.is-dragging {
+  opacity: 0.75;
+  transform: scale(0.985);
+  filter: brightness(1.02);
+}
+
+/* the current hover target (where it will insert) */
+.todo.is-drop-target {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--accent) 60%, transparent),
+    var(--shadow-md);
+}
+
+/* during reorder: kill blue selection / copy highlight */
+body.is-reordering,
+body.is-reordering * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  cursor: grabbing !important;
+}
+
+/* number handle (1/2/3/4) */
+.todo .drag-handle {
+  width: 26px;
+  height: 26px;
+  border-radius: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+
+  background: var(--glass);
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+  opacity: 0.8;
+}
+
+/* 可拖動時才給互動感（你可以用 JS 加 class 或直接用 :not(.locked)） */
+.todo:not(.locked) .drag-handle:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.todo:not(.locked) .drag-handle:active {
+  transform: scale(0.96);
+}
+
+.todo.completed .todo-left {
+  gap: 10px; /* 你想更緊就改 8px */
+}

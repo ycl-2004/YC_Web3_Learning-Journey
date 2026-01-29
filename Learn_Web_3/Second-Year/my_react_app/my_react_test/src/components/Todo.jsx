@@ -9,6 +9,8 @@ import EditForm from "./EditForm.jsx";
 
 function Todo({
   todo,
+  order,
+  hideOrder,
   deleteTodo,
   toggleComplete,
   toggleIsEditing,
@@ -20,6 +22,9 @@ function Todo({
   onStart,
   onPause,
   onFinish,
+
+  // ✅ Pointer-drag reorder（用 wrapper 那套）
+  onPointerDragStart,
 }) {
   if (todo.isEditing) {
     return (
@@ -36,20 +41,48 @@ function Todo({
 
   const disableRow = isLocked && !isActive;
   const isRunning = isActive && status === "running";
-  const isPaused = isActive && status === "paused";
+
+  const canDrag = !isLocked && !todo.isCompleted;
 
   return (
     <div
-      className={`todo ${todo.isCompleted ? "completed" : ""} ${disableRow ? "locked" : ""}`}
+      className={`todo ${todo.isCompleted ? "completed" : ""} ${
+        disableRow ? "locked" : ""
+      }`}
+      data-todo-id={String(todo.id)}
+      onPointerDown={(e) => {
+        if (!canDrag) return;
+        if (e.button !== 0) return;
+
+        const tag = e.target?.tagName?.toLowerCase?.();
+        if (
+          tag === "button" ||
+          tag === "input" ||
+          tag === "svg" ||
+          tag === "path"
+        )
+          return;
+
+        e.preventDefault();
+        onPointerDragStart?.(todo.id, e.clientX, e.clientY);
+      }}
     >
       <div className="todo-left">
+        {/* ✅ Only show order badge when NOT completed + NOT hidden */}
+        {!hideOrder && !todo.isCompleted && (
+          <span className="drag-handle" aria-hidden="true">
+            {order}
+          </span>
+        )}
+
         <input
           className="checkbox"
           type="checkbox"
           checked={todo.isCompleted}
           onChange={() => toggleComplete(todo.id)}
-          disabled={disableRow || isLocked} // active 時也禁止手動勾（用 Finish 控制）
+          disabled={disableRow || isLocked}
         />
+
         <div className="todo-main">
           <span className="todo-text" title={todo.content}>
             {todo.content}
@@ -59,7 +92,6 @@ function Todo({
       </div>
 
       <div className="todo-actions">
-        {/* Focus controls */}
         {isActive ? (
           <>
             <button
@@ -70,6 +102,7 @@ function Todo({
             >
               {isRunning ? <MdPause /> : <MdPlayArrow />}
             </button>
+
             <button
               className="icon-btn ok"
               onClick={onFinish}
@@ -91,7 +124,6 @@ function Todo({
           </button>
         )}
 
-        {/* Edit/Delete (disabled when locked) */}
         <button
           className="icon-btn"
           onClick={() => toggleIsEditing(todo.id)}
