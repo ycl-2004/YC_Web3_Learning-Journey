@@ -875,209 +875,134 @@ function TodoWrapper() {
 
   return (
     <div className="menu-card">
-      <header className="menu-header">
-        <div className="header-row">
-          <div className="title-wrap">
-            <h1>Todo</h1>
+      <div className="menu-main">
+        <header className="menu-header">
+          <div className="header-row">
+            <div className="title-wrap">
+              <h1>YC Todo</h1>
+              <span className="subtitle">想她了就學習吧</span>
+            </div>
+
+            <div className="header-badges">
+              <button type="button" className="badge badge-timer">
+                {headerRight}
+              </button>
+
+              <button
+                type="button"
+                className="badge-music"
+                onClick={() => setShowSoundPanel((v) => !v)}
+                aria-label="Sound"
+              >
+                🎵
+              </button>
+
+              {showSoundPanel && (
+                <div className="sound-panel" ref={soundPanelWrapRef}>
+                  {/* 你原本 sound panel 內容放這裡 */}
+                  <div className="sound-title">Sound</div>
+                </div>
+              )}
+            </div>
           </div>
+        </header>
 
-          {/* 🎵 + 3 badge */}
-          <div className="header-badges" ref={soundPanelWrapRef}>
-            <button
-              type="button"
-              className="badge badge-circle badge-music"
-              onClick={() => setShowSoundPanel((v) => !v)}
-              aria-label="Sound settings"
-              title={soundName ? `Sound: ${soundName}` : "Set timer sound"}
-            >
-              🎵
-            </button>
+        <CreateForm addTodo={addTodo} isLocked={isLocked} />
 
-            <span
-              className={`badge badge-circle ${isLocked ? "badge-timer" : ""}`}
-            >
-              {headerRight}
-            </span>
-
-            {showSoundPanel && (
-              <div className="sound-panel">
-                <div className="sound-row">
-                  <div className="sound-title">Timer Sound</div>
-                  <button
-                    type="button"
-                    className="sound-close"
-                    onClick={() => setShowSoundPanel(false)}
-                    aria-label="Close"
-                    title="Close"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <div className="sound-meta">
-                  {soundName ? soundName : "No sound selected"}
-                </div>
-
-                <div className="sound-actions">
-                  <button
-                    type="button"
-                    className="btn ghost"
-                    onClick={onPickMp3}
-                    disabled={false}
-                  >
-                    Upload MP3
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn ghost"
-                    onClick={playSoundNow}
-                    disabled={!soundDataUrl}
-                  >
-                    Play
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn ghost"
-                    onClick={togglePauseResume}
-                    disabled={!soundDataUrl}
-                  >
-                    {isSoundPlaying ? "Pause" : "Resume"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn ghost"
-                    onClick={restartSound}
-                    disabled={!soundDataUrl}
-                  >
-                    Restart
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn ghost"
-                    onClick={clearSound}
-                    disabled={!soundDataUrl}
-                  >
-                    Clear
-                  </button>
-                </div>
-
-                <div className="sound-slider">
-                  <span className="muted">Volume</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="3.5"
-                    step="0.05"
-                    value={soundVolume}
-                    onChange={(e) => setSoundVolume(Number(e.target.value))}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="section-title">
+          <span>Now</span>
+          <span className="muted">{remainingCount} remaining</span>
         </div>
 
-        <p className="subtitle">
-          {isLocked
-            ? "Focus mode: other tasks are locked"
-            : "Quick tasks for your menubar workflow"}
-        </p>
-      </header>
-
-      <CreateForm addTodo={addTodo} isLocked={isLocked} />
-
-      <div className="section-title">
-        <span>Now</span>
-        <span className="muted">{remainingCount} remaining</span>
-      </div>
-
-      <div className="now-section">
-        <div className="tag-bar">
-          {TAGS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              className={`tag-chip ${activeTag === t ? "active" : ""}`}
-              onClick={() => setActiveTag(t)}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {visibleIncomplete.map((todo, index) => {
-        const isActive = todo.id === activeId;
-        const canStart = !isLocked && nextTodoToStart?.id === todo.id;
-
-        return (
-          <Todo
-            key={todo.id}
-            todo={todo}
-            order={index + 1} // ✅ 1-based
-            deleteTodo={deleteTodo}
-            toggleComplete={toggleComplete}
-            toggleIsEditing={toggleIsEditing}
-            editTodo={editTodo}
-            isLocked={isLocked}
-            isActive={isActive}
-            canStart={canStart}
-            status={status}
-            onStart={() => {
-              if (!isActive) return startTodo(todo);
-              if (status === "running") return pauseActive();
-              if (status === "paused") return resumeActive();
-            }}
-            onPause={pauseActive}
-            onFinish={() => finishActive(false)}
-            onPointerDragStart={startPointerDrag}
-          />
-        );
-      })}
-
-      <div className="completed-panel">
-        <button
-          className="collapse-btn"
-          onClick={() => setShowCompleted((v) => !v)}
-          disabled={visibleCompleted.length === 0}
-          aria-label="Toggle completed"
-        >
-          <span>Completed</span>
-          <span className="muted">
-            {visibleCompleted.length === 0
-              ? "0"
-              : `${visibleCompleted.length} ${showCompleted ? "▾" : "▸"}`}
-          </span>
-        </button>
-
-        {showCompleted && visibleCompleted.length > 0 && (
-          <div className="completed-list">
-            {visibleCompleted.map((todo) => (
-              <Todo
-                key={todo.id}
-                todo={todo}
-                hideOrder // ✅ 代表左邊顯示 ☑️
-                deleteTodo={deleteTodo}
-                toggleComplete={toggleComplete}
-                toggleIsEditing={toggleIsEditing}
-                editTodo={editTodo}
-                isLocked={isLocked}
-                isActive={todo.id === activeId}
-                canStart={false}
-                status={status}
-                onStart={() => {}}
-                onPause={() => {}}
-                onFinish={() => {}}
-              />
+        <div className="now-section">
+          <div className="tag-bar">
+            {TAGS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                className={`tag-chip ${activeTag === t ? "active" : ""}`}
+                onClick={() => setActiveTag(t)}
+              >
+                {t}
+              </button>
             ))}
           </div>
-        )}
+
+          {/* ✅ NEW: Now list scroll container (max 3 tasks visible) */}
+          <div className="now-list">
+            {visibleIncomplete.map((todo, index) => {
+              const isActive = todo.id === activeId;
+              const canStart = !isLocked && nextTodoToStart?.id === todo.id;
+
+              return (
+                <Todo
+                  key={todo.id}
+                  todo={todo}
+                  order={index + 1}
+                  deleteTodo={deleteTodo}
+                  toggleComplete={toggleComplete}
+                  toggleIsEditing={toggleIsEditing}
+                  editTodo={editTodo}
+                  isLocked={isLocked}
+                  isActive={isActive}
+                  canStart={canStart}
+                  status={status}
+                  onStart={() => {
+                    if (!isActive) return startTodo(todo);
+                    if (status === "running") return pauseActive();
+                    if (status === "paused") return resumeActive();
+                  }}
+                  onPause={pauseActive}
+                  onFinish={() => finishActive(false)}
+                  onPointerDragStart={startPointerDrag}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ✅ Completed 原本就有 collapse state，保留就好 */}
+        <div className="completed-panel">
+          <button
+            className="collapse-btn"
+            onClick={() => setShowCompleted((v) => !v)}
+            disabled={visibleCompleted.length === 0}
+            aria-label="Toggle completed"
+          >
+            <span>Completed</span>
+            <span className="muted">
+              {visibleCompleted.length === 0
+                ? "0"
+                : `${visibleCompleted.length} ${showCompleted ? "▾" : "▸"}`}
+            </span>
+          </button>
+
+          {showCompleted && visibleCompleted.length > 0 && (
+            <div className="completed-list">
+              {visibleCompleted.map((todo) => (
+                <Todo
+                  key={todo.id}
+                  todo={todo}
+                  hideOrder
+                  deleteTodo={deleteTodo}
+                  toggleComplete={toggleComplete}
+                  toggleIsEditing={toggleIsEditing}
+                  editTodo={editTodo}
+                  isLocked={isLocked}
+                  isActive={todo.id === activeId}
+                  canStart={false}
+                  status={status}
+                  onStart={() => {}}
+                  onPause={() => {}}
+                  onFinish={() => {}}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* ✅ footer stays outside menu-main so it never scrolls away */}
       <div className="footer-bar">
         <button
           className="btn ghost"
