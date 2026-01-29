@@ -1,13 +1,12 @@
-/* =============================
-   YC Todo — Complete Theme CSS
-   (✅ Light/Dark via :root[data-theme="dark"]
-    ✅ Accent via --accent + --accent-glow
-    ✅ No duplicated .sound-panel / no hard-coded pink blocks)
-   ============================= */
+/* ============================================================
+   YC Todo — Theme CSS
+   - Light/Dark via :root[data-theme="dark"]
+   - Accent via --accent + --accent-glow
+   ============================================================ */
 
-/* -----------------------------
-   Base reset
------------------------------ */
+/* ============================================================
+   1) Reset / Base
+   ============================================================ */
 * {
   margin: 0;
   padding: 0;
@@ -43,9 +42,9 @@ body {
   overflow: hidden;
 }
 
-/* -----------------------------
-   Tokens (Light default)
------------------------------ */
+/* ============================================================
+     2) Tokens
+     ============================================================ */
 :root {
   /* Accent (JS will set these) */
   --accent: #d4a5c1;
@@ -73,9 +72,6 @@ body {
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* -----------------------------
-   Dark theme overrides
------------------------------ */
 :root[data-theme="dark"] {
   --bg1: rgba(26, 22, 28, 0.92);
   --bg2: rgba(18, 16, 20, 0.88);
@@ -93,9 +89,9 @@ body {
   --shadow-sm: 0 8px 18px rgba(0, 0, 0, 0.22);
 }
 
-/* -----------------------------
-   Card (Popover container)
------------------------------ */
+/* ============================================================
+     3) Popover Card Container
+     ============================================================ */
 .menu-card {
   width: 100%;
   height: 100%;
@@ -112,8 +108,9 @@ body {
   border-radius: var(--radius-lg);
   padding: 24px;
 
-  box-shadow: var(--shadow-lg);
   border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-lg);
+
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 
@@ -135,9 +132,9 @@ body {
   pointer-events: none;
 }
 
-/* -----------------------------
-   Header
------------------------------ */
+/* ============================================================
+     4) Header
+     ============================================================ */
 .menu-header {
   text-align: left;
   margin-bottom: 10px;
@@ -168,7 +165,7 @@ body {
   line-height: 1.25;
 }
 
-/* Right badges wrap */
+/* Header badges */
 .header-badges {
   position: relative;
   display: inline-flex;
@@ -176,7 +173,6 @@ body {
   gap: 10px;
 }
 
-/* Badge base */
 .badge {
   width: 42px;
   height: 42px;
@@ -195,8 +191,8 @@ body {
   background: var(--accent);
   color: #fff;
 
-  box-shadow: 0 8px 18px rgba(212, 165, 193, 0.28);
   border: 1px solid var(--card-border);
+  box-shadow: 0 8px 18px rgba(212, 165, 193, 0.28);
 }
 
 .badge-timer {
@@ -207,14 +203,15 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 999px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   padding: 0;
   line-height: 1;
 }
 
-/* Music badge */
 .badge-music {
   width: 36px;
   height: 36px;
@@ -225,9 +222,9 @@ body {
   justify-content: center;
 
   border: 1px solid var(--card-border);
+  background: var(--glass);
   cursor: pointer;
 
-  background: var(--glass);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
@@ -238,21 +235,20 @@ body {
   filter: brightness(1.04);
 }
 
-/* -----------------------------
-   Create Form
------------------------------ */
+/* =============================
+   Create Form (single source of truth)
+   ============================= */
 .create-form {
-  height: 42px;
-  width: 100%;
-  margin: 12px 0 12px;
-
-  border: 1px solid rgba(212, 165, 193, 0.65);
-  border-radius: var(--radius-md);
-
   display: flex;
-  overflow: hidden;
+  align-items: center;
+  gap: 6px;
 
-  background: var(--glass);
+  height: 42px;
+  padding: 6px 10px;
+
+  border-radius: 999px;
+  border: 2px solid rgba(137, 38, 183, 0.35);
+  background: color-mix(in srgb, var(--glass) 75%, transparent);
   box-shadow: var(--shadow-sm);
 }
 
@@ -263,66 +259,228 @@ body {
     var(--shadow-sm);
 }
 
+/* input */
 .create-form > input {
-  outline: none;
-  border: none;
-  background: transparent;
-  color: var(--accent);
+  flex: 1 1 auto;
+  min-width: 0;
   height: 100%;
-  width: 100%;
-  padding: 0 12px;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  padding: 0 10px;
   font-size: 14px;
+  font-weight: 700;
+  line-height: 1; /* ✅ avoids baseline weirdness */
 }
 
 .create-form > input::placeholder {
   color: color-mix(in srgb, var(--ink) 40%, transparent);
 }
 
-.time-select {
-  border: none;
-  outline: none;
-  background: color-mix(in srgb, var(--glass) 70%, transparent);
-  padding: 0 12px;
+/* tag pill (smaller than time) */
+.create-form .tag-select {
+  margin-left: auto; /* ✅ push controls to the right */
+  height: 26px;
+  width: auto;
+  padding: 0 10px;
+
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
+  background: color-mix(in srgb, #fff 70%, transparent);
+
+  font-size: 11px;
   font-weight: 900;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* minute wrapper */
+.create-form .minute-select {
+  display: flex;
+  align-items: center;
+}
+
+/* time pill */
+.create-form .minute-btn {
+  height: 26px;
+  min-width: 70px;
+  padding: 0 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
+  background: color-mix(in srgb, #fff 78%, transparent);
+
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.create-form .minute-btn > span {
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* + button */
+.create-form > button {
+  height: 26px;
+  width: 26px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: color-mix(in srgb, var(--accent) 65%, transparent);
+  color: #fff;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* ============================================================
+   Create Form: force Tag / Time / + perfectly aligned
+   ============================================================ */
+
+/* wrapper must be row + centered */
+.create-form {
+  display: flex;
+  align-items: center;
+}
+
+/* MinuteSelect wrapper: don't affect baseline */
+.create-form .minute-select {
+  display: flex;
+  align-items: center;
+  height: auto;
+  line-height: 1; /* ✅ 避免 baseline 漂 */
+}
+
+/* unify the three controls */
+.create-form .tag-select,
+.create-form .minute-btn,
+.create-form > button {
+  height: 28px; /* 你想半尺寸就 24~28 */
+  line-height: 28px; /* ✅ 讓文字垂直置中一致 */
+  margin: 0;
+}
+
+/* tag select: make it flex-centered (select needs explicit line-height) */
+.create-form .tag-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+/* minute button: flex-centered + remove default button quirks */
+.create-form .minute-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 10px;
+  font-size: 12px;
+
+  border: 1px solid color-mix(in srgb, var(--card-border) 65%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 78%, transparent);
+}
+
+/* remove inner span baseline weirdness */
+.create-form .minute-btn > span {
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* + button */
+.create-form > button {
+  width: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ONLY style the filter tags under the Now section */
+.now-section .tag-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px; /* ✅ 原本 8px → 4px 更緊 */
+
+  padding: 4px 6px; /* ✅ 原本 6px 10px → 更小 */
+  margin: 6px 0 10px;
+
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 55%, transparent);
+  background: color-mix(in srgb, var(--glass) 75%, transparent);
+  box-shadow: var(--shadow-sm);
+
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.now-section .tag-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.now-section .tag-chip {
+  padding: 0 9px; /* ✅ 原本 4px 10px → 更扁、更像 chip */
+  height: 24px; /* ✅ 原本 26px → 24px */
+  line-height: 24px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  border: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
+  background: color-mix(in srgb, #fff 70%, transparent);
+  color: color-mix(in srgb, var(--ink) 88%, transparent);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   cursor: pointer;
-  color: var(--ink);
-  border-left: 1px solid var(--card-border);
+  user-select: none;
 }
 
 .create-form > button {
-  height: 100%;
-  width: 46px;
-  border: none;
-  background: var(--accent);
-  color: white;
-  font-weight: 900;
-  font-size: 18px;
-  cursor: pointer;
-  transition:
-    transform 120ms var(--ease),
-    filter 120ms var(--ease),
-    opacity 120ms var(--ease);
-}
+  width: 28px; /* 跟高度一樣才會是圓形 */
+  height: 28px;
+  border-radius: 999px; /* ✅ 完全圓 */
 
-.create-form > button:hover {
-  filter: brightness(1.03);
-}
+  padding: 0;
+  line-height: 1;
 
-.create-form > button:active {
-  transform: translateY(1px) scale(0.98);
-}
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-.create-form > button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  margin-right: 2px; /* ✅ 讓它不要貼到最右邊被外框裁到 */
 }
+/* ============================================================
+     6) Section Title / Utilities
+     ============================================================ */
 
-/* -----------------------------
-   Section Title
------------------------------ */
 .section-title {
   margin-top: 10px;
   margin-bottom: 8px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -337,22 +495,22 @@ body {
   font-weight: 800;
 }
 
-/* Optional empty text */
 .empty {
   font-size: 12px;
   color: var(--muted);
   padding: 8px 4px;
 }
 
-/* -----------------------------
-   List + scrollbar
------------------------------ */
+/* ============================================================
+     7) Todo List + Scrollbar
+     ============================================================ */
 .todo-list {
   flex: 1;
   min-height: 0;
 
   overflow: auto;
   padding: 4px 8px 4px 4px;
+
   scroll-behavior: smooth;
 }
 
@@ -370,33 +528,36 @@ body {
   background: transparent;
 }
 
-/* -----------------------------
-   Todo row
------------------------------ */
+/* ============================================================
+     8) Todo Row
+     ============================================================ */
 .todo {
+  min-height: 46px;
+  padding: 10px 12px;
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+
+  box-shadow: var(--shadow-md);
+
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--accent) 35%, rgba(255, 255, 255, 1)),
     color-mix(in srgb, var(--accent) 25%, rgba(255, 255, 255, 1))
   );
 
-  min-height: 46px;
-  padding: 10px 12px;
-  margin-top: 10px;
-
-  border-radius: var(--radius-lg);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--card-border);
-
   transition:
     transform 160ms var(--ease),
     filter 160ms var(--ease),
     opacity 160ms var(--ease);
+
+  cursor: default;
 }
 
 :root[data-theme="dark"] .todo {
@@ -413,10 +574,9 @@ body {
 }
 
 .todo:active {
-  transform: translateY(0px);
+  transform: translateY(0);
 }
 
-/* Focus editing ring */
 .todo.editing {
   background: color-mix(in srgb, var(--accent) 18%, var(--glass-strong));
   box-shadow:
@@ -424,13 +584,15 @@ body {
     var(--shadow-md);
 }
 
-/* left area */
+/* Left block */
 .todo-left {
   display: flex;
   align-items: center;
   gap: 10px;
+
   flex: 1;
   min-width: 0;
+
   cursor: default;
 }
 
@@ -453,9 +615,11 @@ body {
   font-size: 14px;
   line-height: 1.2;
   font-weight: 900;
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
   color: var(--ink);
 }
 
@@ -463,14 +627,17 @@ body {
   font-size: 12px;
   opacity: 0.8;
   font-weight: 900;
+
   padding: 2px 8px;
   border-radius: 999px;
+
   background: var(--glass);
   border: 1px solid var(--card-border);
+
   color: var(--ink);
 }
 
-/* actions */
+/* Actions */
 .todo-actions {
   display: flex;
   align-items: center;
@@ -478,19 +645,23 @@ body {
 }
 
 .icon-btn {
-  border: 1px solid var(--card-border);
-  background: var(--glass);
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   padding: 7px;
   border-radius: 12px;
+
+  border: 1px solid var(--card-border);
+  background: var(--glass);
+  color: var(--ink);
+
+  cursor: pointer;
+
   transition:
     transform 120ms var(--ease),
     background 120ms var(--ease),
     opacity 120ms var(--ease);
-  color: var(--ink);
 }
 
 .icon-btn:hover {
@@ -510,7 +681,7 @@ body {
   cursor: not-allowed;
 }
 
-/* completed */
+/* Completed / Locked */
 .completed {
   opacity: 0.55;
   filter: saturate(0.9);
@@ -521,15 +692,62 @@ body {
     color-mix(in srgb, var(--ink) 50%, transparent);
 }
 
-/* locked visual */
 .todo.locked {
   opacity: 0.35;
   pointer-events: none;
 }
 
-/* -----------------------------
-   Edit form
------------------------------ */
+/* ============================================================
+     8.5) Task Row adjustment
+     ============================================================ */
+
+/* =========================================
+   Todo: keep row inline, but stack tag+time in a small column
+   ========================================= */
+
+/* undo the previous grid approach */
+.todo-main {
+  display: flex; /* ✅ back to one-line layout */
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* task text keeps space */
+.todo-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* tag+time as a tiny vertical stack, but the stack itself stays inline */
+.todo-badge-stack {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* ✅ 原本 flex-end → center */
+  justify-content: center;
+  gap: 3px;
+  min-width: 64px; /* ✅ 給它一個固定/最小寬度，才像「自己的盒子」 */
+}
+
+.todo-badge-stack .todo-tag,
+.todo-badge-stack .todo-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center; /* ✅ 文字置中 */
+
+  height: 18px;
+  line-height: 18px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 900;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ============================================================
+     9) Edit Form
+     ============================================================ */
 .edit-form {
   width: 100%;
   display: flex;
@@ -539,13 +757,17 @@ body {
 
 .edit-form input {
   height: 38px;
+  padding: 0 12px;
+
   border-radius: var(--radius-md);
   border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+
   background: var(--glass);
   outline: none;
-  padding: 0 12px;
+
   font-size: 14px;
   color: var(--accent);
+
   box-shadow: var(--shadow-sm);
 }
 
@@ -567,14 +789,15 @@ body {
   gap: 8px;
 }
 
-/* -----------------------------
-   Minute dropdown (if used)
------------------------------ */
+/* ============================================================
+     10) Minute Dropdown (if used)
+     ============================================================ */
 .minute-pop {
   border-radius: 14px;
   background: var(--glass-strong);
   border: 1px solid var(--stroke);
   box-shadow: var(--shadow-lg);
+
   overflow: hidden;
   z-index: 9999;
   color: var(--ink);
@@ -584,6 +807,7 @@ body {
   padding: 10px 12px;
   font-size: 12px;
   font-weight: 700;
+
   background: color-mix(in srgb, var(--ink) 6%, transparent);
   border-bottom: 1px solid var(--stroke);
 }
@@ -596,19 +820,23 @@ body {
 
 .minute-item {
   width: 100%;
+  padding: 10px;
+
   border: 0;
+  border-radius: 10px;
   background: transparent;
   color: var(--ink);
-  padding: 10px 10px;
-  border-radius: 10px;
+
   display: flex;
   justify-content: space-between;
+
   cursor: pointer;
 }
 
 .minute-item:hover {
   background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
+
 .minute-item.active {
   background: color-mix(in srgb, var(--ink) 12%, transparent);
   font-weight: 700;
@@ -621,17 +849,15 @@ body {
 }
 
 .minute-btn {
-  margin-top: 5px;
-  margin-right: 2px;
   height: 30px;
   min-width: 90px;
+  margin-top: 5px;
+  margin-right: 2px;
   padding: 0 14px;
+
   border-radius: 14px;
-
-  font-size: 15px;
-  font-weight: 600;
-
   border: 1px solid var(--stroke);
+
   background: var(--glass-strong);
   color: var(--ink);
 
@@ -639,6 +865,9 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
 
   cursor: pointer;
 }
@@ -649,13 +878,14 @@ body {
   transform: translateY(1px);
 }
 
-/* -----------------------------
-   Buttons
------------------------------ */
+/* ============================================================
+     11) Buttons
+     ============================================================ */
 .btn {
-  border: 1px solid var(--card-border);
   padding: 8px 12px;
   border-radius: 12px;
+
+  border: 1px solid var(--card-border);
   cursor: pointer;
 
   background: linear-gradient(
@@ -667,6 +897,7 @@ body {
   color: #fff;
   font-weight: 900;
   font-size: 12px;
+
   box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 18%, transparent);
 
   transition:
@@ -695,13 +926,14 @@ body {
   border: 1px solid var(--card-border);
 }
 
-/* -----------------------------
-   Sound panel (ONLY ONE)
------------------------------ */
+/* ============================================================
+     12) Sound Panel
+     ============================================================ */
 .sound-panel {
   position: absolute;
   right: 0;
   top: calc(100% + 10px);
+
   width: 280px;
   padding: 12px;
   border-radius: 16px;
@@ -723,6 +955,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+
   margin-bottom: 6px;
 }
 
@@ -735,21 +968,27 @@ body {
 .sound-close {
   width: 30px;
   height: 30px;
+
   border-radius: 999px;
   border: 1px solid var(--stroke);
+
   background: var(--glass);
   color: var(--ink);
+
   display: grid;
   place-items: center;
+
   cursor: pointer;
   transition:
     transform 120ms var(--ease),
     filter 120ms var(--ease);
 }
+
 .sound-close:hover {
   filter: brightness(1.05);
   transform: scale(1.04);
 }
+
 .sound-close:active {
   transform: scale(0.98);
 }
@@ -757,13 +996,14 @@ body {
 .sound-meta {
   font-size: 12px;
   color: var(--muted);
+
   margin-bottom: 12px;
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Actions layout */
 .sound-actions {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -771,16 +1011,16 @@ body {
   margin-bottom: 14px;
 }
 
-/* Ghost buttons inside panel */
 .sound-panel .btn.ghost {
   border-radius: 12px;
   padding: 9px 8px;
+
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.2px;
 }
 
-/* Volume row */
+/* Volume */
 .sound-slider {
   display: flex;
   align-items: center;
@@ -794,21 +1034,20 @@ body {
   min-width: 58px;
 }
 
-/* Slider */
 .sound-slider input[type="range"] {
   width: 100%;
+  height: 6px;
+
+  border-radius: 999px;
+  outline: none;
+
   appearance: none;
   -webkit-appearance: none;
-  height: 6px;
-  border-radius: 999px;
+
   background: color-mix(in srgb, var(--ink) 14%, transparent);
-  outline: none;
 }
 
 .sound-slider input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-
   width: 18px;
   height: 18px;
   border-radius: 999px;
@@ -816,7 +1055,12 @@ body {
   background: var(--glass-strong);
   border: 1px solid var(--stroke);
   box-shadow: var(--shadow-sm);
+
   cursor: pointer;
+
+  -webkit-appearance: none;
+  appearance: none;
+
   transition: transform 120ms var(--ease);
 }
 
@@ -834,39 +1078,44 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 999px;
+
   background: var(--glass-strong);
   border: 1px solid var(--stroke);
   box-shadow: var(--shadow-sm);
+
   cursor: pointer;
 }
 
-/* -----------------------------
-   Completed panel
------------------------------ */
+/* ============================================================
+     13) Completed Panel + Footer
+     ============================================================ */
 .completed-panel {
   margin-top: 12px;
 }
 
 .collapse-btn {
   width: 100%;
-  border: 1px solid var(--card-border);
-  background: var(--glass);
   padding: 10px 12px;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+
+  background: var(--glass);
+  color: var(--ink);
+
   font-weight: 900;
 
+  cursor: pointer;
   box-shadow: var(--shadow-sm);
+
   transition:
     transform 120ms var(--ease),
     filter 120ms var(--ease),
     opacity 120ms var(--ease);
-
-  color: var(--ink);
 }
 
 .collapse-btn:hover {
@@ -889,12 +1138,10 @@ body {
   gap: 10px;
 }
 
-/* -----------------------------
-   Footer controls
------------------------------ */
 .footer-bar {
   margin-top: 12px;
   padding-top: 10px;
+
   border-top: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
 
   display: flex;
@@ -902,96 +1149,9 @@ body {
   gap: 8px;
 }
 
-/* Optional: small width */
-@media (max-width: 380px) {
-  .sound-panel {
-    width: 300px;
-  }
-}
-
-/* =============================
-   Pointer Drag Reorder (clean)
-   ============================= */
-
-/* -----------------------------------
-   Drag reorder (clean)
------------------------------------ */
-
-/* default: don't show grab cursor everywhere */
-.todo {
-  cursor: default;
-}
-
-/* handle (single source of truth) */
-.todo .drag-handle {
-  width: 26px;
-  height: 26px;
-  border-radius: 10px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  background: var(--glass);
-  border: 1px solid var(--card-border);
-  color: var(--muted);
-
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-
-  cursor: grab;
-  opacity: 0.75;
-
-  transition:
-    transform 120ms var(--ease),
-    filter 120ms var(--ease),
-    opacity 120ms var(--ease);
-}
-
-.todo .drag-handle:hover {
-  opacity: 1;
-  filter: brightness(1.06);
-  transform: translateY(-1px);
-}
-
-.todo .drag-handle:active {
-  cursor: grabbing;
-  transform: scale(0.96);
-}
-
-/* don't allow dragging locked rows */
-.todo.locked .drag-handle {
-  cursor: not-allowed;
-  opacity: 0.4;
-  filter: none;
-  transform: none;
-}
-
-/* while dragging, make the dragged one feel "picked up" */
-.todo.is-dragging {
-  opacity: 0.75;
-  transform: scale(0.985);
-  filter: brightness(1.02);
-}
-
-/* the current hover target (where it will insert) */
-.todo.is-drop-target {
-  box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--accent) 60%, transparent),
-    var(--shadow-md);
-}
-
-/* during reorder: kill blue selection / copy highlight */
-body.is-reordering,
-body.is-reordering * {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -webkit-touch-callout: none !important;
-  cursor: grabbing !important;
-}
-
-/* number handle (1/2/3/4) */
+/* ============================================================
+     14) Drag Reorder (Pointer)
+     ============================================================ */
 .todo .drag-handle {
   width: 26px;
   height: 26px;
@@ -1013,19 +1173,84 @@ body.is-reordering * {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 
+  cursor: grab;
   opacity: 0.8;
+
+  transition:
+    transform 120ms var(--ease),
+    filter 120ms var(--ease),
+    opacity 120ms var(--ease);
 }
 
-/* 可拖動時才給互動感（你可以用 JS 加 class 或直接用 :not(.locked)） */
 .todo:not(.locked) .drag-handle:hover {
+  opacity: 1;
   filter: brightness(1.06);
   transform: translateY(-1px);
 }
 
 .todo:not(.locked) .drag-handle:active {
+  cursor: grabbing;
   transform: scale(0.96);
 }
 
+.todo.locked .drag-handle {
+  cursor: not-allowed;
+  opacity: 0.4;
+  filter: none;
+  transform: none;
+}
+
+.todo.is-dragging {
+  opacity: 0.75;
+  transform: scale(0.985);
+  filter: brightness(1.02);
+}
+
+.todo.is-drop-target {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--accent) 60%, transparent),
+    var(--shadow-md);
+}
+
+body.is-reordering,
+body.is-reordering * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  cursor: grabbing !important;
+}
+
 .todo.completed .todo-left {
-  gap: 10px; /* 你想更緊就改 8px */
+  gap: 10px;
+}
+
+/* ============================================================
+     15) Tag Select
+     ============================================================ */
+.tag-select {
+  height: 100%;
+  padding: 0 12px;
+
+  border: none;
+  outline: none;
+
+  font-weight: 900;
+  color: var(--ink);
+
+  background: var(--glass);
+  border-left: 1px solid var(--card-border);
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  cursor: pointer;
+}
+
+/* ============================================================
+     16) Responsive
+     ============================================================ */
+@media (max-width: 380px) {
+  .sound-panel {
+    width: 300px;
+  }
 }

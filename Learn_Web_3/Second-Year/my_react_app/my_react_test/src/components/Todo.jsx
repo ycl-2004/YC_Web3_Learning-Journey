@@ -87,7 +87,10 @@ function Todo({
           <span className="todo-text" title={todo.content}>
             {todo.content}
           </span>
-          <span className="todo-meta">{todo.minutes ?? 25}m</span>
+          <div className="todo-badge-stack">
+            <span className="todo-tag">{todo.tag}</span>
+            <span className="todo-meta">{todo.minutes}m</span>
+          </div>
         </div>
       </div>
 

@@ -34,6 +34,9 @@ function TodoWrapper() {
   // -----------------------------
   const initialLoadedRef = useRef(false);
 
+  const TAGS = ["All", "Study", "Exam", "Life", "Daily", "Other"];
+  const [activeTag, setActiveTag] = useState("All");
+
   const [accent, setAccent] = useState(() => {
     const raw = localStorage.getItem(SETTINGS_KEY);
     return raw ? (safeParse(raw, null)?.accent ?? "#d4a5c1") : "#d4a5c1";
@@ -57,6 +60,7 @@ function TodoWrapper() {
         isCompleted: false,
         isEditing: false,
         minutes: 25,
+        tag: "Study",
       },
       {
         content: "學習2",
@@ -64,6 +68,7 @@ function TodoWrapper() {
         isCompleted: false,
         isEditing: false,
         minutes: 25,
+        tag: "Study",
       },
       {
         content: "學習3",
@@ -71,6 +76,7 @@ function TodoWrapper() {
         isCompleted: false,
         isEditing: false,
         minutes: 25,
+        tag: "Study",
       },
     ];
   });
@@ -201,23 +207,38 @@ function TodoWrapper() {
   // End of reorderTodos
   //--------------------------------
 
+  const normalizedTodos = useMemo(
+    () => todos.map((t) => ({ ...t, tag: t.tag ?? "Study" })),
+    [todos],
+  );
+
+  const allIncomplete = useMemo(
+    () => normalizedTodos.filter((t) => !t.isCompleted),
+    [normalizedTodos],
+  );
+
+  const allCompleted = useMemo(
+    () => normalizedTodos.filter((t) => t.isCompleted),
+    [normalizedTodos],
+  );
+
+  const visibleIncomplete = useMemo(() => {
+    if (activeTag === "All") return allIncomplete;
+    return allIncomplete.filter((t) => t.tag === activeTag);
+  }, [allIncomplete, activeTag]);
+
+  const visibleCompleted = useMemo(() => {
+    if (activeTag === "All") return allCompleted;
+    return allCompleted.filter((t) => t.tag === activeTag);
+  }, [allCompleted, activeTag]);
+
   const activeTodo = useMemo(
     () => todos.find((t) => t.id === activeId) || null,
     [todos, activeId],
   );
 
-  const incompleteTodos = useMemo(
-    () => todos.filter((t) => !t.isCompleted),
-    [todos],
-  );
-
-  const completedTodos = useMemo(
-    () => todos.filter((t) => t.isCompleted),
-    [todos],
-  );
-
-  const remainingCount = incompleteTodos.length;
-  const nextTodoToStart = incompleteTodos[0] || null;
+  const remainingCount = allIncomplete.length; // ✅ 這個顯示總 remaining
+  const nextTodoToStart = allIncomplete[0] || null; // ✅ focus 順序不被 filter 影
 
   // -----------------------------
   // Sound settings (mp3 alarm)
@@ -742,7 +763,7 @@ function TodoWrapper() {
   // -----------------------------
   // CRUD
   // -----------------------------
-  const addTodo = (content, minutes) => {
+  const addTodo = (content, minutes, tag) => {
     setTodos([
       ...todos,
       {
@@ -751,6 +772,7 @@ function TodoWrapper() {
         isCompleted: false,
         isEditing: false,
         minutes: minutes ?? 25,
+        tag: tag ?? "Study", // ✅ NEW
       },
     ]);
   };
@@ -973,7 +995,22 @@ function TodoWrapper() {
         <span className="muted">{remainingCount} remaining</span>
       </div>
 
-      {incompleteTodos.map((todo, index) => {
+      <div className="now-section">
+        <div className="tag-bar">
+          {TAGS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={`tag-chip ${activeTag === t ? "active" : ""}`}
+              onClick={() => setActiveTag(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {visibleIncomplete.map((todo, index) => {
         const isActive = todo.id === activeId;
         const canStart = !isLocked && nextTodoToStart?.id === todo.id;
 
@@ -1006,20 +1043,20 @@ function TodoWrapper() {
         <button
           className="collapse-btn"
           onClick={() => setShowCompleted((v) => !v)}
-          disabled={completedTodos.length === 0}
+          disabled={visibleCompleted.length === 0}
           aria-label="Toggle completed"
         >
           <span>Completed</span>
           <span className="muted">
-            {completedTodos.length === 0
+            {visibleCompleted.length === 0
               ? "0"
-              : `${completedTodos.length} ${showCompleted ? "▾" : "▸"}`}
+              : `${visibleCompleted.length} ${showCompleted ? "▾" : "▸"}`}
           </span>
         </button>
 
-        {showCompleted && completedTodos.length > 0 && (
+        {showCompleted && visibleCompleted.length > 0 && (
           <div className="completed-list">
-            {completedTodos.map((todo) => (
+            {visibleCompleted.map((todo) => (
               <Todo
                 key={todo.id}
                 todo={todo}
