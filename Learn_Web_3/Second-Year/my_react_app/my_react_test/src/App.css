@@ -44,11 +44,9 @@ body {
      2) Tokens
      ============================================================ */
 :root {
-  /* Accent (JS will set these) */
   --accent: #d4a5c1;
   --accent-glow: rgba(212, 165, 193, 0.18);
 
-  /* Theme tokens */
   --bg1: rgba(230, 203, 227, 0.96);
   --bg2: rgba(230, 203, 227, 0.9);
   --ink: rgba(20, 18, 18, 0.92);
@@ -69,7 +67,6 @@ body {
 
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  /* List spacing (compact) */
   --todo-row-gap: 10px;
 }
 
@@ -135,13 +132,12 @@ body {
 
 .menu-main {
   flex: 1 1 auto;
-  min-height: 0; /* MUST for inner scroll */
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* Footer stays outside scroll */
 .footer-bar {
   margin-top: 12px;
   padding-top: 10px;
@@ -153,7 +149,7 @@ body {
 }
 
 /* ============================================================
-     4) Header (fix title squished to ...)
+     4) Header
      ============================================================ */
 .menu-header {
   text-align: left;
@@ -169,7 +165,7 @@ body {
 
 .title-wrap {
   flex: 1 1 auto;
-  min-width: 140px; /* prevents 0 width */
+  min-width: 140px;
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -240,19 +236,16 @@ body {
   filter: brightness(1.04);
 }
 
-/* Make the two header circles same size + smaller */
 .header-badges .badge,
 .header-badges .badge-music {
-  width: 34px; /* try 32~36 */
+  width: 34px;
   height: 34px;
   border-radius: 999px;
 }
 
-/* Optional: tune text/icon sizes so they look centered */
 .header-badges .badge {
   font-size: 11px;
 }
-
 .header-badges .badge-music {
   font-size: 16px;
 }
@@ -333,28 +326,31 @@ body {
   justify-content: center;
 }
 
+/* ✅ Minute Button size (Create + Edit) */
 .create-form .minute-btn {
-  min-width: 70px;
-  padding: 0 10px;
+  height: 26px;
+  min-width: 56px; /* ✅ smaller */
+  padding: 0 8px;
+  gap: 6px;
 
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
 
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--card-border) 65%, transparent);
   background: color-mix(in srgb, #fff 78%, transparent);
 
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   line-height: 1;
 }
 
-.create-form .minute-btn > span {
-  line-height: 1;
+.minute-btn > span {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
+  line-height: 1;
 }
 
 .create-form > button {
@@ -377,7 +373,174 @@ body {
 }
 
 /* ============================================================
-     6) Section Title
+     6) MinuteSelect Popover (ONE version only)
+     ============================================================ */
+.minute-pop {
+  padding: 10px;
+  border-radius: 16px;
+  background: var(--glass-strong);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow-lg);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  z-index: 9999;
+}
+
+.minute-pop-header {
+  padding: 6px 8px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  color: var(--ink);
+  opacity: 0.9;
+}
+
+.minute-pop-list {
+  max-height: 220px;
+  overflow-y: auto;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+
+  padding: 6px;
+  border-radius: 14px;
+
+  background: color-mix(in srgb, var(--glass) 75%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-border) 55%, transparent);
+
+  scrollbar-width: none;
+}
+.minute-pop-list::-webkit-scrollbar {
+  display: none;
+}
+
+.minute-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  margin: 4px 0;
+  background: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
+/* ✅ 這裡也順便縮小每個選項 */
+.minute-item {
+  position: relative;
+
+  height: 26px; /* ✅ smaller */
+  padding: 0 8px;
+
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
+  background: color-mix(in srgb, #fff 70%, transparent);
+  color: var(--ink);
+
+  font-size: 11px; /* ✅ smaller */
+  font-weight: 900;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition:
+    transform 120ms var(--ease),
+    filter 120ms var(--ease);
+}
+
+:root[data-theme="dark"] .minute-item {
+  background: color-mix(in srgb, var(--glass) 85%, transparent);
+}
+
+.minute-item:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+.minute-item:active {
+  transform: translateY(0);
+}
+
+.minute-item.active {
+  background: color-mix(in srgb, var(--accent) 75%, transparent);
+  color: #fff;
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.minute-item .tick {
+  display: none !important;
+}
+/* ============================================================
+   Fix: Minute <select> looks native gray (Edit/Create)
+   ============================================================ */
+
+/* 只要 minute selector 是 select，都吃這套 */
+.minute-btn,
+.minute-select select,
+.edit-form.edit-inline select {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--card-border) 65%, transparent);
+  background: color-mix(in srgb, #fff 78%, transparent);
+  color: var(--ink);
+  outline: none;
+
+  border-radius: 999px;
+  height: 26px;
+  min-width: 56px;
+  padding: 0 26px 0 10px; /* ✅ 右邊留空給箭頭 */
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 26px;
+
+  cursor: pointer;
+}
+
+/* dark mode 微調 */
+:root[data-theme="dark"] .minute-btn,
+:root[data-theme="dark"] .minute-select select,
+:root[data-theme="dark"] .edit-form.edit-inline select {
+  background: color-mix(in srgb, var(--glass) 85%, transparent);
+}
+
+/* 自己畫一個小箭頭（不靠原生箭頭） */
+.minute-btn,
+.minute-select select,
+.edit-form.edit-inline select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 9px) 50%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* focus 看起來像你的 theme */
+.minute-btn:focus,
+.minute-select select:focus,
+.edit-form.edit-inline select:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* ==============================
+   Edit minute select: remove native arrow
+   ============================== */
+.edit-form.edit-inline select.minute-btn,
+.edit-form.edit-inline .minute-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: none !important; /* ✅ 不要任何箭頭 */
+  padding-right: 12px; /* ✅ 不需要留箭頭空間 */
+}
+
+/* ============================================================
+     7) Section Title
      ============================================================ */
 .section-title {
   margin-top: 10px;
@@ -404,7 +567,7 @@ body {
 }
 
 /* ============================================================
-     7) Now section: tag bar fixed + list scroll
+     8) Now section: tag bar fixed + list scroll
      ============================================================ */
 .now-section {
   flex: 1 1 auto;
@@ -431,7 +594,6 @@ body {
   overflow-x: auto;
   scrollbar-width: none;
 }
-
 .now-section .tag-bar::-webkit-scrollbar {
   display: none;
 }
@@ -470,29 +632,27 @@ body {
 
   scrollbar-width: none;
 }
-
 .now-list::-webkit-scrollbar {
   display: none;
 }
 
-/* Completed panel should not disappear */
 .completed-panel {
   flex: 0 0 auto;
   margin-top: 12px;
 }
 
 /* ============================================================
-     8) Todo Row (compact)
+     9) Todo Row
      ============================================================ */
 .todo {
   min-height: 40px;
-  padding: 6px 12px;
+  padding: 6px 8px;
   margin-top: 0;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 6px;
 
   border-radius: var(--radius-lg);
   border: 1px solid var(--card-border);
@@ -525,15 +685,12 @@ body {
   filter: brightness(1.02);
 }
 
-.todo:active {
-  transform: translateY(0);
-}
-
 .todo.editing {
   background: color-mix(in srgb, var(--accent) 18%, var(--glass-strong));
   box-shadow:
     0 0 0 2px color-mix(in srgb, var(--accent) 60%, transparent),
     var(--shadow-md);
+  padding: 8px 10px; /* edit inline padding */
 }
 
 .todo-left {
@@ -559,6 +716,9 @@ body {
   min-width: 0;
 }
 
+/* ============================================================
+   Todo text: horizontal scroll for long titles
+   ============================================================ */
 .todo-text {
   flex: 1 1 auto;
   min-width: 0;
@@ -566,12 +726,30 @@ body {
   font-size: 14px;
   line-height: 1.2;
   font-weight: 900;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
   color: var(--ink);
+
+  /* ✅ horizontal scroll */
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* ✅ remove ellipsis behavior */
+  text-overflow: clip;
+
+  /* nice spacing */
+  padding: 2px 2px;
+
+  /* hide scrollbar */
+  scrollbar-width: none;
+}
+.todo-text::-webkit-scrollbar {
+  display: none;
+}
+
+/* optional: smooth inertial scroll on mac */
+.todo-text {
+  -webkit-overflow-scrolling: touch;
+  cursor: ew-resize;
 }
 
 .todo-badge-stack {
@@ -582,6 +760,7 @@ body {
   justify-content: center;
   gap: 3px;
   min-width: 64px;
+  margin-left: auto;
 }
 
 .todo-meta {
@@ -616,6 +795,23 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-left: 6px;
+}
+
+.todo-right {
+  margin-left: auto; /* ✅ 推到最右 */
+  display: flex;
+  align-items: center;
+  gap: 2px; /* tag/time 跟 buttons 間距 */
+}
+
+/* 讓 badge stack 變成一排（Study + 14m 在同一行） */
+.todo-badge-stack {
+  display: flex;
+  flex-direction: col; /* ✅ 由 column 變 row */
+  align-items: center;
+  gap: 6px;
+  min-width: auto; /* ✅ 不要硬卡寬度 */
 }
 
 .icon-btn {
@@ -655,7 +851,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Completed / Locked */
 .completed {
   opacity: 0.55;
   filter: saturate(0.9);
@@ -672,7 +867,52 @@ body {
 }
 
 /* ============================================================
-     9) Completed Panel
+     10) Edit Inline Form
+     ============================================================ */
+.edit-form.edit-inline {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-form.edit-inline > input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px; /* ✅ slightly smaller */
+  border-radius: 12px;
+
+  border: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
+  background: color-mix(in srgb, var(--glass) 75%, transparent);
+
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 800;
+  outline: none;
+}
+
+.edit-form.edit-inline > input:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.edit-form.edit-inline .minute-btn {
+  height: 30px;
+  min-width: 54px;
+  padding: 0 8px;
+  font-size: 11px;
+  border-radius: 12px;
+}
+
+.edit-form.edit-inline .btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ============================================================
+     11) Completed Panel
      ============================================================ */
 .collapse-btn {
   width: 100%;
@@ -725,13 +965,12 @@ body {
 
   scrollbar-width: none;
 }
-
 .completed-list::-webkit-scrollbar {
   display: none;
 }
 
 /* ============================================================
-     10) Buttons
+     12) Buttons
      ============================================================ */
 .btn {
   padding: 8px 12px;
@@ -779,7 +1018,7 @@ body {
 }
 
 /* ============================================================
-     11) Sound Panel
+     13) Sound Panel
      ============================================================ */
 .sound-panel {
   position: absolute;
@@ -814,34 +1053,6 @@ body {
   font-size: 16px;
   font-weight: 800;
   letter-spacing: 0.2px;
-}
-
-.sound-close {
-  width: 30px;
-  height: 30px;
-
-  border-radius: 999px;
-  border: 1px solid var(--stroke);
-
-  background: var(--glass);
-  color: var(--ink);
-
-  display: grid;
-  place-items: center;
-
-  cursor: pointer;
-  transition:
-    transform 120ms var(--ease),
-    filter 120ms var(--ease);
-}
-
-.sound-close:hover {
-  filter: brightness(1.05);
-  transform: scale(1.04);
-}
-
-.sound-close:active {
-  transform: scale(0.98);
 }
 
 .sound-meta {
@@ -934,7 +1145,7 @@ body {
 }
 
 /* ============================================================
-     12) Drag Reorder
+     14) Drag Reorder
      ============================================================ */
 .todo .drag-handle {
   width: 26px;
@@ -993,7 +1204,7 @@ body.is-reordering * {
 }
 
 /* ============================================================
-     13) Responsive
+     15) Responsive
      ============================================================ */
 @media (max-width: 380px) {
   .sound-panel {

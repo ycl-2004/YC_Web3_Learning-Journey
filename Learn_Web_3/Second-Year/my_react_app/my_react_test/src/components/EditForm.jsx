@@ -14,7 +14,7 @@ function EditForm({ todo, editTodo, toggleIsEditing, isLocked }) {
   };
 
   return (
-    <form className="edit-form" onSubmit={handleSubmit}>
+    <form className="edit-form edit-inline" onSubmit={handleSubmit}>
       <input
         type="text"
         placeholder="Edit task…"
@@ -24,28 +24,25 @@ function EditForm({ todo, editTodo, toggleIsEditing, isLocked }) {
         autoFocus
       />
 
-      <div className="edit-row">
-        <MinuteSelect
-          value={minutes}
-          onChange={setMinutes}
-          disabled={isLocked}
-          ariaLabel="Edit minutes"
-        />
+      <MinuteSelect
+        value={minutes}
+        onChange={setMinutes}
+        disabled={isLocked}
+        ariaLabel="Edit minutes"
+      />
 
-        <div className="edit-actions">
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => toggleIsEditing(todo.id)}
-            disabled={isLocked}
-          >
-            Cancel
-          </button>
-          <button type="submit" className="btn" disabled={!isValid || isLocked}>
-            Save
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        className="btn ghost"
+        onClick={() => toggleIsEditing(todo.id)}
+        disabled={isLocked}
+      >
+        Cancel
+      </button>
+
+      <button type="submit" className="btn" disabled={!isValid || isLocked}>
+        Save
+      </button>
     </form>
   );
 }

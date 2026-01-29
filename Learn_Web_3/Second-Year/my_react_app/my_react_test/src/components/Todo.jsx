@@ -87,65 +87,67 @@ function Todo({
           <span className="todo-text" title={todo.content}>
             {todo.content}
           </span>
-          <div className="todo-badge-stack">
-            <span className="todo-tag">{todo.tag}</span>
-            <span className="todo-meta">{todo.minutes}m</span>
-          </div>
         </div>
       </div>
 
-      <div className="todo-actions">
-        {isActive ? (
-          <>
+      <div className="todo-right">
+        <div className="todo-badge-stack">
+          <span className="todo-tag">{todo.tag}</span>
+          <span className="todo-meta">{todo.minutes}m</span>
+        </div>
+        <div className="todo-actions">
+          {isActive ? (
+            <>
+              <button
+                className="icon-btn"
+                onClick={isRunning ? onPause : onStart}
+                aria-label={isRunning ? "Pause" : "Start"}
+                title={isRunning ? "Pause" : "Start"}
+              >
+                {isRunning ? <MdPause /> : <MdPlayArrow />}
+              </button>
+
+              <button
+                className="icon-btn ok"
+                onClick={onFinish}
+                aria-label="Finish"
+                title="Finish"
+              >
+                <MdCheckCircle />
+              </button>
+            </>
+          ) : (
             <button
               className="icon-btn"
-              onClick={isRunning ? onPause : onStart}
-              aria-label={isRunning ? "Pause" : "Start"}
-              title={isRunning ? "Pause" : "Start"}
+              onClick={onStart}
+              aria-label="Start"
+              title={canStart ? "Start" : "Start (only the next task in order)"}
+              disabled={!canStart || isLocked}
             >
-              {isRunning ? <MdPause /> : <MdPlayArrow />}
+              <MdPlayArrow />
             </button>
+          )}
 
-            <button
-              className="icon-btn ok"
-              onClick={onFinish}
-              aria-label="Finish"
-              title="Finish"
-            >
-              <MdCheckCircle />
-            </button>
-          </>
-        ) : (
           <button
             className="icon-btn"
-            onClick={onStart}
-            aria-label="Start"
-            title={canStart ? "Start" : "Start (only the next task in order)"}
-            disabled={!canStart || isLocked}
+            onClick={() => toggleIsEditing(todo.id)}
+            aria-label="Edit"
+            title="Edit"
+            disabled={isLocked}
           >
-            <MdPlayArrow />
+            <MdEdit />
           </button>
-        )}
 
-        <button
-          className="icon-btn"
-          onClick={() => toggleIsEditing(todo.id)}
-          aria-label="Edit"
-          title="Edit"
-          disabled={isLocked}
-        >
-          <MdEdit />
-        </button>
-
-        <button
-          className="icon-btn danger"
-          onClick={() => deleteTodo(todo.id)}
-          aria-label="Delete"
-          title="Delete"
-          disabled={isLocked}
-        >
-          <MdDelete />
-        </button>
+          <button
+            className="icon-btn danger"
+            onClick={() => deleteTodo(todo.id)}
+            aria-label="Delete"
+            title="Delete"
+            disabled={isLocked}
+          >
+            <MdDelete />
+          </button>
+        </div>
       </div>
     </div>
   );
