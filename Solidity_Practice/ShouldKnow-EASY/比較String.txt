@@ -1,0 +1,45 @@
+============================================================
+       Solidity 字串比較與 ABI 編碼學習筆記
+============================================================
+
+1. 核心公式 (Standard Formula)
+------------------------------------------------------------
+在 Solidity 中，比較字串內容的標準寫法：
+keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2))
+
+2. 關鍵術語拆解
+------------------------------------------------------------
+■ ABI (Application Binary Interface):
+  - 智能合約的「溝通橋樑」。
+  - 將高級語言 (Solidity) 的資料類型轉換為 EVM (機器) 能理解的二進位格式。
+
+■ abi.encodePacked:
+  - 作用：將資料「緊湊打包」成 bytes 格式。
+  - 特點：不補位 (No Padding)，節省空間與 Gas。
+  - 目的：因為 keccak256 函數只接受 bytes 類型作為輸入。
+
+■ keccak256:
+  - 作用：生成「加密指紋」(Hash)。
+  - 特點：無論字串多長，結果永遠是固定 32 位元組 (bytes32)。
+  - 優勢：比對固定長度的 bytes32 非常快速且省 Gas。
+
+3. 為什麼不能直接用 str1 == str2 ?
+------------------------------------------------------------
+- 類型限制：string 在 Solidity 是引用類型 (Reference Type)。
+- 底層結構：string 本質上是動態 bytes 陣列。
+- 編譯器行為：Solidity 編譯器目前不支援直接對動態陣列進行內容比對。
+
+4. 最佳實踐：Gas 優化方案
+------------------------------------------------------------
+為了節省手續費，建議先比對「長度」，長度相同才計算哈希：
+
+function compare(string memory a, string memory b) public pure returns (bool) {
+    if (bytes(a).length != bytes(b).length) {
+        return false;
+    }
+    return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+}
+
+============================================================
+日期：2026-01-28
+備註：適用於 Solidity ^0.8.0 以上版本
